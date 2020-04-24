@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+
+  apache:
+    container_name: realworld_apache
+    build:
+      context: .
+      dockerfile: .docker/apache.dockerfile
+    volumes:
+      - ./src:/var/www/src
+    working_dir: /var/www/src
+    depends_on:
+      - drash
+    ports:
+      - "8080:80"
+    networks:
+      - drash-app-network
+
+  drash:
+    container_name: realworld_drash
+    build:
+      context: .
+      dockerfile: .docker/drash.dockerfile
+    volumes:
+      - ./src:/var/www/src
+    working_dir: /var/www/src
+    ports:
+      - "1447:1447"
+    command: bash -c "deno --allow-net app.ts"
+    networks:
+      - drash-app-network
+
+networks:
+  drash-app-network:
+    driver: bridge
