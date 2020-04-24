@@ -13,3 +13,6 @@ server.run({
     hostname: "realworld_drash",
     port: 1447
 });
+
+console.log('Drash server running on realworld_drash:1447')
+console.log('Navigate to localhost:8080')
