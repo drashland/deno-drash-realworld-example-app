@@ -1,4 +1,7 @@
 import { Drash } from "../deps.ts"
+import {PostgresClient} from "../deps.ts";
+import UserModel from "../models/user_model.ts";
+//import UserModel from "../models/user_model.ts";
 
 class HomeResource extends Drash.Http.Resource {
 
@@ -13,7 +16,7 @@ class HomeResource extends Drash.Http.Resource {
         ]
     }
 
-    public GET() {
+    public async GET() {
         this.response.body = this.response.render('/index.html')
         return this.response;
     }
