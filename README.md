@@ -26,3 +26,15 @@
 
 * Dockerised
 * Middleware: Logging
+* Postgres DB (with seeder)
+* DB models
+
+## Notes
+
+### Login to postgres container
+
+`psql -U user -P realworld` // pass = userpassword
+
+### Make Data Dump
+
+`docker exec -t realworld_postgres pg_dumpall -c -U user > dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql`
