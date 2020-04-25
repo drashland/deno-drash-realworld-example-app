@@ -7,6 +7,12 @@ class HomeResource extends Drash.Http.Resource {
         "/home"
     ];
 
+    static middleware: {
+        before_request: [
+            'LogMiddleware'
+        ]
+    }
+
     public GET() {
         this.response.body = this.response.render('/index.html')
         return this.response;
