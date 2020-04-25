@@ -8,9 +8,15 @@
 ## To Add
 
 * Redis
-* API?
+* API container?
 * Database
 * Auth middleware
+* Pages:
+    * Register (register resource)
+    * Login (login resource)
+    * Home (Authed) - displays all users, can delete any user
+* User resource
+* Web Socket container?
 
 ## Already Implemented
 
