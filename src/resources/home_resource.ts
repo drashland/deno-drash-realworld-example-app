@@ -8,7 +8,8 @@ class HomeResource extends Drash.Http.Resource {
     ];
 
     public GET() {
-        this.response.body = 'Hello World!';
+        // TODO :: Render app vue
+        this.response.body = this.response.render('/index.html')
         return this.response;
     }
 }
