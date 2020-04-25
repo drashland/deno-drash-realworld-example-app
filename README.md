@@ -3,6 +3,10 @@
 * Deno version: v0.41.0
 * Drash version: v0.41.1
 
+# How to Run
+
+`docker-compose build && docker-compose up -d`
+
 # Features
 
 ## To Add
@@ -22,4 +26,3 @@
 
 * Dockerised
 * Middleware: Logging
-* Resources

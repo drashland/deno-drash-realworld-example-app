@@ -1,7 +1,7 @@
 import { Drash } from "./deps.ts";
 import HomeResource from "./resources/home_resource.ts";
 import AuthMiddleware from "./middlewares/auth_middleware.ts";
-import LogMiddleware from "./middlewares/log_moddleware.ts";
+import LogMiddleware from "./middlewares/log_middleware.ts";
 
 const server = new Drash.Http.Server({
     directory: ".",
