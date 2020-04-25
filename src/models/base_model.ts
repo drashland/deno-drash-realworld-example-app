@@ -26,7 +26,7 @@ export default abstract class BaseModel {
      *
      * @type {string[]} fillable
      */
-    public abstract fillable: string[]
+    public abstract required: string[]
 
     /**
      * Primary key of the table

@@ -22,7 +22,7 @@ export default class UserModel extends BaseModel {
         'password'
     ]
 
-    public fillable: string[] = [
+    public required: string[] = [
         'username',
         'password',
         'email'
