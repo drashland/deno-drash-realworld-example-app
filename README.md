@@ -33,7 +33,12 @@
 
 ### Login to postgres container
 
-`psql -U user -P realworld` // pass = userpassword
+```shell script
+$ docker exec -it realworld_postgres bash
+$ psql -U user
+# \c realworld
+# select * from users;
+````
 
 ### Make Data Dump
 

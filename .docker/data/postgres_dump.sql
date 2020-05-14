@@ -218,7 +218,7 @@ SET default_with_oids = false;
 
 CREATE TABLE public.users (
     id integer NOT NULL UNIQUE,
-    username character varying(5) NOT NULL,
+    username character varying(50) NOT NULL,
     password character varying(50) NOT NULL,
     email character varying(355) NOT NULL,
     created_on timestamp without time zone,
@@ -262,8 +262,106 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 COPY public.users (id, username, password, email, created_on, last_login) FROM stdin;
-998	one	two	one@hotmail.com	2020-04-23 00:00:00	\N
-999	two	two	two@hotmail.com	2020-04-23 00:00:00	\N
+1	user1	user1	user1@hotmail.com	2020-05-14 20:03:56.025651	\N
+2	user2	user2	user2@hotmail.com	2020-05-14 20:03:56.025651	\N
+3	user3	user3	user3@hotmail.com	2020-05-14 20:03:56.025651	\N
+4	user4	user4	user4@hotmail.com	2020-05-14 20:03:56.025651	\N
+5	user5	user5	user5@hotmail.com	2020-05-14 20:03:56.025651	\N
+6	user6	user6	user6@hotmail.com	2020-05-14 20:03:56.025651	\N
+7	user7	user7	user7@hotmail.com	2020-05-14 20:03:56.025651	\N
+8	user8	user8	user8@hotmail.com	2020-05-14 20:03:56.025651	\N
+9	user9	user9	user9@hotmail.com	2020-05-14 20:03:56.025651	\N
+10	user10	user10	user10@hotmail.com	2020-05-14 20:03:56.025651	\N
+11	user11	user11	user11@hotmail.com	2020-05-14 20:03:56.025651	\N
+12	user12	user12	user12@hotmail.com	2020-05-14 20:03:56.025651	\N
+13	user13	user13	user13@hotmail.com	2020-05-14 20:03:56.025651	\N
+14	user14	user14	user14@hotmail.com	2020-05-14 20:03:56.025651	\N
+15	user15	user15	user15@hotmail.com	2020-05-14 20:03:56.025651	\N
+16	user16	user16	user16@hotmail.com	2020-05-14 20:03:56.025651	\N
+17	user17	user17	user17@hotmail.com	2020-05-14 20:03:56.025651	\N
+18	user18	user18	user18@hotmail.com	2020-05-14 20:03:56.025651	\N
+19	user19	user19	user19@hotmail.com	2020-05-14 20:03:56.025651	\N
+20	user20	user20	user20@hotmail.com	2020-05-14 20:03:56.025651	\N
+21	user21	user21	user21@hotmail.com	2020-05-14 20:03:56.025651	\N
+22	user22	user22	user22@hotmail.com	2020-05-14 20:03:56.025651	\N
+23	user23	user23	user23@hotmail.com	2020-05-14 20:03:56.025651	\N
+24	user24	user24	user24@hotmail.com	2020-05-14 20:03:56.025651	\N
+25	user25	user25	user25@hotmail.com	2020-05-14 20:03:56.025651	\N
+26	user26	user26	user26@hotmail.com	2020-05-14 20:03:56.025651	\N
+27	user27	user27	user27@hotmail.com	2020-05-14 20:03:56.025651	\N
+28	user28	user28	user28@hotmail.com	2020-05-14 20:03:56.025651	\N
+29	user29	user29	user29@hotmail.com	2020-05-14 20:03:56.025651	\N
+30	user30	user30	user30@hotmail.com	2020-05-14 20:03:56.025651	\N
+31	user31	user31	user31@hotmail.com	2020-05-14 20:03:56.025651	\N
+32	user32	user32	user32@hotmail.com	2020-05-14 20:03:56.025651	\N
+33	user33	user33	user33@hotmail.com	2020-05-14 20:03:56.025651	\N
+34	user34	user34	user34@hotmail.com	2020-05-14 20:03:56.025651	\N
+35	user35	user35	user35@hotmail.com	2020-05-14 20:03:56.025651	\N
+36	user36	user36	user36@hotmail.com	2020-05-14 20:03:56.025651	\N
+37	user37	user37	user37@hotmail.com	2020-05-14 20:03:56.025651	\N
+38	user38	user38	user38@hotmail.com	2020-05-14 20:03:56.025651	\N
+39	user39	user39	user39@hotmail.com	2020-05-14 20:03:56.025651	\N
+40	user40	user40	user40@hotmail.com	2020-05-14 20:03:56.025651	\N
+41	user41	user41	user41@hotmail.com	2020-05-14 20:03:56.025651	\N
+42	user42	user42	user42@hotmail.com	2020-05-14 20:03:56.025651	\N
+43	user43	user43	user43@hotmail.com	2020-05-14 20:03:56.025651	\N
+44	user44	user44	user44@hotmail.com	2020-05-14 20:03:56.025651	\N
+45	user45	user45	user45@hotmail.com	2020-05-14 20:03:56.025651	\N
+46	user46	user46	user46@hotmail.com	2020-05-14 20:03:56.025651	\N
+47	user47	user47	user47@hotmail.com	2020-05-14 20:03:56.025651	\N
+48	user48	user48	user48@hotmail.com	2020-05-14 20:03:56.025651	\N
+49	user49	user49	user49@hotmail.com	2020-05-14 20:03:56.025651	\N
+50	user50	user50	user50@hotmail.com	2020-05-14 20:03:56.025651	\N
+51	user51	user51	user51@hotmail.com	2020-05-14 20:03:56.025651	\N
+52	user52	user52	user52@hotmail.com	2020-05-14 20:03:56.025651	\N
+53	user53	user53	user53@hotmail.com	2020-05-14 20:03:56.025651	\N
+54	user54	user54	user54@hotmail.com	2020-05-14 20:03:56.025651	\N
+55	user55	user55	user55@hotmail.com	2020-05-14 20:03:56.025651	\N
+56	user56	user56	user56@hotmail.com	2020-05-14 20:03:56.025651	\N
+57	user57	user57	user57@hotmail.com	2020-05-14 20:03:56.025651	\N
+58	user58	user58	user58@hotmail.com	2020-05-14 20:03:56.025651	\N
+59	user59	user59	user59@hotmail.com	2020-05-14 20:03:56.025651	\N
+60	user60	user60	user60@hotmail.com	2020-05-14 20:03:56.025651	\N
+61	user61	user61	user61@hotmail.com	2020-05-14 20:03:56.025651	\N
+62	user62	user62	user62@hotmail.com	2020-05-14 20:03:56.025651	\N
+63	user63	user63	user63@hotmail.com	2020-05-14 20:03:56.025651	\N
+64	user64	user64	user64@hotmail.com	2020-05-14 20:03:56.025651	\N
+65	user65	user65	user65@hotmail.com	2020-05-14 20:03:56.025651	\N
+66	user66	user66	user66@hotmail.com	2020-05-14 20:03:56.025651	\N
+67	user67	user67	user67@hotmail.com	2020-05-14 20:03:56.025651	\N
+68	user68	user68	user68@hotmail.com	2020-05-14 20:03:56.025651	\N
+69	user69	user69	user69@hotmail.com	2020-05-14 20:03:56.025651	\N
+70	user70	user70	user70@hotmail.com	2020-05-14 20:03:56.025651	\N
+71	user71	user71	user71@hotmail.com	2020-05-14 20:03:56.025651	\N
+72	user72	user72	user72@hotmail.com	2020-05-14 20:03:56.025651	\N
+73	user73	user73	user73@hotmail.com	2020-05-14 20:03:56.025651	\N
+74	user74	user74	user74@hotmail.com	2020-05-14 20:03:56.025651	\N
+75	user75	user75	user75@hotmail.com	2020-05-14 20:03:56.025651	\N
+76	user76	user76	user76@hotmail.com	2020-05-14 20:03:56.025651	\N
+77	user77	user77	user77@hotmail.com	2020-05-14 20:03:56.025651	\N
+78	user78	user78	user78@hotmail.com	2020-05-14 20:03:56.025651	\N
+79	user79	user79	user79@hotmail.com	2020-05-14 20:03:56.025651	\N
+80	user80	user80	user80@hotmail.com	2020-05-14 20:03:56.025651	\N
+81	user81	user81	user81@hotmail.com	2020-05-14 20:03:56.025651	\N
+82	user82	user82	user82@hotmail.com	2020-05-14 20:03:56.025651	\N
+83	user83	user83	user83@hotmail.com	2020-05-14 20:03:56.025651	\N
+84	user84	user84	user84@hotmail.com	2020-05-14 20:03:56.025651	\N
+85	user85	user85	user85@hotmail.com	2020-05-14 20:03:56.025651	\N
+86	user86	user86	user86@hotmail.com	2020-05-14 20:03:56.025651	\N
+87	user87	user87	user87@hotmail.com	2020-05-14 20:03:56.025651	\N
+88	user88	user88	user88@hotmail.com	2020-05-14 20:03:56.025651	\N
+89	user89	user89	user89@hotmail.com	2020-05-14 20:03:56.025651	\N
+90	user90	user90	user90@hotmail.com	2020-05-14 20:03:56.025651	\N
+91	user91	user91	user91@hotmail.com	2020-05-14 20:03:56.025651	\N
+92	user92	user92	user92@hotmail.com	2020-05-14 20:03:56.025651	\N
+93	user93	user93	user93@hotmail.com	2020-05-14 20:03:56.025651	\N
+94	user94	user94	user94@hotmail.com	2020-05-14 20:03:56.025651	\N
+95	user95	user95	user95@hotmail.com	2020-05-14 20:03:56.025651	\N
+96	user96	user96	user96@hotmail.com	2020-05-14 20:03:56.025651	\N
+97	user97	user97	user97@hotmail.com	2020-05-14 20:03:56.025651	\N
+98	user98	user98	user98@hotmail.com	2020-05-14 20:03:56.025651	\N
+99	user99	user99	user99@hotmail.com	2020-05-14 20:03:56.025651	\N
+100	user100	user100	user100@hotmail.com	2020-05-14 20:03:56.025651	\N
 \.
 
 
