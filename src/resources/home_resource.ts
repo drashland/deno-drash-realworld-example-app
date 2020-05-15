@@ -14,7 +14,7 @@ class HomeResource extends Drash.Http.Resource {
     }
 
     public async GET() {
-        this.response.body = this.response.render('/index.html')
+        this.response.body = this.response.render('/index.html', { title: 'Home'})
         return this.response;
     }
 }

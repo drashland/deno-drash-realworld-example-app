@@ -22,31 +22,17 @@ export default abstract class BaseModel {
     public abstract hidden: string[];
 
     /**
-     * Columns that must be filled before creating or updating a row
-     *
-     * @type {string[]} fillable
-     */
-    public abstract required: string[]
-
-    /**
      * Primary key of the table
      *
      * @type {string} primary_key
      */
     public abstract primary_key: string
 
-    /**
-     * Validation rules
-     *
-     * @type {string[]} rules
-     */
-    public abstract rules: string[]
-
     //////////////////////////////////////////////////////////////////////////////
     // FILE MARKER - METHODS - ABSTRACT //////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////
 
-    //
+    public async abstract validate(data: any): Promise<{ success: boolean, message: string }>
 
     //////////////////////////////////////////////////////////////////////////////
     // FILE MARKER - METHODS - PRIVATE ///////////////////////////////////////////
@@ -96,6 +82,38 @@ export default abstract class BaseModel {
         return formattedResults
     }
 
+    /**
+     * @description
+     * Prepares a query to insert dynamic data into, similar to what PHP would do.
+     * The query doesn't have to have "?", if it doesn't, method will return the original query string
+     *
+     * @param {string}      query The db query string. Required.
+     * @param {string[]}    data Array of strings to update each placeholder
+     *
+     * @example
+     * const query = "SELECT * FROM users WHERE name = ? AND username = ?"
+     * const data = ["Edward", "Ed2020"]; // note first index is for 1st placeholder, 2nd index is for 2nd placeholder and so on
+     *
+     * @return {string} The query with the placeholders replaced with the data
+     */
+    private prepare (query: string, data?: string[]): string {
+        if (!data || !data.length)
+            return query
+        // First create an array item for each placeholder
+        let occurrences = query.split('?')
+        occurrences.splice(occurrences.length -1)
+        // Replace each item with itself but passed in data instead of the placeholder
+        data.forEach((val, i) => {
+            occurrences[i] = occurrences[i] + "'" + data[i] + "'"
+        })
+        // re construct the string
+        let prepared = ''
+        occurrences.forEach((val, i) => {
+            prepared += occurrences[i]
+        })
+        return prepared
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////
@@ -106,13 +124,15 @@ export default abstract class BaseModel {
      * strips properties based on the child class' hidden prop
      *
      * @param {string} query
+     * @param {string[]} data
      *
      * @example
      * const userModel = new UserModel;
      * const result = userModel.SELECT(UserModel.SELECT_ALL)
      */
     // TODO :: Figure out return type (its format of: [{key: string}]
-    public async SELECT(query: string) {
+    public async SELECT(query: string, data: string[]) {
+        query = this.prepare(query, data)
         await dbClient.connect()
         let result = await dbClient.query(query);
         result = BaseModel.formatResults(result.rows, result.rowDescription.columns)
