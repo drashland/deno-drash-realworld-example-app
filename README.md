@@ -15,10 +15,12 @@ Navigate to `localhost:1667`
 - [ ] Middleware
     - [ ] Logging
     - [ ] Authentication (/home route)
-- [ ] Postgres Database to hold user accounts with a db seeder
-- [ ] Registration of a new user account
-- [ ] Login of a user account
-- [ ] Home page for a list all of users
+- [ ] User accounts
+    - [ ] Postgres DB to hold user accounts with a seeder
+    - [ ] Registration
+    - [ ] Login
+    - [ ] Password hashing
+    - [ ] Home page listing all user accounts
 - [ ] Redis?
 - [ ] API container?
 - [ ] Web socket?

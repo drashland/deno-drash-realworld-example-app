@@ -28,9 +28,9 @@ class RegisterResource extends Drash.Http.Resource {
      */
     public async POST() {
         // Gather data
-        const username = this.request.getRequestBodyParam('username')
-        const email = this.request.getRequestBodyParam('email')
-        const password = this.request.getRequestBodyParam('password')
+        const username = this.request.getBodyParam('username')
+        const email = this.request.getBodyParam('email')
+        const password = this.request.getBodyParam('password')
 
         // Validate
         const userModel = new UserModel();

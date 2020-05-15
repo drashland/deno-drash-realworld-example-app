@@ -42,7 +42,7 @@ export default class UserModel extends BaseModel {
     // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////
 
-    public async validate (data: { username: string, email: string, password: string}) {
+    public async validate (data: { username: string, email: string, password: string}): Promise<{ success: boolean, message: string, data: any}> {
         //
         // Username
         //
@@ -51,7 +51,8 @@ export default class UserModel extends BaseModel {
         if (!data.username) {
             return {
                 success: false,
-                message: 'Username must be set.'
+                message: 'Username must be set.',
+                data: 'username'
             }
         }
 
@@ -63,14 +64,17 @@ export default class UserModel extends BaseModel {
         if (!data.email) {
             return {
                 success: false,
-                message: 'Email must be set.'
+                message: 'Email must be set.',
+                data: 'email'
             }
         }
         // Matches an email address
-        if (/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/.test(data.email) === false) {
+        const emailRegex = /@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$/i
+        if (emailRegex.test(data.email) === false) {
             return {
                 success: false,
-                message: 'Email must be a valid email address.'
+                message: 'Email must be a valid email address.',
+                data: 'email'
             }
         }
 
@@ -82,14 +86,16 @@ export default class UserModel extends BaseModel {
         if (!data.password) {
             return {
                 success: false,
-                message: 'Password must be set.'
+                message: 'Password must be set.',
+                data: 'password'
             }
         }
         // Min 8 characters, max any, 1 uppercase, 1 lowercase, 1 number
         if (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(data.password) === false) {
             return {
                 success: false,
-                message: 'Password must contain the following: 8 characters, 1 number and 1 uppercase and lowercase letter'
+                message: 'Password must contain the following: 8 characters, 1 number and 1 uppercase and lowercase letter',
+                data: 'password'
             }
         }
 
@@ -100,10 +106,12 @@ export default class UserModel extends BaseModel {
         // TODO :: Doesn't already exist
         const result = await this.SELECT(UserModel.SELECT_ALL_BY_EMAIL, [data.email])
         console.log(result)
+        return { success: false, message: 'stopping here to check db result', data: null}
 
         return {
             success: true,
-            message: 'Passed validation'
+            message: 'Passed validation',
+            data: null
         }
 
     }

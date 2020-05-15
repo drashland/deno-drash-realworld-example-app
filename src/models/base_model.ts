@@ -182,13 +182,15 @@ export default abstract class BaseModel {
      * CREATE query
      *
      * @param {string} query
+     * @param {string[]} data
      *
      * @example
      * const userModel = new UserModel;
      * const result = userModel.CREATE(UserModel.CREATE_ONE)
      */
     // TODO :: Add JSDoc, and analyse what we could return using the query response
-    public async CREATE(query: string) {
+    public async CREATE(query: string, data: string[]) {
+        query = this.prepare(query, data)
         await dbClient.connect()
         let result = await dbClient.query(query);
         await dbClient.end()
