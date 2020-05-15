@@ -7,27 +7,23 @@
 
 `docker-compose build && docker-compose up -d`
 
+Navigate to `localhost:1667`
+
 # Features
 
-## To Add
-
-* Redis
-* API container?
-* Database
-* Auth middleware
-* Pages:
-    * Register (register resource)
-    * Login (login resource)
-    * Home (Authed) - displays all users, can delete any user
-* User resource
-* Web Socket container?
-
-## Already Implemented
-
-* Dockerised
-* Middleware: Logging
-* Postgres DB (with seeder)
-* DB models
+- [ ] Docker compose environment
+- [ ] Middleware
+    - [ ] Logging
+    - [ ] Authentication (/home route)
+- [ ] Postgres Database to hold user accounts with a db seeder
+- [ ] Registration of a new user account
+- [ ] Login of a user account
+- [ ] Home page for a list all of users
+- [ ] Redis?
+- [ ] API container?
+- [ ] Web socket?
+- [ ] Database model representations
+- [ ] Vue
 
 ## Notes
 
