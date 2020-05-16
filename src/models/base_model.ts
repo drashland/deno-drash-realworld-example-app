@@ -15,13 +15,6 @@ export default abstract class BaseModel {
     //////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Properties you wish to keep hidden when pulling db data
-     *
-     * @type {string[]} hidden
-     */
-    public abstract hidden: string[];
-
-    /**
      * Primary key of the table
      *
      * @type {string} primary_key
@@ -48,9 +41,13 @@ export default abstract class BaseModel {
      *
      * @example
      * BaseModel.formatResults([[1, 'ed'], [2, 'john']], [{name: 'id', ...}, {name: 'name', ...}]);
+     *
+     * @return {any[]} Empty array of no db rows, else array of rows as key value pairs
      */
     // TODO :: Figure out return type (its format of: [{key: string}]
-    private static formatResults (rows: Array<string[]>, columns: any[]) {
+    private static formatResults (rows: Array<string[]>, columns: any[]): any[] {
+        if (!rows.length)
+            return []
         const columnNames: string[] = columns.map(column => {
             return column.name
         })
@@ -64,22 +61,6 @@ export default abstract class BaseModel {
             newResult.push(rowData)
         })
         return newResult
-    }
-
-    /**
-     * @description
-     * Removes properties from array of objects if the property is hidden on the child class
-     *
-     * @param {Array<{}>} formattedResults Return value of said method
-     *
-     */
-    // TODO :: Figure out return type (its format of: [{key: string}]
-    private checkHidden (formattedResults: any) {
-        formattedResults.forEach((result: string, i: number) => {
-            if (this.hidden.indexOf(result))
-                delete formattedResults.result
-        })
-        return formattedResults
     }
 
     /**
@@ -101,7 +82,8 @@ export default abstract class BaseModel {
             return query
         // First create an array item for each placeholder
         let occurrences = query.split('?')
-        occurrences.splice(occurrences.length -1)
+        if (occurrences[occurrences.length - 1] === '') // for when last item is ""
+            occurrences.splice(occurrences.length -1)
         // Replace each item with itself but passed in data instead of the placeholder
         data.forEach((val, i) => {
             occurrences[i] = occurrences[i] + "'" + data[i] + "'"
@@ -129,16 +111,17 @@ export default abstract class BaseModel {
      * @example
      * const userModel = new UserModel;
      * const result = userModel.SELECT(UserModel.SELECT_ALL)
+     *
+     * @return {Promise<any[]|[]>} Array of db row(s) or empty array if no result
      */
     // TODO :: Figure out return type (its format of: [{key: string}]
-    public async SELECT(query: string, data: string[]) {
+    public async SELECT(query: string, data: string[]): Promise<any[]> {
         query = this.prepare(query, data)
         await dbClient.connect()
-        let result = await dbClient.query(query);
-        result = BaseModel.formatResults(result.rows, result.rowDescription.columns)
-        result = this.checkHidden(result)
+        const dbResult = await dbClient.query(query);
+        const formattedResult = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
         await dbClient.end()
-        return result;
+        return formattedResult;
     }
 
     /**
