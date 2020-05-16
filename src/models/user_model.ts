@@ -10,17 +10,13 @@ export default class UserModel extends BaseModel {
     public static DELETE_ALL = "DELETE FROM users WHERE username = 'one'";
     public static UPDATE_ONE = "UPDATE users SET username = 'TEST' WHERE username = 'one'";
     public static CREATE_ONE = "INSERT INTO users (username, password, email) VALUES (?, ?, ?);"
-    public static SELECT_ALL_BY_EMAIL = "SELECT * FROM users WHERE email = ";
+    public static SELECT_ALL_BY_EMAIL = "SELECT * FROM users WHERE email = ?";
 
     //////////////////////////////////////////////////////////////////////////////
     // FILE MARKER - PROPERTIES - ABSTRACT ///////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////
 
     public primary_key: string = 'id'
-
-    public hidden: string[] = [
-        'password'
-    ]
 
     //////////////////////////////////////////////////////////////////////////////
     // FILE MARKER - PROPERTIES - PUBLIC /////////////////////////////////////////
@@ -69,11 +65,20 @@ export default class UserModel extends BaseModel {
             }
         }
         // Matches an email address
-        const emailRegex = /@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$/i
+        const emailRegex = new RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i)
         if (emailRegex.test(data.email) === false) {
             return {
                 success: false,
                 message: 'Email must be a valid email address.',
+                data: 'email'
+            }
+        }
+        // Doesn't already exist
+        const result = await this.SELECT(UserModel.SELECT_ALL_BY_EMAIL, [data.email])
+        if (result.length) {
+            return {
+                success: false,
+                message: 'User with that email already exists',
                 data: 'email'
             }
         }
@@ -98,15 +103,6 @@ export default class UserModel extends BaseModel {
                 data: 'password'
             }
         }
-
-        //
-        // General checks
-        //
-
-        // TODO :: Doesn't already exist
-        const result = await this.SELECT(UserModel.SELECT_ALL_BY_EMAIL, [data.email])
-        console.log(result)
-        return { success: false, message: 'stopping here to check db result', data: null}
 
         return {
             success: true,
