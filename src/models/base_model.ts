@@ -114,7 +114,6 @@ export default abstract class BaseModel {
      *
      * @return {Promise<any[]|[]>} Array of db row(s) or empty array if no result
      */
-    // TODO :: Figure out return type (its format of: [{key: string}]
     public async SELECT(query: string, data: string[]): Promise<any[]> {
         query = this.prepare(query, data)
         await dbClient.connect()
@@ -133,13 +132,13 @@ export default abstract class BaseModel {
      * @example
      * const userModel = new UserModel;
      * const result = userModel.UPDATE(UserModel.UPDATE_ALL)
+     *
+     * @return {Promise<void>}
      */
-    // TODO :: analyse what we could return using the query response
-    public async UPDATE(query: string) {
+    public async UPDATE(query: string): Promise<void> {
         await dbClient.connect()
-        let result = await dbClient.query(query);
+        await dbClient.query(query);
         await dbClient.end()
-        return result;
     }
 
     /**
@@ -151,13 +150,13 @@ export default abstract class BaseModel {
      * @example
      * const userModel = new UserModel;
      * const result = userModel.DELETE(UserModel.DELETE_ALL)
+     *
+     * @return {Promise<void>}
      */
-    // TODO :: analyse what we could return using the query response
-    public async DELETE(query: string) {
+    public async DELETE(query: string): Promise<void> {
         await dbClient.connect()
-        let result = await dbClient.query(query);
+        await dbClient.query(query);
         await dbClient.end()
-        return result;
     }
 
     /**
@@ -169,14 +168,14 @@ export default abstract class BaseModel {
      *
      * @example
      * const userModel = new UserModel;
-     * const result = userModel.CREATE(UserModel.CREATE_ONE)
+     * const result = userModel.CREATE(UserModel.CREATE_ONE, ['Ed', 'Password', 'Email'])
+     *
+     * @return {Promise<void>}
      */
-    // TODO :: Add JSDoc, and analyse what we could return using the query response
-    public async CREATE(query: string, data: string[]) {
+    public async CREATE(query: string, data: string[]): Promise<void> {
         query = this.prepare(query, data)
         await dbClient.connect()
-        let result = await dbClient.query(query);
+        await dbClient.query(query);
         await dbClient.end()
-        return result;
     }
 }

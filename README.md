@@ -40,4 +40,4 @@ $ psql -U user
 
 ### Make Data Dump
 
-`docker exec -t realworld_postgres pg_dumpall -c -U user > dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql`
+`docker exec -t realworld_postgres pg_dumpall -c -U user > postgres_dump.sql`
