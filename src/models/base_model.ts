@@ -15,38 +15,17 @@ export default abstract class BaseModel {
     //////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Properties you wish to keep hidden when pulling db data
-     *
-     * @type {string[]} hidden
-     */
-    public abstract hidden: string[];
-
-    /**
-     * Columns that must be filled before creating or updating a row
-     *
-     * @type {string[]} fillable
-     */
-    public abstract required: string[]
-
-    /**
      * Primary key of the table
      *
      * @type {string} primary_key
      */
     public abstract primary_key: string
 
-    /**
-     * Validation rules
-     *
-     * @type {string[]} rules
-     */
-    public abstract rules: string[]
-
     //////////////////////////////////////////////////////////////////////////////
     // FILE MARKER - METHODS - ABSTRACT //////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////
 
-    //
+    public async abstract validate(data: any): Promise<{ success: boolean, message: string }>
 
     //////////////////////////////////////////////////////////////////////////////
     // FILE MARKER - METHODS - PRIVATE ///////////////////////////////////////////
@@ -62,9 +41,13 @@ export default abstract class BaseModel {
      *
      * @example
      * BaseModel.formatResults([[1, 'ed'], [2, 'john']], [{name: 'id', ...}, {name: 'name', ...}]);
+     *
+     * @return {any[]} Empty array of no db rows, else array of rows as key value pairs
      */
     // TODO :: Figure out return type (its format of: [{key: string}]
-    private static formatResults (rows: Array<string[]>, columns: any[]) {
+    private static formatResults (rows: Array<string[]>, columns: any[]): any[] {
+        if (!rows.length)
+            return []
         const columnNames: string[] = columns.map(column => {
             return column.name
         })
@@ -82,18 +65,35 @@ export default abstract class BaseModel {
 
     /**
      * @description
-     * Removes properties from array of objects if the property is hidden on the child class
+     * Prepares a query to insert dynamic data into, similar to what PHP would do.
+     * The query doesn't have to have "?", if it doesn't, method will return the original query string
      *
-     * @param {Array<{}>} formattedResults Return value of said method
+     * @param {string}      query The db query string. Required.
+     * @param {string[]}    data Array of strings to update each placeholder
      *
+     * @example
+     * const query = "SELECT * FROM users WHERE name = ? AND username = ?"
+     * const data = ["Edward", "Ed2020"]; // note first index is for 1st placeholder, 2nd index is for 2nd placeholder and so on
+     *
+     * @return {string} The query with the placeholders replaced with the data
      */
-    // TODO :: Figure out return type (its format of: [{key: string}]
-    private checkHidden (formattedResults: any) {
-        formattedResults.forEach((result: string, i: number) => {
-            if (this.hidden.indexOf(result))
-                delete formattedResults.result
+    private prepare (query: string, data?: string[]): string {
+        if (!data || !data.length)
+            return query
+        // First create an array item for each placeholder
+        let occurrences = query.split('?')
+        if (occurrences[occurrences.length - 1] === '') // for when last item is ""
+            occurrences.splice(occurrences.length -1)
+        // Replace each item with itself but passed in data instead of the placeholder
+        data.forEach((val, i) => {
+            occurrences[i] = occurrences[i] + "'" + data[i] + "'"
         })
-        return formattedResults
+        // re construct the string
+        let prepared = ''
+        occurrences.forEach((val, i) => {
+            prepared += occurrences[i]
+        })
+        return prepared
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -106,19 +106,21 @@ export default abstract class BaseModel {
      * strips properties based on the child class' hidden prop
      *
      * @param {string} query
+     * @param {string[]} data
      *
      * @example
      * const userModel = new UserModel;
      * const result = userModel.SELECT(UserModel.SELECT_ALL)
+     *
+     * @return {Promise<any[]|[]>} Array of db row(s) or empty array if no result
      */
-    // TODO :: Figure out return type (its format of: [{key: string}]
-    public async SELECT(query: string) {
+    public async SELECT(query: string, data: string[]): Promise<any[]> {
+        query = this.prepare(query, data)
         await dbClient.connect()
-        let result = await dbClient.query(query);
-        result = BaseModel.formatResults(result.rows, result.rowDescription.columns)
-        result = this.checkHidden(result)
+        const dbResult = await dbClient.query(query);
+        const formattedResult = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
         await dbClient.end()
-        return result;
+        return formattedResult;
     }
 
     /**
@@ -130,13 +132,13 @@ export default abstract class BaseModel {
      * @example
      * const userModel = new UserModel;
      * const result = userModel.UPDATE(UserModel.UPDATE_ALL)
+     *
+     * @return {Promise<void>}
      */
-    // TODO :: analyse what we could return using the query response
-    public async UPDATE(query: string) {
+    public async UPDATE(query: string): Promise<void> {
         await dbClient.connect()
-        let result = await dbClient.query(query);
+        await dbClient.query(query);
         await dbClient.end()
-        return result;
     }
 
     /**
@@ -148,13 +150,13 @@ export default abstract class BaseModel {
      * @example
      * const userModel = new UserModel;
      * const result = userModel.DELETE(UserModel.DELETE_ALL)
+     *
+     * @return {Promise<void>}
      */
-    // TODO :: analyse what we could return using the query response
-    public async DELETE(query: string) {
+    public async DELETE(query: string): Promise<void> {
         await dbClient.connect()
-        let result = await dbClient.query(query);
+        await dbClient.query(query);
         await dbClient.end()
-        return result;
     }
 
     /**
@@ -162,16 +164,18 @@ export default abstract class BaseModel {
      * CREATE query
      *
      * @param {string} query
+     * @param {string[]} data
      *
      * @example
      * const userModel = new UserModel;
-     * const result = userModel.CREATE(UserModel.CREATE_ONE)
+     * const result = userModel.CREATE(UserModel.CREATE_ONE, ['Ed', 'Password', 'Email'])
+     *
+     * @return {Promise<void>}
      */
-    // TODO :: Add JSDoc, and analyse what we could return using the query response
-    public async CREATE(query: string) {
+    public async CREATE(query: string, data: string[]): Promise<void> {
+        query = this.prepare(query, data)
         await dbClient.connect()
-        let result = await dbClient.query(query);
+        await dbClient.query(query);
         await dbClient.end()
-        return result;
     }
 }

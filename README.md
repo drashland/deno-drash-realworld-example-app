@@ -7,27 +7,25 @@
 
 `docker-compose build && docker-compose up -d`
 
+Navigate to `localhost:1667`
+
 # Features
 
-## To Add
-
-* Redis
-* API container?
-* Database
-* Auth middleware
-* Pages:
-    * Register (register resource)
-    * Login (login resource)
-    * Home (Authed) - displays all users, can delete any user
-* User resource
-* Web Socket container?
-
-## Already Implemented
-
-* Dockerised
-* Middleware: Logging
-* Postgres DB (with seeder)
-* DB models
+- [ ] Docker compose environment
+- [ ] Middleware
+    - [ ] Logging
+    - [ ] Authentication (/home route)
+- [ ] User accounts
+    - [ ] Postgres DB to hold user accounts with a seeder
+    - [ ] Registration
+    - [ ] Login
+    - [ ] Password hashing
+    - [ ] Home page listing all user accounts
+- [ ] Redis?
+- [ ] API container?
+- [ ] Web socket?
+- [ ] Database model representations
+- [ ] Vue
 
 ## Notes
 
@@ -42,4 +40,4 @@ $ psql -U user
 
 ### Make Data Dump
 
-`docker exec -t realworld_postgres pg_dumpall -c -U user > dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql`
+`docker exec -t realworld_postgres pg_dumpall -c -U user > postgres_dump.sql`

@@ -1,4 +1,3 @@
-import { PostgresClient } from "../deps.ts";
 import BaseModel from "./base_model.ts";
 
 export default class UserModel extends BaseModel {
@@ -10,7 +9,8 @@ export default class UserModel extends BaseModel {
     public static SELECT_ALL = "SELECT * FROM users";
     public static DELETE_ALL = "DELETE FROM users WHERE username = 'one'";
     public static UPDATE_ONE = "UPDATE users SET username = 'TEST' WHERE username = 'one'";
-    public static CREATE_ONE = "INSERT INTO users (username, password, email) VALUES ('three', 'three', 'three@hotmail.com');"
+    public static CREATE_ONE = "INSERT INTO users (username, password, email) VALUES (?, ?, ?);"
+    public static SELECT_ALL_BY_EMAIL = "SELECT * FROM users WHERE email = ?";
 
     //////////////////////////////////////////////////////////////////////////////
     // FILE MARKER - PROPERTIES - ABSTRACT ///////////////////////////////////////
@@ -18,23 +18,8 @@ export default class UserModel extends BaseModel {
 
     public primary_key: string = 'id'
 
-    public hidden: string[] = [
-        'password'
-    ]
-
-    public required: string[] = [
-        'username',
-        'password',
-        'email'
-    ]
-
-    // TODO :: Add validation rules
-    public rules: string[] = [
-
-    ]
-
     //////////////////////////////////////////////////////////////////////////////
-    // FILE MARKER - PROPERTIES - PUBLIC ///////////////////////////////////////
+    // FILE MARKER - PROPERTIES - PUBLIC /////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////
 
     public id: number = 0
@@ -49,4 +34,81 @@ export default class UserModel extends BaseModel {
 
     public last_login: any = null
 
+    //////////////////////////////////////////////////////////////////////////////
+    // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////
+
+    public async validate (data: { username: string, email: string, password: string}): Promise<{ success: boolean, message: string, data: any}> {
+        //
+        // Username
+        //
+
+        // Required
+        if (!data.username) {
+            return {
+                success: false,
+                message: 'Username must be set.',
+                data: 'username'
+            }
+        }
+
+        //
+        // Email
+        //
+
+        // Required
+        if (!data.email) {
+            return {
+                success: false,
+                message: 'Email must be set.',
+                data: 'email'
+            }
+        }
+        // Matches an email address
+        const emailRegex = new RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i)
+        if (emailRegex.test(data.email) === false) {
+            return {
+                success: false,
+                message: 'Email must be a valid email address.',
+                data: 'email'
+            }
+        }
+        // Doesn't already exist
+        const result = await this.SELECT(UserModel.SELECT_ALL_BY_EMAIL, [data.email])
+        if (result.length) {
+            return {
+                success: false,
+                message: 'User with that email already exists',
+                data: 'email'
+            }
+        }
+
+        //
+        // Password
+        //
+
+        // Required
+        if (!data.password) {
+            return {
+                success: false,
+                message: 'Password must be set.',
+                data: 'password'
+            }
+        }
+        // Min 8 characters, max any, 1 uppercase, 1 lowercase, 1 number
+        if (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(data.password) === false) {
+            return {
+                success: false,
+                message: 'Password must contain the following: 8 characters, 1 number and 1 uppercase and lowercase letter',
+                data: 'password'
+            }
+        }
+
+        return {
+            success: true,
+            message: 'Passed validation',
+            data: null
+        }
+
+    }
 }
