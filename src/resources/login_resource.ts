@@ -61,7 +61,7 @@ class LoginResource extends Drash.Http.Resource {
             this.response.body = JSON.stringify({ success: false, message: 'No account exists with that email.'})
             return this.response
         }
-        Check the passwords match
+        //Check the passwords match
         const passwordsMatch = await bcrypt.compare(password, user[0].password);
         if (!passwordsMatch) {
             this.response.body = JSON.stringify({ success: false, message: 'The email or password you entered is incorrect.'})
