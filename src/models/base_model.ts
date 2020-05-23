@@ -4,8 +4,8 @@ const dbClient: PostgresClient = new PostgresClient({
     user: "user",
     password: "userpassword",
     database: "realworld",
-    host: "realworld_postgres",
-    port: "5432"
+    hostname: "realworld_postgres",
+    port: 5432
 });
 
 export default abstract class BaseModel {
@@ -25,7 +25,7 @@ export default abstract class BaseModel {
     // FILE MARKER - METHODS - ABSTRACT //////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////
 
-    public async abstract validate(data: any): Promise<{ success: boolean, message: string }>
+    public async abstract validate (data: any): Promise<{ success: boolean, message: string }>
 
     //////////////////////////////////////////////////////////////////////////////
     // FILE MARKER - METHODS - PRIVATE ///////////////////////////////////////////

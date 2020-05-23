@@ -15,16 +15,6 @@ const server = new Drash.Http.Server({
     ],
     static_paths: ["/public"],
     views_path: "./public/views",
-    middleware: {
-        server_level: {
-            before_request: [
-                LogMiddleware
-            ]
-        },
-        resource_level: [
-            AuthMiddleware
-        ]
-    },
     template_engine: true,
 });
 
