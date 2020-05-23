@@ -1,8 +1,8 @@
 import { Drash, bcrypt } from "../deps.ts"
 import UserModel from "../models/user_model.ts";
 import SessionModel from "../models/session_model.ts";
-const test = new SessionModel()
-await test.CREATE(SessionModel.CREATE_ONE, [1, 'sesh 2', 'sesh 3'])
+// const test = new SessionModel()
+// await test.CREATE(SessionModel.CREATE_ONE, [1, 'sesh 2', 'sesh 3'])
 
 class LoginResource extends Drash.Http.Resource {
 
@@ -22,7 +22,7 @@ class LoginResource extends Drash.Http.Resource {
         const sessionOne = this.request.getCookie('sessionOne')
         const sessionTwo = this.request.getCookie('sessionTwo')
         if (sessionOne && sessionTwo) {
-            const session = sessionModel.SELECT(SessionModel.SELECT_ONE_BY_SESSION_ONE_AND_TWO, [sessionOne, sessionTwo])
+            const session = await sessionModel.SELECT(SessionModel.SELECT_ONE_BY_SESSION_ONE_AND_TWO, [sessionOne, sessionTwo])
             if (session.length) {
                 this.response.body = this.response.render('/index.html', { title: 'Home'})
                 return this.response
@@ -61,7 +61,7 @@ class LoginResource extends Drash.Http.Resource {
             this.response.body = JSON.stringify({ success: false, message: 'No account exists with that email.'})
             return this.response
         }
-        // Check the passwords match
+        Check the passwords match
         const passwordsMatch = await bcrypt.compare(password, user[0].password);
         if (!passwordsMatch) {
             this.response.body = JSON.stringify({ success: false, message: 'The email or password you entered is incorrect.'})
@@ -71,7 +71,7 @@ class LoginResource extends Drash.Http.Resource {
         const sessionModel = new SessionModel()
         const sessionOneValue = await bcrypt.hash('sessionOne2020Drash')
         const sessionTwoValue = await bcrypt.hash('sessionTwo2020Drash')
-        const result = sessionModel.CREATE(SessionModel.CREATE_ONE, [user[0].id, sessionOneValue, sessionTwoValue])
+        await sessionModel.CREATE(SessionModel.CREATE_ONE, [user[0].id, sessionOneValue, sessionTwoValue])
 
         // Success response
         const expiresDate = new Date();
@@ -79,6 +79,12 @@ class LoginResource extends Drash.Http.Resource {
         this.response.setCookie({
             name: "sessionOne",
             value: sessionOneValue,
+            expires: expiresDate,
+            path: "/"
+        });
+        this.response.setCookie({
+            name: "sessionTne",
+            value: sessionTwoValue,
             expires: expiresDate,
             path: "/"
         });

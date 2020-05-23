@@ -3,6 +3,7 @@ $(document).ready(function () {
     const $email = $('#email')
     const $password = $('#password')
     // Clean up the form
+    $('.error-message').text('')
     $email.css('border', '')
     $password.css('border', '')
     $('#email + p').text('')
@@ -33,8 +34,7 @@ $(document).ready(function () {
     // If failed validation
     if (res.success === false) {
       // Highlight the errored field
-      $('#' + res.data).css('border', '1px solid red')
-      $('#' + res.data + ' + p').text(res.message)
+      $('.error-message').text(res.message)
       return false
     }
     // When passed validation

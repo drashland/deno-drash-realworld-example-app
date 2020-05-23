@@ -110,11 +110,11 @@ export default abstract class BaseModel {
      *
      * @example
      * const userModel = new UserModel;
-     * const result = userModel.SELECT(UserModel.SELECT_ALL)
+     * const result = userModel.SELECT(UserModel.SELECT_ALL, [1, 'ed'])
      *
      * @return {Promise<any[]|[]>} Array of db row(s) or empty array if no result
      */
-    public async SELECT(query: string, data: string[]): Promise<any[]> {
+    public async SELECT(query: string, data: any[]): Promise<any[]> {
         query = this.prepare(query, data)
         await dbClient.connect()
         const dbResult = await dbClient.query(query);
@@ -172,7 +172,7 @@ export default abstract class BaseModel {
      *
      * @return {Promise<void>}
      */
-    public async CREATE(query: string, data: string[]): Promise<void> {
+    public async CREATE(query: string, data: any[]): Promise<void> {
         query = this.prepare(query, data)
         await dbClient.connect()
         await dbClient.query(query);
