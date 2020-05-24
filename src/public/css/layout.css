@@ -1,6 +1,7 @@
 :root {
     --main-bg-colour: #282633;
     --main-fg-colour: #fff;
+    --sub-bg-colour: #36304a;
 }
 
 /**
@@ -24,17 +25,36 @@
 #sidebar > ul li > a:hover {
     color: powderblue;
 }
+
 #content-container {
     background-color: var(--main-bg-colour);
     color: var(--main-fg-colour);
     margin-left: 12.5em;
     padding: 0.5em;
     min-height: 100vh;
+    text-align: center;
 }
 #content-container > h1 {
     text-align: center;
-    font-size: 2em;
     margin-bottom: 1em;
+}
+
+#user-list {
+
+}
+#user-list li.user-list-item {
+    margin: 0.5em;
+}
+#user-list li.user-list-item > div.user-container {
+    background: var(--main-fg-colour);
+    color: var(--main-bg-colour);
+    padding: 0.5em;
+}
+#user-list li.user-list-item > div.user-container > h3 {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    border-bottom: 1px solid var(--sub-bg-colour);
+    padding-bottom: 0.5em;
 }
 
 /**
@@ -42,4 +62,28 @@
  */
 input[type="text"] {
     color: var(--main-bg-colour)
+}
+
+body {
+    font-family: 'Nunito', Arial, Helvetica, sans-serif;
+    line-height: 1.75;
+    font-size: 1.16rem;
+}
+h1, h2, h3, h4, h5 {
+    font-weight: bold;
+}
+h1 {
+    font-size: 3rem;
+}
+h2 {
+    font-size: 2rem;
+}
+h3 {
+    font-size: 1.5rem;
+}
+h4 {
+    font-size: 1.3rem;
+}
+h5 {
+    font-size:1rem;
 }
