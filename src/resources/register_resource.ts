@@ -7,11 +7,11 @@ class RegisterResource extends Drash.Http.Resource {
         "/register",
     ];
 
-    static middleware: {
-        before_request: [
-            'LogMiddleware'
-        ]
-    }
+    // static middleware: {
+    //     before_request: [
+    //         'LogMiddleware'
+    //     ]
+    // }
 
     public GET() {
         this.response.body = this.response.render('/register.html', { title: 'Register'})
