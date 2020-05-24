@@ -40,10 +40,11 @@
 }
 
 #user-list {
-
+    margin-top:1em;
 }
 #user-list li.user-list-item {
-    margin: 0.5em;
+    margin: 0.5em auto;
+    width: 80%;
 }
 #user-list li.user-list-item > div.user-container {
     background: var(--main-fg-colour);

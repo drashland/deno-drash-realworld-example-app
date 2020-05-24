@@ -78,7 +78,7 @@ export default abstract class BaseModel {
      * @return {string} The query with the placeholders replaced with the data
      */
     private prepare (query: string, data?: string[]): string {
-        if (!data || !data.length)
+        if (!data || !data.length || query.indexOf('?') === -1)
             return query
         // First create an array item for each placeholder
         let occurrences = query.split('?')
