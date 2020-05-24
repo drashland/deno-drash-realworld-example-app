@@ -88,7 +88,7 @@ class LoginResource extends Drash.Http.Resource {
             expires: expiresDate,
             path: "/"
         });
-        this.response.body = JSON.stringify({success: true, message: 'Successfully created.'})
+        this.response.body = JSON.stringify({success: true, message: 'Successfully logged in.'})
         return this.response
     }
 }

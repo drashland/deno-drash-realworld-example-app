@@ -29,6 +29,16 @@ Navigate to `localhost:1667`
 
 ## Notes
 
+### Fontend login
+
+There are a total of 100 users, with each user having the same password. Say we want to login as user 32:
+
+```
+Username: user32
+Password: Userpass1
+Email: user32@hotmail.com
+```
+
 ### Login to postgres container
 
 ```shell script
