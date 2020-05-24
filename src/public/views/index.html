@@ -3,3 +3,15 @@
 <div id="vue_app" style="max-width: 640px; margin: 0 auto;">
     <p>{{ message }}</p>
 </div>
+
+<h2>Users</h2>
+<ul id="user-list">
+    <% for (let index in users) { %>
+    <li class="user-list-item">
+        <div class="user-container">
+            <h3><% users[index].username %></h3>
+            <p><% users[index].email %></p>
+        </div>
+    </li>
+    <% } %>
+</ul>

@@ -1,4 +1,5 @@
 import { Drash } from "../deps.ts"
+import UserModel from "../models/user_model.ts";
 
 class HomeResource extends Drash.Http.Resource {
 
@@ -14,7 +15,10 @@ class HomeResource extends Drash.Http.Resource {
     // }
 
     public async GET() {
-        this.response.body = this.response.render('/index.html', { title: 'Home'})
+        const userModel = new UserModel()
+        const users = await userModel.SELECT(UserModel.SELECT_ALL, [])
+        console.log(users)
+        this.response.body = this.response.render('/index.html', { title: 'Home', users: users })
         return this.response;
     }
 }
