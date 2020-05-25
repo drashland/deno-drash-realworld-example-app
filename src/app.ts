@@ -1,23 +1,29 @@
 import { Drash } from "./deps.ts";
+
+import ArticlesCreateResource from "./resources/articles/create_resource.ts";
+import ArticlesEditResource from "./resources/articles/edit_resource.ts";
 import HomeResource from "./resources/home_resource.ts";
-import AuthMiddleware from "./middlewares/auth_middleware.ts";
-import LogMiddleware from "./middlewares/log_middleware.ts";
 import RegisterResource from "./resources/register_resource.ts";
 import LoginResource from "./resources/login_resource.ts";
 import SettingsResource from "./resources/settings_resource.ts";
 
+import AuthMiddleware from "./middlewares/auth_middleware.ts";
+import LogMiddleware from "./middlewares/log_middleware.ts";
+
 const server = new Drash.Http.Server({
-    directory: ".",
-    response_output: "text/html",
-    resources: [
-        HomeResource,
-        RegisterResource,
-        LoginResource,
-        SettingsResource,
-    ],
-    static_paths: ["/public"],
-    views_path: "./public/views",
-    template_engine: true,
+  directory: ".",
+  response_output: "text/html",
+  resources: [
+    ArticlesCreateResource,
+    ArticlesEditResource,
+    HomeResource,
+    LoginResource,
+    RegisterResource,
+    SettingsResource,
+  ],
+  static_paths: ["/public"],
+  views_path: "./public/views",
+  template_engine: true,
 });
 
 server.run({
