@@ -1,35 +1,35 @@
 <% extends("/layout.html") %>
 
-<div class="w-full max-w-xs">
-    <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        <p class="success-message text-green-500"></p>
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
-                Username
-            </label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username">
-            <p class="text-red-500 text-xs italic"></p>
-        </div>
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
-                Email
-            </label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email">
-            <p class="text-red-500 text-xs italic"></p>
-        </div>
-        <div class="mb-6">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
-                Password
-            </label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="********">
-            <p class="text-red-500 text-xs italic"></p>
-        </div>
-        <div class="flex items-center justify-between">
-            <button id="register-submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-                Register
-            </button>
-        </div>
-    </form>
-</div>
+<div class="auth-page">
+  <div class="container page">
+    <div class="row">
 
-<script src="/public/js/register.js"></script>
+      <div class="col-md-6 offset-md-3 col-xs-12">
+        <h1 class="text-xs-center">Sign up</h1>
+        <p class="text-xs-center">
+          <a href="">Have an account?</a>
+        </p>
+
+        <ul class="error-messages">
+          <li>That email is already taken</li>
+        </ul>
+
+        <form>
+          <fieldset class="form-group">
+            <input class="form-control form-control-lg" type="text" placeholder="Your Name">
+          </fieldset>
+          <fieldset class="form-group">
+            <input class="form-control form-control-lg" type="text" placeholder="Email">
+          </fieldset>
+          <fieldset class="form-group">
+            <input class="form-control form-control-lg" type="password" placeholder="Password">
+          </fieldset>
+          <button class="btn btn-lg btn-primary pull-xs-right">
+            Sign up
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>

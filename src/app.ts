@@ -3,7 +3,8 @@ import HomeResource from "./resources/home_resource.ts";
 import AuthMiddleware from "./middlewares/auth_middleware.ts";
 import LogMiddleware from "./middlewares/log_middleware.ts";
 import RegisterResource from "./resources/register_resource.ts";
-import LoginResource from "./resources/login_resource.ts"
+import LoginResource from "./resources/login_resource.ts";
+import SettingsResource from "./resources/settings_resource.ts";
 
 const server = new Drash.Http.Server({
     directory: ".",
@@ -11,7 +12,8 @@ const server = new Drash.Http.Server({
     resources: [
         HomeResource,
         RegisterResource,
-        LoginResource
+        LoginResource,
+        SettingsResource,
     ],
     static_paths: ["/public"],
     views_path: "./public/views",

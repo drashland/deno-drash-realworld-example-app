@@ -29,7 +29,7 @@ class LoginResource extends Drash.Http.Resource {
             }
         }
 
-        this.response.body = this.response.render('/login.html', { title: 'Login'})
+        this.response.body = this.response.render('/login.html');
         return this.response;
     }
 
@@ -93,4 +93,4 @@ class LoginResource extends Drash.Http.Resource {
     }
 }
 
-export default LoginResource
+export default LoginResource;

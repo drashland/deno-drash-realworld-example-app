@@ -4,7 +4,6 @@ class HomeResource extends Drash.Http.Resource {
 
     static paths = [
         "/",
-        "/home"
     ];
 
     // static middleware: {
@@ -14,9 +13,9 @@ class HomeResource extends Drash.Http.Resource {
     // }
 
     public async GET() {
-        this.response.body = this.response.render('/index.html', { title: 'Home'})
+        this.response.body = this.response.render('/home.html');
         return this.response;
     }
 }
 
-export default HomeResource
+export default HomeResource;
