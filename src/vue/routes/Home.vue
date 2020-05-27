@@ -11,7 +11,7 @@
         <div class="col-md-9">
           <div class="feed-toggle">
             <ul class="nav nav-pills outline-active">
-              <li v-if="isAuthenticated" class="nav-item">
+              <li v-if="isLoggedIn" class="nav-item">
                 <router-link
                   :to="{ name: 'home-my-feed' }"
                   class="nav-link"
@@ -60,17 +60,20 @@
 <script>
 import { mapGetters } from "vuex";
 import Tag from "@/components/Tag.vue";
-import { FETCH_TAGS } from "@/store/actions.type.js";
+
 export default {
   name: "home",
   components: {
     Tag
   },
   mounted() {
-    this.$store.dispatch(FETCH_TAGS);
+    this.$store.dispatch("api/fetchTags");
   },
   computed: {
-    ...mapGetters(["isAuthenticated", "tags"]),
+    ...mapGetters([
+      "isLoggedIn",
+      "tags"
+    ]),
     tag() {
       return this.$route.params.tag;
     }

@@ -1,4 +1,4 @@
-export { Drash } from "https://deno.land/x/drash@v1.0.0/mod.ts";
+export { Drash } from "https://deno.land/x/drash@v1.0.2/mod.ts";
 
 export { Client as PostgresClient } from "https://deno.land/x/postgres@v0.4.0/mod.ts";
 
