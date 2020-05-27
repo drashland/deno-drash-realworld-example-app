@@ -11,7 +11,11 @@ This real world example application uses Deno, Drash, Vue, webpack, and docker-c
 
 # How to Run
 
-`docker-compose build && docker-compose up -d`
+```
+$ docker-compose build && docker-compose up -d
+$ npm install
+$ npm run webpack
+```
 
 Navigate to `localhost:1667`
 
