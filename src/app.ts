@@ -1,26 +1,36 @@
 import { Drash } from "./deps.ts";
+
+// Resources
+import ArticlesResource from "./resources/articles_resource.ts";
+import AuthResource from "./resources/auth_resource.ts";
 import HomeResource from "./resources/home_resource.ts";
-import AuthMiddleware from "./middlewares/auth_middleware.ts";
-import LogMiddleware from "./middlewares/log_middleware.ts";
 import RegisterResource from "./resources/register_resource.ts";
+import TagsResource from "./resources/tags_resource.ts";
 import LoginResource from "./resources/login_resource.ts"
 
+// Middleware
+import AuthMiddleware from "./middlewares/auth_middleware.ts";
+import LogMiddleware from "./middlewares/log_middleware.ts";
+
 const server = new Drash.Http.Server({
-    directory: ".",
-    response_output: "text/html",
-    resources: [
-        HomeResource,
-        RegisterResource,
-        LoginResource
-    ],
-    static_paths: ["/public"],
-    views_path: "./public/views",
-    template_engine: true,
+  directory: ".",
+  response_output: "application/json",
+  resources: [
+    ArticlesResource,
+    AuthResource,
+    HomeResource,
+    LoginResource,
+    RegisterResource,
+    TagsResource,
+  ],
+  static_paths: ["/public"],
+  views_path: "./public/views",
+  template_engine: true,
 });
 
 server.run({
-    hostname: "realworld_drash",
-    port: 1667
+  hostname: "realworld_drash",
+  port: 1667
 });
 
 console.log('Drash server running on realworld_drash:1667')

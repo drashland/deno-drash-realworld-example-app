@@ -1,3 +1,9 @@
+# ![Drash Example App](logo.png)
+
+### Drash codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) spec and API.
+
+This real world example application uses Deno, Drash, Vue, webpack, and docker-compose.
+
 # Realworld Drash App Example
 
 * Deno version: v0.41.0
@@ -5,7 +11,12 @@
 
 # How to Run
 
-`docker-compose build && docker-compose up -d`
+```
+$ docker-compose build && docker-compose up -d
+$ cd src
+$ npm install
+$ npm run webpack
+```
 
 Navigate to `localhost:1667`
 
