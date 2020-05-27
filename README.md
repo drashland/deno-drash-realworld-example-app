@@ -13,6 +13,7 @@ This real world example application uses Deno, Drash, Vue, webpack, and docker-c
 
 ```
 $ docker-compose build && docker-compose up -d
+$ cd src
 $ npm install
 $ npm run webpack
 ```
