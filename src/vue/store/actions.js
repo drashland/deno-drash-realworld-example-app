@@ -38,6 +38,20 @@ export default {
     });
   },
 
+  fetchProfile({ commit }, params) {
+    console.log(params);
+    return new Promise((resolve) => {
+      axios
+        .get("/profiles")
+        .then(({ data }) => {
+          resolve(data)
+        })
+        .catch(error => {
+          resolve(undefined);
+        });
+    });
+  },
+
   fetchTags({ commit }) {
     return new Promise((resolve) => {
       axios

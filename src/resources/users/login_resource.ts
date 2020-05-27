@@ -7,7 +7,7 @@ import SessionModel from "../models/session_model.ts";
 class LoginResource extends Drash.Http.Resource {
 
     static paths = [
-        "/login",
+        "/users/login",
     ];
 
     // static middleware: {

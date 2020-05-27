@@ -8,7 +8,7 @@ class HomeResource extends Drash.Http.Resource {
 
   public async GET() {
     this.response.headers.set("Content-Type", "text/html");
-    this.response.body = this.response.render("/index.html");
+    this.response.body = this.response.render("/index.html", { title: "Conduit"});
     return this.response;
   }
 }

@@ -4,7 +4,9 @@ const state = {
   errors: {},
   is_authenticated: false,
   is_loading: false,
-  profile: null,
+  profile: {
+    image: "https://static.productionready.io/images/smiley-cyrus.jpg"
+  },
   tags: [],
   user: null,
 };
