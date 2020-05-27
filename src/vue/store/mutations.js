@@ -1,5 +1,5 @@
 export default {
-  setErrors(state, errors = {}) {
+  setError(state, errors = {}) {
     state.errors = {};
   },
 

@@ -48,10 +48,10 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-import { REGISTER } from "@/store/actions.type.js";
+import { mapGetters } from "vuex";
+
 export default {
-  name: "RwvRegister",
+  name: "Register",
   data() {
     return {
       username: "",
@@ -60,19 +60,26 @@ export default {
     };
   },
   computed: {
-    ...mapState({
-      errors: state => state.auth.errors
-    })
+    ...mapGetters([
+      "errors"
+    ])
   },
   methods: {
-    onSubmit() {
-      this.$store
-        .dispatch(REGISTER, {
+    async onSubmit() {
+      let data = await this.$store.dispatch("register", {
           email: this.email,
           password: this.password,
           username: this.username
-        })
-        .then(() => this.$router.push({ name: "home" }));
+      });
+
+      if (data) {
+        this.$store.commit("setIsAuthenticated", true);
+        this.$store.commit("setUser", data.user);
+        this.$router.push({ name: "home" });
+        return;
+      }
+
+      // Show some error message
     }
   }
 };

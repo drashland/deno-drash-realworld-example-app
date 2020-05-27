@@ -30,13 +30,6 @@
 
 <script>
 import { mapGetters } from "vuex";
-import {
-  FAVORITE_ADD,
-  FAVORITE_REMOVE,
-  ARTICLE_DELETE,
-  FETCH_PROFILE_FOLLOW,
-  FETCH_PROFILE_UNFOLLOW
-} from "@/store/actions.type";
 
 export default {
   name: "ArticleActions",
@@ -45,9 +38,23 @@ export default {
     canModify: { type: Boolean, required: true }
   },
   computed: {
-    ...mapGetters(["profile", "isAuthenticated"]),
+    ...mapGetters([
+      "profile",
+      "is_authenticated"
+    ]),
     editArticleLink() {
       return { name: "article-edit", params: { slug: this.article.slug } };
+    },
+    favoriteArticleLabel() {
+      return this.article.favorited ? "Unfavorite Article" : "Favorite Article";
+    },
+    favoriteCounter() {
+      return `(${this.article.favoritesCount})`;
+    },
+    followUserLabel() {
+      return `${this.profile.following ? "Unfollow" : "Follow"} ${
+        this.article.author.username
+      }`;
     },
     toggleFavoriteButtonClasses() {
       return {
@@ -55,47 +62,38 @@ export default {
         "btn-outline-primary": !this.article.favorited
       };
     },
-    followUserLabel() {
-      return `${this.profile.following ? "Unfollow" : "Follow"} ${
-        this.article.author.username
-      }`;
-    },
-    favoriteArticleLabel() {
-      return this.article.favorited ? "Unfavorite Article" : "Favorite Article";
-    },
-    favoriteCounter() {
-      return `(${this.article.favoritesCount})`;
-    }
   },
   methods: {
-    toggleFavorite() {
-      if (!this.isAuthenticated) {
-        this.$router.push({ name: "login" });
-        return;
-      }
-      const action = this.article.favorited ? FAVORITE_REMOVE : FAVORITE_ADD;
-      this.$store.dispatch(action, this.article.slug);
-    },
-    toggleFollow() {
-      if (!this.isAuthenticated) {
-        this.$router.push({ name: "login" });
-        return;
-      }
-      const action = this.article.following
-        ? FETCH_PROFILE_UNFOLLOW
-        : FETCH_PROFILE_FOLLOW;
-      this.$store.dispatch(action, {
-        username: this.profile.username
-      });
-    },
     async deleteArticle() {
       try {
-        await this.$store.dispatch(ARTICLE_DELETE, this.article.slug);
+        await this.$store.dispatch("deleteArticle", {
+          article_slug: this.article.slug
+        });
         this.$router.push("/");
       } catch (err) {
         console.error(err);
       }
-    }
+    },
+    toggleFavorite() {
+      if (!this.is_authenticated) {
+        this.$router.push({ name: "login" });
+        return;
+      }
+      this.$store.dispatch("setFavorite", {
+        article_slug: this.article.slug,
+        value: !this.article.favorited
+      });
+    },
+    toggleFollow() {
+      if (!this.is_authenticated) {
+        this.$router.push({ name: "login" });
+        return;
+      }
+      this.$store.dispatch("setFollowProfile", {
+        username: this.profile.username,
+        value: !this.article.following
+      });
+    },
   }
 };
 </script>

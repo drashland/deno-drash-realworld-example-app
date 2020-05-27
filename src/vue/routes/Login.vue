@@ -40,8 +40,8 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-import { LOGIN } from "@/store/actions.type.js";
+import { mapGetters } from "vuex";
+
 export default {
   name: "Login",
   data() {
@@ -50,17 +50,27 @@ export default {
       password: null
     };
   },
+  computed: {
+    ...mapGetters([
+      "errors"
+    ])
+  },
   methods: {
     onSubmit(email, password) {
-      this.$store
-        .dispatch(LOGIN, { email, password })
-        .then(() => this.$router.push({ name: "home" }));
+      let data = this.$store.dispatch("logIn", {
+        email,
+        password
+      });
+
+      if (data) {
+        this.$store.commit("setIsAuthenticated", true);
+        this.$store.commit("setUser", data.user);
+        this.$router.push({ name: "home" });
+        return;
+      }
+
+      // Show some error message
     }
   },
-  computed: {
-    ...mapState({
-      errors: state => state.auth.errors
-    })
-  }
 };
 </script>

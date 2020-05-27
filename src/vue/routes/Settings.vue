@@ -64,23 +64,23 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { LOGOUT, UPDATE_USER } from "@/store/actions.type.js";
 export default {
   name: "Settings",
   computed: {
-    ...mapGetters(["currentUser"])
+    ...mapGetters(["user"])
   },
   methods: {
     updateSettings() {
-      this.$store.dispatch(UPDATE_USER, this.currentUser).then(() => {
+      this.$store.dispatch("updateUser", this.user).then(() => {
         // #todo, nice toast and no redirect
         this.$router.push({ name: "home" });
       });
     },
     logout() {
-      this.$store.dispatch(LOGOUT).then(() => {
-        this.$router.push({ name: "home" });
-      });
+      this.$store.dispatch("logOut")
+        .then(() => {
+          this.$router.push({ name: "home" });
+        });
     }
   }
 };

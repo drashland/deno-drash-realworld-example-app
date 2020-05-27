@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="isLoading" class="article-preview">Loading articles...</div>
+    <div v-if="is_loading" class="article-preview">Loading articles...</div>
     <div v-else>
       <div v-if="articles.length === 0" class="article-preview">
         No articles are here... yet.
@@ -19,7 +19,6 @@
 import { mapGetters } from "vuex";
 import ArticlePreview from "./ArticlePreview.vue";
 import Pagination from "./Pagination.vue";
-import { FETCH_ARTICLES } from "../store/actions.type";
 export default {
   name: "ArticleList",
   components: {
@@ -56,6 +55,11 @@ export default {
     };
   },
   computed: {
+    ...mapGetters([
+      "articles",
+      "articles_count",
+      "is_loading",
+    ]),
     listConfig() {
       const { type } = this;
       const filters = {
@@ -77,14 +81,13 @@ export default {
       };
     },
     pages() {
-      if (this.isLoading || this.articlesCount <= this.itemsPerPage) {
+      if (this.isLoading || this.articles_count <= this.itemsPerPage) {
         return [];
       }
       return [
-        ...Array(Math.ceil(this.articlesCount / this.itemsPerPage)).keys()
+        ...Array(Math.ceil(this.articles_count / this.itemsPerPage)).keys()
       ].map(e => e + 1);
     },
-    ...mapGetters(["articlesCount", "isLoading", "articles"])
   },
   watch: {
     currentPage(newValue) {
@@ -113,7 +116,7 @@ export default {
   },
   methods: {
     fetchArticles() {
-      this.$store.dispatch(FETCH_ARTICLES, this.listConfig);
+      this.$store.dispatch("fetchArticles", this.listConfig);
     },
     resetPagination() {
       this.listConfig.offset = 0;

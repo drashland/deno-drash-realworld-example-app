@@ -2,21 +2,15 @@ import { Drash } from "../deps.ts"
 
 class HomeResource extends Drash.Http.Resource {
 
-    static paths = [
-        "/",
-        "/home"
-    ];
+  static paths = [
+    "/",
+  ];
 
-    // static middleware: {
-    //     before_request: [
-    //         'LogMiddleware'
-    //     ]
-    // }
-
-    public async GET() {
-        this.response.body = this.response.render('/index.html', { title: 'Home'})
-        return this.response;
-    }
+  public async GET() {
+    this.response.headers.set("Content-Type", "text/html");
+    this.response.body = this.response.render("/index.html");
+    return this.response;
+  }
 }
 
-export default HomeResource
+export default HomeResource;

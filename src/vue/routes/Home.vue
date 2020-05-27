@@ -11,7 +11,7 @@
         <div class="col-md-9">
           <div class="feed-toggle">
             <ul class="nav nav-pills outline-active">
-              <li v-if="isLoggedIn" class="nav-item">
+              <li v-if="is_authenticated" class="nav-item">
                 <router-link
                   :to="{ name: 'home-my-feed' }"
                   class="nav-link"
@@ -67,11 +67,11 @@ export default {
     Tag
   },
   mounted() {
-    this.$store.dispatch("api/fetchTags");
+    this.$store.dispatch("fetchTags");
   },
   computed: {
     ...mapGetters([
-      "isLoggedIn",
+      "is_authenticated",
       "tags"
     ]),
     tag() {

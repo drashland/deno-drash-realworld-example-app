@@ -74,37 +74,37 @@
 
 <script>
 import { mapGetters } from "vuex";
-import {
-  FETCH_PROFILE,
-  FETCH_PROFILE_FOLLOW,
-  FETCH_PROFILE_UNFOLLOW
-} from "@/store/actions.type.js";
+
 export default {
   name: "Profile",
   mounted() {
-    this.$store.dispatch(FETCH_PROFILE, this.$route.params);
+    this.$store.dispatch("fetchProfile", this.$route.params);
   },
   computed: {
-    ...mapGetters(["currentUser", "profile", "isAuthenticated"])
+    ...mapGetters([
+      "is_authenticated",
+      "profile",
+      "user",
+    ])
   },
   methods: {
     isCurrentUser() {
-      if (this.currentUser.username && this.profile.username) {
-        return this.currentUser.username === this.profile.username;
+      if (this.user.username && this.profile.username) {
+        return this.user.username === this.profile.username;
       }
       return false;
     },
     follow() {
       if (!this.isAuthenticated) return;
-      this.$store.dispatch(FETCH_PROFILE_FOLLOW, this.$route.params);
+      this.$store.dispatch("setFollowProfile", this.$route.params);
     },
     unfollow() {
-      this.$store.dispatch(FETCH_PROFILE_UNFOLLOW, this.$route.params);
+      this.$store.dispatch("setFollowProfile", this.$route.params);
     }
   },
   watch: {
     $route(to) {
-      this.$store.dispatch(FETCH_PROFILE, to.params);
+      this.$store.dispatch("fetchProfile", to.params);
     }
   }
 };

@@ -23,7 +23,6 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { COMMENT_DESTROY } from "@/store/actions.type.js";
 export default {
   name: "Comment",
   props: {
@@ -31,17 +30,19 @@ export default {
     comment: { type: Object, required: true }
   },
   computed: {
+    ...mapGetters([
+      "user"
+    ]),
     isCurrentUser() {
-      if (this.currentUser.username && this.comment.author.username) {
-        return this.comment.author.username === this.currentUser.username;
+      if (this.user.username && this.comment.author.username) {
+        return this.comment.author.username === this.user.username;
       }
       return false;
     },
-    ...mapGetters(["currentUser"])
   },
   methods: {
     destroy(slug, commentId) {
-      this.$store.dispatch(COMMENT_DESTROY, { slug, commentId });
+      this.$store.dispatch("deleteComment", { slug, commentId });
     }
   }
 };

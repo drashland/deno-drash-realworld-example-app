@@ -69,14 +69,6 @@
 import { mapGetters } from "vuex";
 import { store } from "../../public/js/_app.js";
 import ListErrors from "@/components/ListErrors.vue";
-import {
-  ARTICLE_PUBLISH,
-  ARTICLE_EDIT,
-  FETCH_ARTICLE,
-  ARTICLE_EDIT_ADD_TAG,
-  ARTICLE_EDIT_REMOVE_TAG,
-  ARTICLE_RESET_STATE
-} from "@/store/actions.type";
 export default {
   name: "ArticleEdit",
   components: { ListErrors },
@@ -86,29 +78,6 @@ export default {
       required: false
     }
   },
-  async beforeRouteUpdate(to, from, next) {
-    // Reset state if user goes from /editor/:id to /editor
-    // The component is not recreated so we use to hook to reset the state.
-    await store.dispatch(ARTICLE_RESET_STATE);
-    return next();
-  },
-  async beforeRouteEnter(to, from, next) {
-    // SO: https://github.com/vuejs/vue-router/issues/1034
-    // If we arrive directly to this url, we need to fetch the article
-    await store.dispatch(ARTICLE_RESET_STATE);
-    if (to.params.slug !== undefined) {
-      await store.dispatch(
-        FETCH_ARTICLE,
-        to.params.slug,
-        to.params.previousArticle
-      );
-    }
-    return next();
-  },
-  async beforeRouteLeave(to, from, next) {
-    await store.dispatch(ARTICLE_RESET_STATE);
-    next();
-  },
   data() {
     return {
       tagInput: null,
@@ -117,14 +86,15 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["article"])
+    ...mapGetters([
+      "article"
+    ])
   },
   methods: {
     onPublish(slug) {
-      let action = slug ? ARTICLE_EDIT : ARTICLE_PUBLISH;
+      let action = slug ? "updateArticle" : "createArticle";
       this.inProgress = true;
-      this.$store
-        .dispatch(action)
+      this.$store.dispatch(action)
         .then(({ data }) => {
           this.inProgress = false;
           this.$router.push({
@@ -138,10 +108,10 @@ export default {
         });
     },
     removeTag(tag) {
-      this.$store.dispatch(ARTICLE_EDIT_REMOVE_TAG, tag);
+      this.$store.dispatch("deleteArticleTag", tag);
     },
     addTag(tag) {
-      this.$store.dispatch(ARTICLE_EDIT_ADD_TAG, tag);
+      this.$store.dispatch("createArticleTag", tag);
       this.tagInput = null;
     }
   }

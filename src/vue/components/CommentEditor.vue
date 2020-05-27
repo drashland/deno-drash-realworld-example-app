@@ -21,7 +21,6 @@
 
 <script>
 import ListErrors from "@/components/ListErrors.vue";
-import { COMMENT_CREATE } from "@/store/actions.type.js";
 export default {
   name: "CommentEditor",
   components: { ListErrors },
@@ -39,7 +38,7 @@ export default {
   methods: {
     onSubmit(slug, comment) {
       this.$store
-        .dispatch(COMMENT_CREATE, { slug, comment })
+        .dispatch("createComment", { slug, comment })
         .then(() => {
           this.comment = null;
           this.errors = {};

@@ -27,9 +27,9 @@
       <div class="row">
         <div class="col-xs-12 col-md-8 offset-md-2">
           <CommentEditor
-            v-if="isAuthenticated"
+            v-if="is_authenticated"
             :slug="slug"
-            :userImage="currentUser.image"
+            :userImage="user.image"
           >
           </CommentEditor>
           <p v-else>
@@ -59,7 +59,6 @@ import ArticleMeta from "@/components/ArticleMeta.vue";
 import Comment from "@/components/Comment.vue";
 import CommentEditor from "@/components/CommentEditor.vue";
 import Tag from "@/components/Tag.vue";
-import { FETCH_ARTICLE, FETCH_COMMENTS } from "@/store/actions.type.js";
 export default {
   name: "Article",
   props: {
@@ -76,14 +75,14 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     Promise.all([
-      store.dispatch(FETCH_ARTICLE, to.params.slug),
-      store.dispatch(FETCH_COMMENTS, to.params.slug)
+      store.dispatch("fetchArticle", to.params.slug),
+      store.dispatch("fetchArticleComments", to.params.slug)
     ]).then(() => {
       next();
     });
   },
   computed: {
-    ...mapGetters(["article", "currentUser", "comments", "isAuthenticated"])
+    ...mapGetters(["article", "user", "comments", "is_authenticated"])
   },
   methods: {
     parseMarkdown(content) {

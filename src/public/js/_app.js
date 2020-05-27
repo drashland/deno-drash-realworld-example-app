@@ -1,15 +1,24 @@
 import Vue from "vue";
 
-import { CHECK_AUTH } from "@/store/actions.type.js";
-import ApiService from "@/common/api.service.js";
+//
+// Axios
+//
+
+import axios from "axios";
+import VueAxios from "vue-axios";
+Vue.use(VueAxios, axios);
+Vue.axios.defaults.baseURL = "http://localhost:1667";
+
+//
+// Vue filters
+//
+
 import DateFilter from "@/common/date.filter.js";
 import ErrorFilter from "@/common/error.filter.js";
 
 Vue.config.productionTip = false;
 Vue.filter("date", DateFilter);
 Vue.filter("error", ErrorFilter);
-
-ApiService.init();
 
 //
 // Vuex
@@ -18,17 +27,11 @@ ApiService.init();
 import Vuex from "vuex";
 Vue.use(Vuex);
 
-import home from "@/store/home.module.js";
-import auth from "@/store/auth.module.js";
-import article from "@/store/article.module.js";
-import profile from "@/store/profile.module.js";
+import module from "@/store/module.js";
 
 const store = new Vuex.Store({
   modules: {
-    home,
-    auth,
-    article,
-    profile
+    module,
   }
 });
 
@@ -136,9 +139,9 @@ const router = new VueRouter({
 });
 
 // Ensure we checked auth before each page load.
-router.beforeEach((to, from, next) =>
-  Promise.all([store.dispatch(CHECK_AUTH)]).then(next)
-);
+router.beforeEach((to, from, next) => {
+  Promise.all([store.dispatch("checkIfUserIsAuthenticated")]).then(next);
+});
 
 //
 // Vue app initialization
