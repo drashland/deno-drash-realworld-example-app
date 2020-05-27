@@ -1,4 +1,5 @@
 import { Drash } from "../deps.ts"
+import UserService from "../services/user_service.ts";
 
 class UserResource extends Drash.Http.Resource {
 

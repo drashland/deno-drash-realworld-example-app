@@ -9,6 +9,7 @@
     "babel-cli": "^6.26.0",
     "babel-loader": "^8.0.5",
     "babel-preset-env": "^1.7.0",
+    "braces": ">=2.3.1",
     "css-loader": "^2.1.0",
     "date-fns": "^2.14.0",
     "kind-of": ">=6.0.3",

@@ -1,21 +1,23 @@
 import Vue from "vue";
 import axios from "axios";
+import { router } from "../../public/js/_app.js";
 import JwtService from "@/common/jwt_service.js";
 
 export default {
   checkIfUserIsAuthenticated(context) {
-    const token = JwtService.getToken();
-    if (token) {
-      Vue.axios.defaults.headers.common[
-        "Authorization"
-      ] = `Token ${token}`;
-      axios.get("/auth")
-        .then(({ data }) => {
-          context.commit("setIsAuthenticated", true);
-          context.commit("setUser", data.user);
+    if (context.getters.user && context.getters.user.email) {
+      axios
+        .post("/users/login", {
+          user: {
+            email: context.getters.user.email
+          }
         })
-        .catch(() => {
-          context.commit("setError", "An error occurred during the authentication process.");
+        .then((response) => {
+          context.dispatch("setUser", response.data.user);
+        })
+        .catch((response) => {
+          console.log(response.data);
+          context.dispatch("logOut");
         });
       return;
     }
@@ -42,7 +44,7 @@ export default {
     console.log(params);
     return new Promise((resolve) => {
       axios
-        .get("/profiles")
+        .get(`/profiles/${params.username}`)
         .then(({ data }) => {
           resolve(data)
         })
@@ -66,18 +68,19 @@ export default {
   },
 
   logIn(context, credentials) {
-    return new Promise((resolve) => {
-      axios
-        .post("/users/login", {
-          user: credentials
-        })
-        .then(({ data }) => {
-          resolve(data);
-        })
-        .catch(() => {
-          resolve(undefined);
-        });
-    });
+    console.log("Handling action: logIn");
+    axios
+      .post("/users/login", {
+        user: credentials
+      })
+      .then((response) => {
+        console.log(response);
+        context.dispatch("setUser", response.data.user);
+      })
+      .catch((response) => {
+        console.log(response);
+        context.dispatch("unsetUser");
+      });
   },
 
   logOut(context) {
@@ -99,4 +102,14 @@ export default {
         });
     });
   },
+
+  setUser(context, user) {
+    context.commit("setIsAuthenticated", true);
+    context.commit("setUser", user);
+  },
+
+  unsetUser(context) {
+    context.commit("setIsAuthenticated", false);
+    context.commit("setUser", null);
+  }
 };

@@ -163,5 +163,6 @@ window.app = new Vue({
 });
 
 export {
-  store
+  store,
+  router,
 }

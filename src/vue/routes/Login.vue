@@ -57,19 +57,10 @@ export default {
   },
   methods: {
     onSubmit(email, password) {
-      let data = this.$store.dispatch("logIn", {
+      this.$store.dispatch("logIn", {
         email,
-        password
+        password,
       });
-
-      if (data) {
-        this.$store.commit("setIsAuthenticated", true);
-        this.$store.commit("setUser", data.user);
-        this.$router.push({ name: "home" });
-        return;
-      }
-
-      // Show some error message
     }
   },
 };

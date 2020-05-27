@@ -21,7 +21,6 @@ const server = new Drash.Http.Server({
     RegisterResource,
     TagsResource,
     UsersLoginResource,
-    UsersLoginResource,
   ],
   static_paths: ["/public"],
   views_path: "./public/views",
