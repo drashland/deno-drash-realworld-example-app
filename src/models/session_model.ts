@@ -36,7 +36,7 @@ export default class SessionModel extends BaseModel {
     // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////
 
-    public async validate (data: { userId: number, sessionOne: string, sessionTwo: string}): Promise<boolean|{ errors: any }> {
+    public async validate (data: { userId: number, sessionOne: string, sessionTwo: string}): Promise<{ data: any }> {
       //
       // User id
       //
@@ -44,7 +44,7 @@ export default class SessionModel extends BaseModel {
       // Required
       if (!data.userId) {
           return {
-            errors: {
+            data: {
               userId: ['User id must be set.'],
             }
           }
@@ -57,7 +57,7 @@ export default class SessionModel extends BaseModel {
       // Required
       if (!data.sessionOne) {
           return {
-            errors: {
+            data: {
               sessionOne: ['Session one must be set.'],
             }
           }
@@ -70,12 +70,14 @@ export default class SessionModel extends BaseModel {
       // Required
       if (!data.sessionTwo) {
           return {
-            errors: {
+            data: {
               sessionTwo: ['Session two must be set.'],
             }
           }
       }
 
-      return true;
+      return {
+        data: true
+      };
     }
 }

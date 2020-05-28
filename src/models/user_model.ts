@@ -40,7 +40,7 @@ export default class UserModel extends BaseModel {
     // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////
 
-    public async validate (data: { username: string, email: string, password: string}): Promise<boolean|{errors: any}> {
+    public async validate (data: { username: string, email: string, password: string}): Promise<{data: any}> {
         //
         // Username
         //
@@ -48,8 +48,8 @@ export default class UserModel extends BaseModel {
         // Required
         if (!data.username) {
             return {
-              errors: {
-                username: ['Username must be set.'],
+              data: {
+                username: ['Username field is required.'],
               }
             }
         }
@@ -61,29 +61,29 @@ export default class UserModel extends BaseModel {
         // Required
         if (!data.email) {
             return {
-              errors: {
-                email: ['Email must be set.'],
+              data: {
+                email: ['Email field is required.'],
               }
             }
         }
 
         // Matches an email address
-        // const emailRegex = new RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i)
-        // if (emailRegex.test(data.email) === false) {
-        //     return {
-        //       errors: {
-        //         email: ['Email must be a valid email address.']
-        //       }
-        //     }
-        // }
+        const emailRegex = new RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i)
+        if (emailRegex.test(data.email) === false) {
+            return {
+              data: {
+                email: ['Email must be a valid email address.']
+              }
+            }
+        }
 
         // Doesn't already exist
         const result = await this.SELECT(UserModel.SELECT_ALL_BY_EMAIL, [data.email])
         console.log(result);
         if (result.length) {
             return {
-              errors: {
-                email: ['User with that email already exists.'],
+              data: {
+                email: ['Email aready taken.'],
               }
             }
         }
@@ -95,20 +95,22 @@ export default class UserModel extends BaseModel {
         // Required
         if (!data.password) {
             return {
-              errors: {
-                password: ['Password must be set.'],
+              data: {
+                password: ['Password field is required.'],
               }
             }
         }
         // Min 8 characters, max any, 1 uppercase, 1 lowercase, 1 number
         if (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(data.password) === false) {
             return {
-              errors: {
+              data: {
                 password: 'Password must contain the following: 8 characters, 1 number and 1 uppercase and lowercase letter',
               }
             }
         }
 
-        return true;
+        return {
+          data: true
+        };
     }
 }

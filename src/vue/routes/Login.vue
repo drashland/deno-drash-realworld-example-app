@@ -41,6 +41,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import swal from "sweetalert";
 
 export default {
   name: "Login",
@@ -53,7 +54,6 @@ export default {
   computed: {
     ...mapGetters([
       "errors",
-      "is_authenticated",
     ])
   },
   mounted() {
@@ -61,14 +61,27 @@ export default {
   },
   methods: {
     async onSubmit(email, password) {
-      await this.$store.dispatch("logIn", {
-        email,
-        password,
-      });
-
-      if (this.is_authenticated) {
-        this.$router.push({ name: "home" });
-      }
+      swal({
+          text: "Logging you in... Please wait...",
+          timer: 500,
+          buttons: false,
+        })
+        .then(async () => {
+          return await this.$store.dispatch("logIn", {
+            email,
+            password,
+          });
+        })
+        .then((response) => {
+          if (response === true) {
+            return this.$router.push({ name: "home" });
+          }
+          swal({
+            title: "Login failed!",
+            text: response.errors.body.join(" "),
+            icon: "error"
+          });
+        });
     }
   },
 };
