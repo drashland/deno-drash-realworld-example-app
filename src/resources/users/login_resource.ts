@@ -44,6 +44,8 @@ class LoginResource extends Drash.Http.Resource {
     public async POST() {
       console.log("Handling LoginResource POST.");
 
+      let user = null;
+
       const action = this.request.getBodyParam("action");
       if (action == "check_auth") {
         console.log("Checking if user has a session.");
@@ -64,11 +66,12 @@ class LoginResource extends Drash.Http.Resource {
             );
             console.log(session);
             if (session && session.length) {
-              const userId = this.request.getBodyParam("user_id");
-              if (session[0].user_id == userId) {
-                user = await UserService.getUserById(userId);
-                return this.response;
-              }
+              user = await UserService.getUserById(session[0].user_id);
+              user.token = `${sessionOne}|::|${sessionTwo}`;
+              this.response.body = {
+                user
+              };
+              return this.response;
             }
           }
         }
@@ -79,7 +82,6 @@ class LoginResource extends Drash.Http.Resource {
       this.response.body = {
         user: null,
       };
-      let user = null;
       try {
         user = await UserService.getUserByEmail(
           this.request.getBodyParam("user").email

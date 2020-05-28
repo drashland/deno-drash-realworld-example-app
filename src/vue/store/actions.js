@@ -14,13 +14,12 @@ const userDefault = {
 
 export default {
   checkIfUserIsAuthenticated(context) {
-    if (context.getters.user && context.getters.user.email) {
+    if (getCookie("drash_sess")) {
       console.log("Handling action: checkIfUserIsAuthenticated");
       axios
         .post("/users/login", {
           action: "check_auth",
           token: getCookie("drash_sess"),
-          user_id: context.getters.user.id,
         })
         .then((response) => {
           console.log(response);
