@@ -5,16 +5,23 @@ const state = {
   is_authenticated: false,
   is_loading: false,
   profile: {
-    image: "https://static.productionready.io/images/smiley-cyrus.jpg"
+    created_on: null,
+    email: null,
+    id: null,
+    last_login: null,
+    password: null,
+    username: null,
+    image: null,
   },
   tags: [],
   user: {
-   created_on: null,
-   email: null,
-   id: null,
-   last_login: null,
-   password: null,
-   username: null,
+    created_on: null,
+    email: null,
+    id: null,
+    last_login: null,
+    password: null,
+    username: null,
+    image: null,
   },
 };
 

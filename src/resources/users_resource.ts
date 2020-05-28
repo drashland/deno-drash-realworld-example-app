@@ -59,8 +59,6 @@ class RegisterResource extends Drash.Http.Resource {
 
         let user = await UserService.getUserByUsername(username);
 
-        user.image = "https://static.productionready.io/images/smiley-cyrus.jpg";
-
         // Create session for user. We return the session values on the user
         // object and the front-end is in charge of setting the values as a
         // cookie.

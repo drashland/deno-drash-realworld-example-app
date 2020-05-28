@@ -108,8 +108,6 @@ class LoginResource extends Drash.Http.Resource {
 
       console.log("Passwords match. Returning the user object.");
 
-      user.image = "https://static.productionready.io/images/smiley-cyrus.jpg";
-
       // Create session for user. We return the session values on the user
       // object and the front-end is in charge of setting the values as a
       // cookie.
