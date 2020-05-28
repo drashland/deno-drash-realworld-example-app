@@ -8,11 +8,11 @@ export default class UserModel extends BaseModel {
 
     public static SELECT_ALL = "SELECT * FROM users";
     public static DELETE_ALL = "DELETE FROM users WHERE username = 'one'";
-    public static UPDATE_ONE = "UPDATE users SET username = 'TEST' WHERE username = 'one'";
     public static CREATE_ONE = "INSERT INTO users (username, email, password) VALUES (?, ?, ?);"
     public static SELECT_ALL_BY_EMAIL = "SELECT * FROM users WHERE email = ?";
     public static SELECT_ALL_BY_ID = "SELECT * FROM users WHERE id = ?";
     public static SELECT_ALL_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
+    public static UPDATE_ONE = "UPDATE users SET username = ?, password = ?, email = ?, bio = ?, image = ?  WHERE id = ?";
 
     //////////////////////////////////////////////////////////////////////////////
     // FILE MARKER - PROPERTIES - ABSTRACT ///////////////////////////////////////
