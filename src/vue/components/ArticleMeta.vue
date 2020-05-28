@@ -62,8 +62,8 @@ export default {
   },
   methods: {
     isCurrentUser() {
-      if (this.currentUser.username && this.article.author.username) {
-        return this.currentUser.username === this.article.author.username;
+      if (this.user.username && this.article.author.username) {
+        return this.user.username === this.article.author.username;
       }
       return false;
     },

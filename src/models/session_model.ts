@@ -36,51 +36,46 @@ export default class SessionModel extends BaseModel {
     // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////
 
-    public async validate (data: { userId: number, sessionOne: string, sessionTwo: string}): Promise<{ success: boolean, message: string, data: any}> {
-        //
-        // User id
-        //
+    public async validate (data: { userId: number, sessionOne: string, sessionTwo: string}): Promise<boolean|{ errors: any }> {
+      //
+      // User id
+      //
 
-        // Required
-        if (!data.userId) {
-            return {
-                success: false,
-                message: 'User id must be set.',
-                data: 'userId'
+      // Required
+      if (!data.userId) {
+          return {
+            errors: {
+              userId: ['User id must be set.'],
             }
-        }
+          }
+      }
 
-        //
-        // session one
-        //
+      //
+      // session one
+      //
 
-        // Required
-        if (!data.sessionOne) {
-            return {
-                success: false,
-                message: 'Session one must be set.',
-                data: 'sessionOne'
+      // Required
+      if (!data.sessionOne) {
+          return {
+            errors: {
+              sessionOne: ['Session one must be set.'],
             }
-        }
+          }
+      }
 
-        //
-        // session two
-        //
+      //
+      // session two
+      //
 
-        // Required
-        if (!data.sessionTwo) {
-            return {
-                success: false,
-                message: 'Session two must be set.',
-                data: 'sessionTwo'
+      // Required
+      if (!data.sessionTwo) {
+          return {
+            errors: {
+              sessionTwo: ['Session two must be set.'],
             }
-        }
+          }
+      }
 
-        return {
-            success: true,
-            message: 'Passed validation',
-            data: null
-        }
-
+      return true;
     }
 }

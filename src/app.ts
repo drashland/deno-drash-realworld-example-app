@@ -2,11 +2,12 @@ import { Drash } from "./deps.ts";
 
 // Resources
 import ArticlesResource from "./resources/articles_resource.ts";
-import AuthResource from "./resources/auth_resource.ts";
 import HomeResource from "./resources/home_resource.ts";
-import RegisterResource from "./resources/register_resource.ts";
+import ProfilesResource from "./resources/profiles_resource.ts";
 import TagsResource from "./resources/tags_resource.ts";
-import LoginResource from "./resources/login_resource.ts"
+import UserResource from "./resources/user_resource.ts"
+import UsersLoginResource from "./resources/users_login_resource.ts"
+import UsersResource from "./resources/users_resource.ts"
 
 // Middleware
 import AuthMiddleware from "./middlewares/auth_middleware.ts";
@@ -17,11 +18,12 @@ const server = new Drash.Http.Server({
   response_output: "application/json",
   resources: [
     ArticlesResource,
-    AuthResource,
     HomeResource,
-    LoginResource,
-    RegisterResource,
+    ProfilesResource,
     TagsResource,
+    UserResource,
+    UsersLoginResource,
+    UsersResource,
   ],
   static_paths: ["/public"],
   views_path: "./public/views",

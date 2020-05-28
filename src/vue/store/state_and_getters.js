@@ -4,9 +4,25 @@ const state = {
   errors: {},
   is_authenticated: false,
   is_loading: false,
-  profile: null,
+  profile: {
+    created_on: null,
+    email: null,
+    id: null,
+    last_login: null,
+    password: null,
+    username: null,
+    image: null,
+  },
   tags: [],
-  user: null,
+  user: {
+    created_on: null,
+    email: null,
+    id: null,
+    last_login: null,
+    password: null,
+    username: null,
+    image: null,
+  },
 };
 
 const getters = {
