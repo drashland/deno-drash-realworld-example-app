@@ -90,15 +90,13 @@ export default {
         })
         .then((response) => {
           console.log("Log in successful.");
-          console.log(response);
           context.dispatch("setUser", response.data.user);
-          resolve();
+          resolve(true);
         })
-        .catch((response) => {
+        .catch((error) => {
           console.log("Log in unsuccessful.");
-          console.log(response);
           context.dispatch("unsetUser");
-          resolve();
+          resolve(error.response.data);
         });
     });
   },

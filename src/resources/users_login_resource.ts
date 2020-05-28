@@ -76,15 +76,31 @@ class LoginResource extends Drash.Http.Resource {
           }
         }
         console.log("User's session is invalid or has expired.");
-        throw new Drash.Exceptions.HttpException(401, "Invalid session.");
+        this.response.status_code = 401;
+        this.response.body = {
+          errors: {
+            body: ["Invalid session."]
+          }
+        };
+        return this.response;
       }
 
       this.response.body = {
         user: null,
       };
       try {
+        user = this.request.getBodyParam("user");
+        if (!user.email) {
+          this.response.status_code = 422;
+          this.response.body = {
+            errors: {
+              body: ["Email field required."]
+            }
+          };
+          return this.response;
+        }
         user = await UserService.getUserByEmail(
-          this.request.getBodyParam("user").email
+          user.email
         );
       } catch (error) {
         console.log(error);
@@ -92,18 +108,39 @@ class LoginResource extends Drash.Http.Resource {
       }
 
       if (!user) {
-        throw new Drash.Exceptions.HttpException(401, "Invalid user credentials.");
+        this.response.status_code = 401;
+        this.response.body = {
+          errors: {
+            body: ["Invalid user credentials."]
+          }
+        };
+        return this.response;
       }
 
       console.log("Checking if passwords match.");
+      const password = this.request.getBodyParam("user").password;
+      if (!password) {
+        this.response.status_code = 422;
+        this.response.body = {
+          errors: {
+            body: ["Password field required."]
+          }
+        };
+        return this.response;
+      }
       const passwordsMatch = await bcrypt.compare(
-        this.request.getBodyParam("user").password,
+        password,
         user.password
       );
-
       if (!passwordsMatch) {
         console.log("Passwords do not match.");
-        throw new Drash.Exceptions.HttpException(401, "Invalid user credentials.");
+        this.response.status_code = 401;
+        this.response.body = {
+          errors: {
+            body: ["Invalid user credentials."]
+          }
+        };
+        return this.response;
       }
 
       console.log("Passwords match. Returning the user object.");
