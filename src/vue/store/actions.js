@@ -22,16 +22,17 @@ export default {
           token: getCookie("drash_sess"),
         })
         .then((response) => {
-          console.log(response);
+          console.log("User is authenticated.");
           context.dispatch("setUser", response.data.user);
         })
         .catch((response) => {
-          console.log(response);
+          console.log("User is not authenticated.");
           context.dispatch("logOut");
         });
       return;
     }
 
+    console.log("User is not authenticated.");
     context.dispatch("logOut");
   },
 
@@ -50,16 +51,19 @@ export default {
     });
   },
 
-  fetchProfile({ commit }, params) {
-    console.log(params);
+  fetchProfile(context, params) {
+    console.log("Handling action: fetchProfile");
     return new Promise((resolve) => {
       axios
         .get(`/profiles/${params.username}`)
-        .then(({ data }) => {
-          resolve(data)
+        .then((response) => {
+          console.log(response.data.profile);
+          console.log("Setting profile.");
+          context.dispatch("setProfile", response.data.profile);
         })
-        .catch(error => {
-          resolve(undefined);
+        .catch((response) => {
+          console.log("Unsetting profile.");
+          context.dispatch("unsetProfile");
         });
     });
   },
@@ -123,6 +127,10 @@ export default {
     });
   },
 
+  setProfile(context, profile) {
+    context.commit("setProfile", profile);
+  },
+
   setUser(context, user) {
     context.commit("setIsAuthenticated", true);
     context.commit("setUser", user);
@@ -133,7 +141,11 @@ export default {
     context.commit("setIsAuthenticated", false);
     context.commit("setUser", userDefault);
     setCookie("drash_sess", null)
-  }
+  },
+
+  unsetProfile(context) {
+    context.commit("setProfile", userDefault);
+  },
 };
 
 function getCookie(cname) {

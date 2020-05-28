@@ -7,7 +7,11 @@ export default {
     state.is_authenticated = value;
   },
 
-  setUser(state, user = null) {
+  setProfile(state, profile) {
+    state.profile = profile;
+  },
+
+  setUser(state, user) {
     state.user = user;
   },
 };
