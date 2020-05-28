@@ -10,7 +10,7 @@
                 <input
                   class="form-control"
                   type="text"
-                  v-model="currentUser.image"
+                  v-model="user.image"
                   placeholder="URL of profile picture"
                 />
               </fieldset>
@@ -18,7 +18,7 @@
                 <input
                   class="form-control form-control-lg"
                   type="text"
-                  v-model="currentUser.username"
+                  v-model="user.username"
                   placeholder="Your username"
                 />
               </fieldset>
@@ -26,7 +26,7 @@
                 <textarea
                   class="form-control form-control-lg"
                   rows="8"
-                  v-model="currentUser.bio"
+                  v-model="user.bio"
                   placeholder="Short bio about you"
                 ></textarea>
               </fieldset>
@@ -34,7 +34,7 @@
                 <input
                   class="form-control form-control-lg"
                   type="text"
-                  v-model="currentUser.email"
+                  v-model="user.email"
                   placeholder="Email"
                 />
               </fieldset>
@@ -42,7 +42,7 @@
                 <input
                   class="form-control form-control-lg"
                   type="password"
-                  v-model="currentUser.password"
+                  v-model="user.password"
                   placeholder="Password"
                 />
               </fieldset>
@@ -64,10 +64,22 @@
 
 <script>
 import { mapGetters } from "vuex";
+
 export default {
   name: "Settings",
   computed: {
-    ...mapGetters(["user"])
+    ...mapGetters([
+      "is_authenticated",
+      "user",
+    ])
+  },
+  mounted() {
+    console.log("Settings.vue mounted!");
+    console.log("Checking if user is authenticated.");
+    if (!this.is_authenticated) {
+      console.log("User is not authenticated. Redirecting to home.");
+      this.$router.push({ name: "home" });
+    }
   },
   methods: {
     updateSettings() {
@@ -75,6 +87,9 @@ export default {
         // #todo, nice toast and no redirect
         this.$router.push({ name: "home" });
       });
+    },
+    mounted() {
+      console.log("Settings.vue mounted!");
     },
     logout() {
       this.$store.dispatch("logOut")
