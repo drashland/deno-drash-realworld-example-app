@@ -77,8 +77,9 @@ export default {
             return this.$router.push({ name: "home" });
           }
           swal({
-              text: response.errors.body.join(" "),
-              icon: "error"
+            title: "Login failed!",
+            text: response.errors.body.join(" "),
+            icon: "error"
           });
         });
     }
