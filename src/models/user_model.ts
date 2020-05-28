@@ -69,8 +69,8 @@ export default class UserModel extends BaseModel {
         }
 
         // Matches an email address
-        const emailRegex = new RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i)
-        if (emailRegex.test(data.email) === false) {
+        const hasValidFormat = this.validateEmailFormat(data.email);
+        if (hasValidFormat === false) {
             return {
               data: {
                 email: ['Email must be a valid email address.']
@@ -79,9 +79,8 @@ export default class UserModel extends BaseModel {
         }
 
         // Doesn't already exist
-        const result = await this.SELECT(UserModel.SELECT_ALL_BY_EMAIL, [data.email])
-        console.log(result);
-        if (result.length) {
+        const isUnique = await this.validateEmailUnique(data.email);
+        if (!isUnique) {
             return {
               data: {
                 email: ['Email aready taken.'],
@@ -101,11 +100,13 @@ export default class UserModel extends BaseModel {
               }
             }
         }
+
         // Min 8 characters, max any, 1 uppercase, 1 lowercase, 1 number
-        if (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(data.password) === false) {
+        const isStrong = this.validatePasswordFormat(data.password);
+        if (isStrong === false) {
             return {
               data: {
-                password: 'Password must contain the following: 8 characters, 1 number and 1 uppercase and lowercase letter',
+                password: ['Password must contain the following: 8 characters, 1 number and 1 uppercase and lowercase letter.',]
               }
             }
         }
@@ -113,5 +114,22 @@ export default class UserModel extends BaseModel {
         return {
           data: true
         };
+    }
+
+    public validateEmailFormat(email: string): boolean {
+      const emailRegex = new RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i)
+      return emailRegex.test(email);
+    }
+
+    public async validateEmailUnique(email: string): Promise<boolean> {
+        let result = await this.SELECT(UserModel.SELECT_ALL_BY_EMAIL, [email])
+        if (result.length) {
+          return false;
+        }
+        return true;
+    }
+
+    public validatePasswordFormat(password: string): boolean {
+      return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(password);
     }
 }
