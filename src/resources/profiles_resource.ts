@@ -7,7 +7,7 @@ class ProfilesResource extends Drash.Http.Resource {
     "/profiles/:username",
   ];
 
-  public GET() {
+  public async GET() {
     console.log("Handling ProfilesResource GET.");
     const username = this.request.getPathParam("username");
 
@@ -15,8 +15,11 @@ class ProfilesResource extends Drash.Http.Resource {
       throw new Drash.Exceptions.HttpException(400, "Username path param is required.");
     }
 
+    let user = await UserService.getUserByUsername(username);
+    delete user.password;
+
     this.response.body = {
-      profile: UserService.getUserByUsername(username)
+      profile: user
     };
 
     return this.response;

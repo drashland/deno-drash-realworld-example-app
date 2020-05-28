@@ -7,7 +7,6 @@ class UserService {
     const user = await model.SELECT(UserModel.SELECT_ALL_BY_EMAIL, [email]);
     console.log(user[0]);
     if (user && user.length) {
-      delete user[0].password;
       return user[0];
     }
     return null;
@@ -18,7 +17,6 @@ class UserService {
     const user = await model.SELECT(UserModel.SELECT_ALL_BY_ID, [id]);
     console.log(user[0]);
     if (user && user.length) {
-      delete user[0].password;
       return user[0];
     }
     return null;
@@ -29,7 +27,6 @@ class UserService {
     const user = await model.SELECT(UserModel.SELECT_ALL_BY_USERNAME, [username]);
     console.log(user[0]);
     if (user && user.length) {
-      delete user[0].password;
       return user[0];
     }
     return null;
