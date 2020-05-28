@@ -55,6 +55,9 @@ export default {
       "errors"
     ])
   },
+  mounted() {
+    console.log("Login.vue mounted!");
+  },
   methods: {
     onSubmit(email, password) {
       this.$store.dispatch("logIn", {

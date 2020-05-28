@@ -3,21 +3,32 @@ import axios from "axios";
 import { router } from "../../public/js/_app.js";
 import JwtService from "@/common/jwt_service.js";
 
+const userDefault = {
+   created_on: null,
+   email: null,
+   id: null,
+   last_login: null,
+   password: null,
+   username: null,
+};
+
 export default {
   checkIfUserIsAuthenticated(context) {
     if (context.getters.user && context.getters.user.email) {
       axios
         .post("/users/login", {
           user: {
-            email: context.getters.user.email
+            id: context.getters.user.id
           }
         })
         .then((response) => {
           context.dispatch("setUser", response.data.user);
+          resolve();
         })
         .catch((response) => {
           console.log(response.data);
           context.dispatch("logOut");
+          reject();
         });
       return;
     }
@@ -74,18 +85,19 @@ export default {
         user: credentials
       })
       .then((response) => {
+        console.log("Log in successful.");
         console.log(response);
         context.dispatch("setUser", response.data.user);
       })
       .catch((response) => {
+        console.log("Log in unsuccessful.");
         console.log(response);
         context.dispatch("unsetUser");
       });
   },
 
   logOut(context) {
-    context.commit("setIsAuthenticated", false);
-    context.commit("setUser", null);
+    context.dispatch("unsetUser");
   },
 
   register(context, credentials) {
@@ -110,6 +122,6 @@ export default {
 
   unsetUser(context) {
     context.commit("setIsAuthenticated", false);
-    context.commit("setUser", null);
+    context.commit("setUser", userDefault);
   }
 };

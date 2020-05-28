@@ -66,20 +66,39 @@ class LoginResource extends Drash.Http.Resource {
       this.response.body = {
         user: null,
       };
+      let user = null;
       try {
-        const user = await UserService.getUserByEmail(
+        user = await UserService.getUserByEmail(
           this.request.getBodyParam("user").email
         );
-        if (user) {
-          this.response.body = {
-            user
-          }
-        }
       } catch (error) {
         console.log(error);
         throw new Drash.Exceptions.HttpException(400, error);
       }
-      // Check if password is correct
+
+      if (!user) {
+        throw new Drash.Exceptions.HttpException(401, "Invalid user credentials.");
+      }
+
+      console.log("Checking if passwords match.");
+      const passwordsMatch = await bcrypt.compare(
+        this.request.getBodyParam("user").password,
+        user.password
+      );
+
+      if (!passwordsMatch) {
+        console.log("Passwords do not match.");
+        throw new Drash.Exceptions.HttpException(401, "Invalid user credentials.");
+      }
+
+      console.log("Passwords match. Returning the user object.");
+
+      user.image = "https://static.productionready.io/images/smiley-cyrus.jpg";
+
+      this.response.body = {
+        user
+      }
+
       return this.response;
     }
 

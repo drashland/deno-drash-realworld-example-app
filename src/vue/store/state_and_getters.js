@@ -8,7 +8,14 @@ const state = {
     image: "https://static.productionready.io/images/smiley-cyrus.jpg"
   },
   tags: [],
-  user: null,
+  user: {
+   created_on: null,
+   email: null,
+   id: null,
+   last_login: null,
+   password: null,
+   username: null,
+  },
 };
 
 const getters = {
