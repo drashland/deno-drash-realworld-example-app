@@ -127,6 +127,7 @@ export default {
   unsetUser(context) {
     context.commit("setIsAuthenticated", false);
     context.commit("setUser", userDefault);
+    setCookie("drash_sess", null)
   }
 };
 
