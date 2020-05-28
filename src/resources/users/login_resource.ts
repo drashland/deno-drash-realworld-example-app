@@ -5,6 +5,8 @@ import UserService from "../../services/user_service.ts";
 // const test = new SessionModel()
 // await test.CREATE(SessionModel.CREATE_ONE, [1, 'sesh 2', 'sesh 3'])
 
+const sessionModel = new SessionModel();
+
 class LoginResource extends Drash.Http.Resource {
 
     static paths = [
@@ -16,28 +18,6 @@ class LoginResource extends Drash.Http.Resource {
     //         'LogMiddleware'
     //     ]
     // }
-
-    /**
-     * Handle GET requests.
-     *
-     * @return Drash.Http.Response
-     */
-    public async GET() {
-        // TODO :: Turn this block into an auth middleware
-        const sessionModel = new SessionModel()
-        const sessionOne = this.request.getCookie('sessionOne')
-        const sessionTwo = this.request.getCookie('sessionTwo')
-        if (sessionOne && sessionTwo) {
-            const session = await sessionModel.SELECT(SessionModel.SELECT_ONE_BY_SESSION_ONE_AND_TWO, [sessionOne, sessionTwo])
-            if (session.length) {
-                this.response.body = this.response.render('/index.html', { title: 'Home'})
-                return this.response
-            }
-        }
-
-        this.response.body = this.response.render('/login.html', { title: 'Login'})
-        return this.response;
-    }
 
     /**
      * Handle POST requests by checking if the supplied email belongs to a user
@@ -63,6 +43,38 @@ class LoginResource extends Drash.Http.Resource {
      */
     public async POST() {
       console.log("Handling LoginResource POST.");
+
+      const action = this.request.getBodyParam("action");
+      if (action == "check_auth") {
+        console.log("Checking if user has a session.");
+        const sessionValues = this.request.getBodyParam("token");
+        console.log("Using the following session values:");
+        console.log(sessionValues);
+        if (sessionValues) {
+          const sessionValuesSplit = sessionValues.split("|::|");
+          const sessionOne = sessionValuesSplit[0];
+          const sessionTwo = sessionValuesSplit[1];
+          if (sessionOne && sessionTwo) {
+            const session = await sessionModel.SELECT(
+              SessionModel.SELECT_ONE_BY_SESSION_ONE_AND_TWO,
+              [
+                sessionOne,
+                sessionTwo
+              ]
+            );
+            console.log(session);
+            if (session && session.length) {
+              if (session[0].user_id == this.request.getBodyParam("user_id")) {
+                this.response.body = "Session valid.";
+                return this.response;
+              }
+            }
+          }
+        }
+        console.log("User's session is invalid.");
+        throw new Drash.Exceptions.HttpException(401, "Invalid session.");
+      }
+
       this.response.body = {
         user: null,
       };
@@ -94,6 +106,21 @@ class LoginResource extends Drash.Http.Resource {
       console.log("Passwords match. Returning the user object.");
 
       user.image = "https://static.productionready.io/images/smiley-cyrus.jpg";
+
+      // Create session for user. We return the session values on the user
+      // object and the front-end is in charge of setting the values as a
+      // cookie.
+      const sessionOneValue = await bcrypt.hash("sessionOne2020Drash");
+      const sessionTwoValue = await bcrypt.hash("sessionTwo2020Drash");
+      await sessionModel.CREATE(
+        SessionModel.CREATE_ONE,
+        [
+          user.id,
+          sessionOneValue,
+          sessionTwoValue
+        ]
+      );
+      user.token = `${sessionOneValue}|::|${sessionTwoValue}`;
 
       this.response.body = {
         user

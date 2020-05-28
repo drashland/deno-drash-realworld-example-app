@@ -15,20 +15,19 @@ const userDefault = {
 export default {
   checkIfUserIsAuthenticated(context) {
     if (context.getters.user && context.getters.user.email) {
+      console.log("Handling action: checkIfUserIsAuthenticated");
       axios
         .post("/users/login", {
-          user: {
-            id: context.getters.user.id
-          }
+          action: "check_auth",
+          token: getCookie("drash_sess"),
+          user_id: context.getters.user.id,
         })
         .then((response) => {
-          context.dispatch("setUser", response.data.user);
-          resolve();
+          console.log(response);
         })
         .catch((response) => {
-          console.log(response.data);
+          console.log(response);
           context.dispatch("logOut");
-          reject();
         });
       return;
     }
@@ -80,20 +79,24 @@ export default {
 
   logIn(context, credentials) {
     console.log("Handling action: logIn");
-    axios
-      .post("/users/login", {
-        user: credentials
-      })
-      .then((response) => {
-        console.log("Log in successful.");
-        console.log(response);
-        context.dispatch("setUser", response.data.user);
-      })
-      .catch((response) => {
-        console.log("Log in unsuccessful.");
-        console.log(response);
-        context.dispatch("unsetUser");
-      });
+    return new Promise((resolve) => {
+      axios
+        .post("/users/login", {
+          user: credentials
+        })
+        .then((response) => {
+          console.log("Log in successful.");
+          console.log(response);
+          context.dispatch("setUser", response.data.user);
+          resolve();
+        })
+        .catch((response) => {
+          console.log("Log in unsuccessful.");
+          console.log(response);
+          context.dispatch("unsetUser");
+          resolve();
+        });
+    });
   },
 
   logOut(context) {
@@ -118,6 +121,7 @@ export default {
   setUser(context, user) {
     context.commit("setIsAuthenticated", true);
     context.commit("setUser", user);
+    setCookie("drash_sess", user.token, 1);
   },
 
   unsetUser(context) {
@@ -125,3 +129,26 @@ export default {
     context.commit("setUser", userDefault);
   }
 };
+
+function getCookie(cname) {
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(';');
+  for(var i = 0; i <ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+function setCookie(cname, cvalue, exdays) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  var expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}

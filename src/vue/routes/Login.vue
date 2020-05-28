@@ -52,18 +52,23 @@ export default {
   },
   computed: {
     ...mapGetters([
-      "errors"
+      "errors",
+      "is_authenticated",
     ])
   },
   mounted() {
     console.log("Login.vue mounted!");
   },
   methods: {
-    onSubmit(email, password) {
-      this.$store.dispatch("logIn", {
+    async onSubmit(email, password) {
+      await this.$store.dispatch("logIn", {
         email,
         password,
       });
+
+      if (this.is_authenticated) {
+        this.$router.push({ name: "home" });
+      }
     }
   },
 };
