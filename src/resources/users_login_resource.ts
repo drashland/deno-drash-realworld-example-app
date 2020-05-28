@@ -75,7 +75,7 @@ class LoginResource extends Drash.Http.Resource {
             }
           }
         }
-        console.log("User's session is invalid.");
+        console.log("User's session is invalid or has expired.");
         throw new Drash.Exceptions.HttpException(401, "Invalid session.");
       }
 
