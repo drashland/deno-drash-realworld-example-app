@@ -14,7 +14,7 @@ const userDefault = {
 
 export default {
   checkIfUserIsAuthenticated(context) {
-    if (getCookie("drash_sess")) {
+    if (getCookie("drash_sess") && getCookie("drash_sess") != "null") {
       console.log("Handling action: checkIfUserIsAuthenticated");
       axios
         .post("/users/login", {
@@ -107,13 +107,18 @@ export default {
     return new Promise((resolve) => {
       axios
         .post("/users", {
-          user: credentials
+          email: credentials.email,
+          password: credentials.password,
+          username: credentials.username,
         })
-        .then(({ data }) => {
-          resolve(data);
+        .then((response) => {
+          console.log("Registration successful.");
+          console.log(response);
+          context.dispatch("setUser", response.data.user);
         })
-        .catch(() => {
-          resolve(undefined);
+        .catch((response) => {
+          console.log("Registration unsuccessful.");
+          console.log(response);
         });
     });
   },

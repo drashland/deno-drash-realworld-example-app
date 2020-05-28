@@ -1,7 +1,7 @@
-import { Drash, bcrypt } from "../../deps.ts"
-import UserModel from "../../models/user_model.ts";
-import SessionModel from "../../models/session_model.ts";
-import UserService from "../../services/user_service.ts";
+import { Drash, bcrypt } from "../deps.ts"
+import UserModel from "../models/user_model.ts";
+import SessionModel from "../models/session_model.ts";
+import UserService from "../services/user_service.ts";
 // const test = new SessionModel()
 // await test.CREATE(SessionModel.CREATE_ONE, [1, 'sesh 2', 'sesh 3'])
 

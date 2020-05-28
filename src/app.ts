@@ -3,10 +3,10 @@ import { Drash } from "./deps.ts";
 // Resources
 import ArticlesResource from "./resources/articles_resource.ts";
 import HomeResource from "./resources/home_resource.ts";
-import RegisterResource from "./resources/register_resource.ts";
 import TagsResource from "./resources/tags_resource.ts";
 import UserResource from "./resources/user_resource.ts"
-import UsersLoginResource from "./resources/users/login_resource.ts"
+import UsersLoginResource from "./resources/users_login_resource.ts"
+import UsersResource from "./resources/users_resource.ts"
 
 // Middleware
 import AuthMiddleware from "./middlewares/auth_middleware.ts";
@@ -18,9 +18,10 @@ const server = new Drash.Http.Server({
   resources: [
     ArticlesResource,
     HomeResource,
-    RegisterResource,
     TagsResource,
+    UserResource,
     UsersLoginResource,
+    UsersResource,
   ],
   static_paths: ["/public"],
   views_path: "./public/views",

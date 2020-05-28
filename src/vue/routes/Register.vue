@@ -61,22 +61,20 @@ export default {
   },
   computed: {
     ...mapGetters([
-      "errors"
+      "errors",
+      "is_authenticated",
     ])
   },
   methods: {
     async onSubmit() {
-      let data = await this.$store.dispatch("register", {
+      await this.$store.dispatch("register", {
           email: this.email,
           password: this.password,
           username: this.username
       });
 
-      if (data) {
-        this.$store.commit("setIsAuthenticated", true);
-        this.$store.commit("setUser", data.user);
+      if (this.is_authenticated) {
         this.$router.push({ name: "home" });
-        return;
       }
 
       // Show some error message
