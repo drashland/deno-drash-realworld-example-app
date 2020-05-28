@@ -35,6 +35,7 @@ export default class UserModel extends BaseModel {
     public created_on: any = ''
 
     public last_login: any = null
+    public bio: string = "";
 
     //////////////////////////////////////////////////////////////////////////////
     // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////

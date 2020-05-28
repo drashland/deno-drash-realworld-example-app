@@ -258,7 +258,8 @@ CREATE TABLE public.users (
     email character varying(355) NOT NULL,
     created_on timestamp without time zone,
     last_login timestamp without time zone,
-    image character varying DEFAULT 'https://static.productionready.io/images/smiley-cyrus.jpg'::character varying NOT NULL
+    image character varying DEFAULT 'https://static.productionready.io/images/smiley-cyrus.jpg'::character varying NOT NULL,
+    bio character varying(280)
 );
 
 
