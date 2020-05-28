@@ -64,8 +64,9 @@ class LoginResource extends Drash.Http.Resource {
             );
             console.log(session);
             if (session && session.length) {
-              if (session[0].user_id == this.request.getBodyParam("user_id")) {
-                this.response.body = "Session valid.";
+              const userId = this.request.getBodyParam("user_id");
+              if (session[0].user_id == userId) {
+                user = await UserService.getUserById(userId);
                 return this.response;
               }
             }

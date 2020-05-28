@@ -24,6 +24,7 @@ export default {
         })
         .then((response) => {
           console.log(response);
+          context.dispatch("setUser", response.data.user);
         })
         .catch((response) => {
           console.log(response);
