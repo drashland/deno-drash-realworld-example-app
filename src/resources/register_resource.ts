@@ -43,8 +43,8 @@ class RegisterResource extends Drash.Http.Resource {
         const password = await bcrypt.hash(rawPassword)
         // Create user
         await userModel.CREATE(UserModel.CREATE_ONE, [username, email, password])
-        this.response.body = JSON.stringify({success: true, message: 'Successfully created.'})
-        return this.response
+        this.response.body = "User created.";
+        return this.response;
     }
 }
 
