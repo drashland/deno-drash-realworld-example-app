@@ -131,14 +131,17 @@ export default abstract class BaseModel {
      *
      * @example
      * const userModel = new UserModel;
-     * const result = userModel.UPDATE(UserModel.UPDATE_ALL)
+     * const result = userModel.UPDATE(UserModel.UPDATE_ONE, ["someting"])
      *
      * @return {Promise<void>}
      */
-    public async UPDATE(query: string): Promise<void> {
+    public async UPDATE(query: string, data?: any[]): Promise<any> {
+        query = this.prepare(query, data)
+        console.log(query);
         await dbClient.connect()
-        await dbClient.query(query);
+        const dbResult = await dbClient.query(query);
         await dbClient.end()
+        return dbResult;
     }
 
     /**
