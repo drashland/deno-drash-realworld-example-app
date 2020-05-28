@@ -44,7 +44,7 @@ class LoginResource extends Drash.Http.Resource {
      * in the database.
      *
      * @return Drash.Http.Response
-     *    Returns a response with the following bodies:
+     *    Returns a response with one of the following bodies:
      *    - If the user is in the database:
      *      {
      *        user: {
