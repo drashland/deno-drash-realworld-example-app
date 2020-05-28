@@ -67,6 +67,7 @@ class LoginResource extends Drash.Http.Resource {
             console.log(session);
             if (session && session.length) {
               user = await UserService.getUserById(session[0].user_id);
+              delete user.password;
               user.token = `${sessionOne}|::|${sessionTwo}`;
               this.response.body = {
                 user
@@ -122,6 +123,8 @@ class LoginResource extends Drash.Http.Resource {
         ]
       );
       user.token = `${sessionOneValue}|::|${sessionTwoValue}`;
+
+      delete user.password;
 
       this.response.body = {
         user
