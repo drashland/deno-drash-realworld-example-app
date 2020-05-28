@@ -3,6 +3,7 @@ import { Drash } from "./deps.ts";
 // Resources
 import ArticlesResource from "./resources/articles_resource.ts";
 import HomeResource from "./resources/home_resource.ts";
+import ProfilesResource from "./resources/profiles_resource.ts";
 import TagsResource from "./resources/tags_resource.ts";
 import UserResource from "./resources/user_resource.ts"
 import UsersLoginResource from "./resources/users_login_resource.ts"
@@ -18,6 +19,7 @@ const server = new Drash.Http.Server({
   resources: [
     ArticlesResource,
     HomeResource,
+    ProfilesResource,
     TagsResource,
     UserResource,
     UsersLoginResource,
