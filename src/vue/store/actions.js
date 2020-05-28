@@ -117,10 +117,11 @@ export default {
           console.log("Registration successful.");
           console.log(response);
           context.dispatch("setUser", response.data.user);
+          resolve(true);
         })
-        .catch((response) => {
+        .catch((error) => {
           console.log("Registration unsuccessful.");
-          console.log(response);
+          resolve(error.response.data);
         });
     });
   },

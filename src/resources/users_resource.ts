@@ -31,15 +31,15 @@ class RegisterResource extends Drash.Http.Resource {
 
         // Validate
         const userModel = new UserModel();
-        const validation = await userModel.validate({
+        const result = await userModel.validate({
           username,
           email,
           password: rawPassword
         });
-        if (!validation || validation.hasOwnProperty("errors")) {
+        if (result.data !== true) {
           this.response.status_code = 422;
           this.response.body = {
-            validation
+            errors: result.data
           };
           return this.response;
         }

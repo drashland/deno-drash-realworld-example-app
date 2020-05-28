@@ -67,17 +67,39 @@ export default {
   },
   methods: {
     async onSubmit() {
-      await this.$store.dispatch("register", {
-          email: this.email,
-          password: this.password,
-          username: this.username
-      });
-
-      if (this.is_authenticated) {
-        this.$router.push({ name: "home" });
-      }
-
-      // Show some error message
+      swal({
+          text: "Please wait...",
+          timer: 500,
+          buttons: false,
+        })
+        .then(async () => {
+          return await this.$store.dispatch("register", {
+              email: this.email,
+              password: this.password,
+              username: this.username
+          });
+        })
+        .then((response) => {
+          console.log(response);
+          if (response === true) {
+            swal({
+              title: "Welcome!",
+              text: "Your registration was successful!",
+              icon: "success",
+            });
+            return this.$router.push({ name: "home" });
+          }
+          let error = "";
+          for (let key in response.errors) {
+            error += `${response.errors[key]} `;
+          }
+          console.log(error);
+          swal({
+            title: "Registration failed!",
+            text: error,
+            icon: "error"
+          });
+        });
     }
   }
 };
