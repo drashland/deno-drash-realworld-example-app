@@ -6,7 +6,7 @@ class UserService {
     console.log(`Getting user from database by email "${email}".`);
     const user = await model.SELECT(UserModel.SELECT_ALL_BY_EMAIL, [email]);
     console.log(user[0]);
-    if (user.length) {
+    if (user && user.length) {
       return user[0];
     }
     return null;
@@ -16,7 +16,7 @@ class UserService {
     console.log(`Getting user from database by username "${username}".`);
     const user = await model.SELECT(UserModel.SELECT_ALL_BY_USERNAME, [username]);
     console.log(user[0]);
-    if (user.length) {
+    if (user && user.length) {
       return user[0];
     }
     return null;
