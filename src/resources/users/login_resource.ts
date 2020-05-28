@@ -17,6 +17,11 @@ class LoginResource extends Drash.Http.Resource {
     //     ]
     // }
 
+    /**
+     * Handle GET requests.
+     *
+     * @return Drash.Http.Response
+     */
     public async GET() {
         // TODO :: Turn this block into an auth middleware
         const sessionModel = new SessionModel()
@@ -34,13 +39,42 @@ class LoginResource extends Drash.Http.Resource {
         return this.response;
     }
 
+    /**
+     * Handle POST requests by checking if the supplied email belongs to a user
+     * in the database.
+     *
+     * @return Drash.Http.Response
+     *    Returns a response with the following bodies:
+     *    - If the user is in the database:
+     *      {
+     *        user: {
+     *          created_on: "2020-05-14T20:03:56.025Z"
+     *          email: "user1@hotmail.com"
+     *          id: 1
+     *          last_login: null
+     *          password: "$2a$10$Ha7shP2TNTmTR9tC8xdXg.Vta3w6IaHYnMNOxxfl5EG.cdwVFnTlW"
+     *          username: "user1"
+     *        }
+     *      }
+     *    - If the user is not in the database:
+     *      {
+     *        user: null
+     *      }
+     */
     public async POST() {
-      console.log("Checking if user is authenticated");
+      console.log("Handling LoginResource POST.");
+      this.response.body = {
+        user: null,
+      };
       try {
-        this.response.body = await UserService.getUserByEmail(
+        const user = await UserService.getUserByEmail(
           this.request.getBodyParam("user").email
         );
-        console.log(this.response.body);
+        if (user) {
+          this.response.body = {
+            user
+          }
+        }
       } catch (error) {
         console.log(error);
         throw new Drash.Exceptions.HttpException(400, error);

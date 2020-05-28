@@ -12,7 +12,7 @@ class UserService {
     return null;
   }
 
-  static getUserByUsername(username: string) {
+  static async getUserByUsername(username: string) {
     console.log(`Getting user from database by username "${username}".`);
     const user = await model.SELECT(UserModel.SELECT_ALL_BY_USERNAME, [username]);
     console.log(user[0]);
