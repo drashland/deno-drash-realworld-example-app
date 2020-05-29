@@ -17,3 +17,15 @@ $ docker exec -t realworld_postgres pg_dumpall -c -U user > postgres_dump.sql
 $ mv ./postgres_dump.sql ./.docker/data/postgres_dump.sql
 ```
 Remember to commit this file
+
+# Updating Deno Version
+
+* Update the version the Drash container uses in `/.docker/drash.dockerfile`
+
+* Update the Deno-specific dependencies in `deps.ts`
+
+* Update 3rd part dependencies in `deps.ts` - Be mindful that these might not have been updated (using deprecated or old incorrect syntax), meaning we cannot update Deno
+
+* Down, re-build and start the containers to check for any errors.
+
+* Run tests
