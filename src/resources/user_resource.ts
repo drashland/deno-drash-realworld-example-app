@@ -112,14 +112,13 @@ class UserResource extends Drash.Http.Resource {
 
     console.log("Executing the following query:");
     console.log(query);
-    try {
-      let result = await userModel.UPDATE(query);
-      console.log("Update result:");
-      console.log(result);
-    } catch (error) {
+    let result = await userModel.UPDATE(query);
+    console.log("Update result:");
+    console.log(result);
+    if (result !== true) {
       this.response.status_code = 500;
       this.response.body = {
-        errors: [error.message]
+        errors: [result]
       };
     }
 
