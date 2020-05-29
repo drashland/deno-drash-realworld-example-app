@@ -36,7 +36,7 @@ Navigate to `localhost:1667`
 - [ ] Database model representations
 - [x] Vue (built with webpack using Vue Single File Components)
 
-# Fontend login
+# Frontend login
 
 There are a total of 100 users, with each user having the same password. Say we want to login as user 32:
 
