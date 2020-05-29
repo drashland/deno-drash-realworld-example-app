@@ -6,6 +6,7 @@ const userModel = new UserModel();
 
 class UserResource extends Drash.Http.Resource {
   static paths = [
+    "/user",
     "/user/:username",
   ];
 
