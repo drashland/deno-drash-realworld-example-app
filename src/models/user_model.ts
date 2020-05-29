@@ -46,6 +46,14 @@ export default class UserModel extends BaseModel {
   // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * @description
+   * Validate the given username, email, and password.
+   *
+   * @return Promise<{ data: any }>
+   *     - Returns a data field with errors if there are errors.
+   *     - Returns a data field with true if validation passes.
+   */
   public async validate(
     data: { username: string; email: string; password: string },
   ): Promise<{ data: any }> {
