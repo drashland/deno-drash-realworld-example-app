@@ -16,6 +16,22 @@ class UserResource extends Drash.Http.Resource {
     return this.response;
   }
 
+  /**
+   * Handle a POST request with the following accepted request body params:
+   *     {
+   *       username: string,
+   *       email: string,
+   *       bio?: string,
+   *       password? string
+   *     }
+   *
+   * @return Drash.Http.Response
+   *     - If any input fails validation, then we return a 422 response.
+   *     - If the database fails to update the user in question, then we return
+   *       a 500 response.
+   *     - If all is successful, then we return a 200 response with the User
+   *       object with its fields updated.
+   */
   public async POST() {
     console.log("Handling UserResource POST.");
     console.log("Updating the user with the following information:");
