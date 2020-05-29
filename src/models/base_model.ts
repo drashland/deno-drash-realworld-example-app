@@ -136,12 +136,16 @@ export default abstract class BaseModel {
      * @return {Promise<void>}
      */
     public async UPDATE(query: string, data?: any[]): Promise<any> {
+      try {
         query = this.prepare(query, data)
         console.log(query);
         await dbClient.connect()
         const dbResult = await dbClient.query(query);
         await dbClient.end()
-        return dbResult;
+        return true;
+      } catch (error) {
+        return error.message;
+      }
     }
 
     /**
