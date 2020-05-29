@@ -58,6 +58,8 @@ class UserResource extends Drash.Http.Resource {
 
     if (user.bio) {
       query += `, bio = '${user.bio}'`;
+    } else {
+      query += `, bio = ''`;
     }
 
     if (user.image) {
