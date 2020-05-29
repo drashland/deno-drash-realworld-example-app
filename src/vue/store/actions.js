@@ -149,7 +149,6 @@ export default {
   updateUser(context, user) {
     console.log("Handling action: updateUser");
     return new Promise((resolve) => {
-      console.log(user);
       axios
         .post("/user", {
           user
