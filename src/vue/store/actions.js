@@ -57,8 +57,7 @@ export default {
       axios
         .get(`/profiles/${params.username}`)
         .then((response) => {
-          console.log(response.data.profile);
-          console.log("Setting profile.");
+          console.log("Profile fetched successfully. Setting profile.");
           context.dispatch("setProfile", response.data.profile);
         })
         .catch((response) => {
