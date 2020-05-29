@@ -112,9 +112,16 @@ class UserResource extends Drash.Http.Resource {
 
     console.log("Executing the following query:");
     console.log(query);
-    let result = await userModel.UPDATE(query);
-    console.log("Update result:");
-    console.log(result);
+    try {
+      let result = await userModel.UPDATE(query);
+      console.log("Update result:");
+      console.log(result);
+    } catch (error) {
+      this.response.status_code = 500;
+      this.response.body = {
+        errors: [error.message]
+      };
+    }
 
     user = await UserService.getUserByUsername(user.username);
     delete user.password;
