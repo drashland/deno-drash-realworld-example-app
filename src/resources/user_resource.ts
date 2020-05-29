@@ -6,9 +6,16 @@ const userModel = new UserModel();
 
 class UserResource extends Drash.Http.Resource {
   static paths = [
-    "/user",
+    "/user/:username",
   ];
 
+  /**
+   * @description
+   * Handle a GET request given the specified username path param.
+   *
+   * @return Drash.Http.Response
+   *     Returns a User object matched to the username path param.
+   */
   public GET() {
     this.response.body = UserService.getUserByUsername(
       this.request.getPathParam("username"),
@@ -17,6 +24,7 @@ class UserResource extends Drash.Http.Resource {
   }
 
   /**
+   * @description
    * Handle a POST request with the following accepted request body params:
    *     {
    *       username: string,
