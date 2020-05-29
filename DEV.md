@@ -1,4 +1,10 @@
-# Login to postgres container
+# Contents
+
+* [Login to Postgres Container](#login-to-postgres-container)
+* [Make a DB Data Dump](#make-a-db-data-dump-update-the-db)
+* [Updating Deno](#updating-deno)
+
+#Login to Postgres Container
 
 ```shell script
 $ docker exec -it realworld_postgres bash
@@ -7,7 +13,7 @@ $ psql -U user
 # select * from users;
 ````
 
-# Make DB Data Dump (Update the DB)
+# Make a DB Data Dump (Update the DB)
 The postgres container uses a dump file to seed the database - this file is at `/.docker/data/`
 
 Make your changes to the database if needed by directly modifying it inside of the `psql` shell
@@ -18,7 +24,7 @@ $ mv ./postgres_dump.sql ./.docker/data/postgres_dump.sql
 ```
 Remember to commit this file
 
-# Updating Deno Version
+# Updating Deno
 
 * Update the version the Drash container uses in `/.docker/drash.dockerfile`
 
