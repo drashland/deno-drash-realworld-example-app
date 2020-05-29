@@ -133,9 +133,9 @@ export default abstract class BaseModel {
      * const userModel = new UserModel;
      * const result = userModel.UPDATE(UserModel.UPDATE_ONE, ["someting"])
      *
-     * @return {Promise<void>}
+     * @return {Promise<boolean|string>}
      */
-    public async UPDATE(query: string, data?: any[]): Promise<any> {
+    public async UPDATE(query: string, data?: any[]): Promise<boolean|string> {
       try {
         query = this.prepare(query, data)
         console.log(query);
