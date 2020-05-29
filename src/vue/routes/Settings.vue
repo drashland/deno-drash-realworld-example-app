@@ -84,7 +84,6 @@ export default {
           buttons: false,
         })
         .then(async () => {
-          console.log(this.user);
           return await this.$store.dispatch("updateUser", this.user);
         })
         .then((response) => {
@@ -98,7 +97,6 @@ export default {
           for (let key in response.errors) {
             error += `${response.errors[key]} `;
           }
-          console.log(error);
           swal({
             title: "Update failed!",
             text: error,
