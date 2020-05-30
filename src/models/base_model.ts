@@ -116,7 +116,7 @@ export default abstract class BaseModel {
      */
     public async SELECT(query: string, data: any[]): Promise<any[]> {
         query = this.prepare(query, data)
-        const client = await pool.connect();
+        const client = await dbPool.connect();
         const dbResult = await client.query(query);
         client.release();
         const formattedResult = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
@@ -138,13 +138,13 @@ export default abstract class BaseModel {
     public async UPDATE(query: string, data?: any[]): Promise<boolean|string> {
       try {
         query = this.prepare(query, data)
-        const client = await pool.connect();
+        const client = await dbPool.connect();
         const dbResult = await client.query(query);
         client.release();
-        return true;
       } catch (error) {
         return error.message;
       }
+      return true;
     }
 
     /**
@@ -161,13 +161,14 @@ export default abstract class BaseModel {
      */
     public async DELETE(query: string): Promise<boolean|string> {
       try {
-        query = this.prepare(query, data)
-        const client = await pool.connect();
+        query = this.prepare(query)
+        const client = await dbPool.connect();
         const dbResult = await client.query(query);
         client.release();
       } catch (error) {
         return error.message;
       }
+      return true;
     }
 
     /**
@@ -186,11 +187,12 @@ export default abstract class BaseModel {
     public async CREATE(query: string, data: any[]): Promise<boolean|string> {
       try {
         query = this.prepare(query, data)
-        const client = await pool.connect();
+        const client = await dbPool.connect();
         const dbResult = await client.query(query);
         client.release();
       } catch (error) {
         return error.message;
       }
+      return true;
     }
 }
