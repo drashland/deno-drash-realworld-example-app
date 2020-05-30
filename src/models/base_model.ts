@@ -1,12 +1,12 @@
-import { PostgresClient } from "../deps.ts";
+import { Pool } from "../deps.ts";
 
-const dbClient: PostgresClient = new PostgresClient({
+const dbPool: Pool = new Pool({
     user: "user",
     password: "userpassword",
     database: "realworld",
     hostname: "realworld_postgres",
     port: 5432
-});
+}, 100);
 
 export default abstract class BaseModel {
 
@@ -116,10 +116,8 @@ export default abstract class BaseModel {
      */
     public async SELECT(query: string, data: any[]): Promise<any[]> {
         query = this.prepare(query, data)
-        await dbClient.connect()
-        const dbResult = await dbClient.query(query);
+        const dbResult = await dbPool.query(query);
         const formattedResult = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
-        await dbClient.end()
         return formattedResult;
     }
 
@@ -138,10 +136,7 @@ export default abstract class BaseModel {
     public async UPDATE(query: string, data?: any[]): Promise<boolean|string> {
       try {
         query = this.prepare(query, data)
-        console.log(query);
-        await dbClient.connect()
-        const dbResult = await dbClient.query(query);
-        await dbClient.end()
+        const dbResult = await dbPool.query(query);
         return true;
       } catch (error) {
         return error.message;
@@ -161,9 +156,7 @@ export default abstract class BaseModel {
      * @return {Promise<void>}
      */
     public async DELETE(query: string): Promise<void> {
-        await dbClient.connect()
-        await dbClient.query(query);
-        await dbClient.end()
+        await dbPool.query(query);
     }
 
     /**
@@ -181,8 +174,6 @@ export default abstract class BaseModel {
      */
     public async CREATE(query: string, data: any[]): Promise<void> {
         query = this.prepare(query, data)
-        await dbClient.connect()
-        await dbClient.query(query);
-        await dbClient.end()
+        await dbPool.query(query);
     }
 }
