@@ -41,7 +41,11 @@ export default {
     return new Promise((resolve) => {
       axios
         .get("/articles", {
-          filters: params.filters,
+          params: {
+            favorited: params.favorited,
+            offset: params.filters,
+            tag: params.tag,
+          }
         })
         .then(({ data }) => {
           resolve(data)
