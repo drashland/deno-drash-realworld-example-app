@@ -116,7 +116,9 @@ export default abstract class BaseModel {
      */
     public async SELECT(query: string, data: any[]): Promise<any[]> {
         query = this.prepare(query, data)
-        const dbResult = await dbPool.query(query);
+        const client = await pool.connect();
+        const dbResult = await client.query(query);
+        client.release();
         const formattedResult = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
         return formattedResult;
     }
@@ -136,7 +138,9 @@ export default abstract class BaseModel {
     public async UPDATE(query: string, data?: any[]): Promise<boolean|string> {
       try {
         query = this.prepare(query, data)
-        const dbResult = await dbPool.query(query);
+        const client = await pool.connect();
+        const dbResult = await client.query(query);
+        client.release();
         return true;
       } catch (error) {
         return error.message;
@@ -153,10 +157,17 @@ export default abstract class BaseModel {
      * const userModel = new UserModel;
      * const result = userModel.DELETE(UserModel.DELETE_ALL)
      *
-     * @return {Promise<void>}
+     * @return {Promise<boolean|string>}
      */
-    public async DELETE(query: string): Promise<void> {
-        await dbPool.query(query);
+    public async DELETE(query: string): Promise<boolean|string> {
+      try {
+        query = this.prepare(query, data)
+        const client = await pool.connect();
+        const dbResult = await client.query(query);
+        client.release();
+      } catch (error) {
+        return error.message;
+      }
     }
 
     /**
@@ -170,10 +181,16 @@ export default abstract class BaseModel {
      * const userModel = new UserModel;
      * const result = userModel.CREATE(UserModel.CREATE_ONE, ['Ed', 'Password', 'Email'])
      *
-     * @return {Promise<void>}
+     * @return {Promise<boolean|string>}
      */
-    public async CREATE(query: string, data: any[]): Promise<void> {
+    public async CREATE(query: string, data: any[]): Promise<boolean|string> {
+      try {
         query = this.prepare(query, data)
-        await dbPool.query(query);
+        const client = await pool.connect();
+        const dbResult = await client.query(query);
+        client.release();
+      } catch (error) {
+        return error.message;
+      }
     }
 }
