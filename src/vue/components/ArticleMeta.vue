@@ -1,16 +1,16 @@
 <template>
-  <div class="article-meta">
+  <div class="article-meta" v-if="article && article.author">
     <router-link
-      :to="{ name: 'profile', params: { username: article.author.username } }"
+      :to="{ name: 'profile', params: { username: authorUsername() } }"
     >
       <img :src="article.author.image" />
     </router-link>
     <div class="info">
       <router-link
-        :to="{ name: 'profile', params: { username: article.author.username } }"
+        :to="{ name: 'profile', params: { username: authorUsername() } }"
         class="author"
       >
-        {{ article.author.username }}
+        {{ authorUsername() }}
       </router-link>
       <span class="date">{{ article.createdAt | date }}</span>
     </div>
@@ -24,8 +24,8 @@
       class="btn btn-sm pull-xs-right"
       @click="toggleFavorite"
       :class="{
-        'btn-primary': article.favorited,
-        'btn-outline-primary': !article.favorited
+        'btn-primary': article && article.favorited,
+        'btn-outline-primary': article && !article.favorited
       }"
     >
       <i class="ion-heart"></i>
@@ -61,8 +61,17 @@ export default {
     ])
   },
   methods: {
+    authorUsername() {
+      if (this.article && this.article.author) {
+        return this.article.author.username;
+      }
+    },
     isCurrentUser() {
-      if (this.user.username && this.article.author.username) {
+      if (
+        (this.user && this.article && this.article.author)
+        && this.user.username
+        && this.article.author.username
+      ) {
         return this.user.username === this.article.author.username;
       }
       return false;

@@ -84,7 +84,9 @@ export default {
   },
   methods: {
     parseMarkdown(content) {
-      return marked(content);
+      if (content) {
+        return marked(content);
+      }
     }
   }
 };
