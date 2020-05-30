@@ -15,18 +15,16 @@ const userDefault = {
 export default {
   checkIfUserIsAuthenticated(context) {
     if (getCookie("drash_sess") && getCookie("drash_sess") != "null") {
-      console.log("Handling action: checkIfUserIsAuthenticated");
       axios
         .post("/users/login", {
           action: "check_auth",
           token: getCookie("drash_sess"),
         })
         .then((response) => {
-          console.log("User is authenticated.");
           context.dispatch("setUser", response.data.user);
         })
         .catch((error) => {
-          console.log("User is not authenticated.");
+          console.log("User has a session, but it's invalid.");
           console.log(error.response);
           context.dispatch("unsetUser");
         });
