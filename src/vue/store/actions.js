@@ -25,15 +25,16 @@ export default {
           console.log("User is authenticated.");
           context.dispatch("setUser", response.data.user);
         })
-        .catch((response) => {
+        .catch((error) => {
           console.log("User is not authenticated.");
-          context.dispatch("logOut");
+          console.log(error.response);
+          context.dispatch("unsetUser");
         });
       return;
     }
 
     console.log("User is not authenticated.");
-    context.dispatch("logOut");
+    context.dispatch("unsetUser");
   },
 
   fetchArticles({ commit }, offset) {
