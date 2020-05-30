@@ -75,18 +75,34 @@ export default {
   },
   mounted() {
     console.log("Settings.vue mounted!");
-    console.log("Checking if user is authenticated.");
-    if (!this.is_authenticated) {
-      console.log("User is not authenticated. Redirecting to home.");
-      this.$router.push({ name: "home" });
-    }
   },
   methods: {
     updateSettings() {
-      this.$store.dispatch("updateUser", this.user).then(() => {
-        // #todo, nice toast and no redirect
-        this.$router.push({ name: "home" });
-      });
+      swal({
+          text: "Updating your information... Please wait...",
+          timer: 500,
+          buttons: false,
+        })
+        .then(async () => {
+          return await this.$store.dispatch("updateUser", this.user);
+        })
+        .then((response) => {
+          if (response === true) {
+            return swal({
+              title: "Update successful!",
+              icon: "success"
+            });
+          }
+          let error = "";
+          for (let key in response.errors) {
+            error += `${response.errors[key]} `;
+          }
+          swal({
+            title: "Update failed!",
+            text: error,
+            icon: "error"
+          });
+        });
     },
     mounted() {
       console.log("Settings.vue mounted!");

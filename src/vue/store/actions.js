@@ -57,8 +57,7 @@ export default {
       axios
         .get(`/profiles/${params.username}`)
         .then((response) => {
-          console.log(response.data.profile);
-          console.log("Setting profile.");
+          console.log("Profile fetched successfully. Setting profile.");
           context.dispatch("setProfile", response.data.profile);
         })
         .catch((response) => {
@@ -144,6 +143,25 @@ export default {
 
   unsetProfile(context) {
     context.commit("setProfile", userDefault);
+  },
+
+  updateUser(context, user) {
+    console.log("Handling action: updateUser");
+    return new Promise((resolve) => {
+      axios
+        .post("/user", {
+          user
+        })
+        .then((response) => {
+          console.log("User updated successfuly.");
+          context.dispatch("setUser", response.data.user);
+          resolve(true);
+        })
+        .catch((error) => {
+          console.log("User not updated.");
+          resolve(error.response.data);
+        });
+    });
   },
 };
 
