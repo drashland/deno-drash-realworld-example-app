@@ -64,7 +64,6 @@ class LoginResource extends Drash.Http.Resource {
                 sessionTwo
               ]
             );
-            console.log(session);
             if (session && session.length) {
               user = await UserService.getUserById(session[0].user_id);
               delete user.password;
