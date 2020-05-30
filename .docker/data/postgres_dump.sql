@@ -212,6 +212,24 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: articles; Type: TABLE; Schema: public; Owner: user
+--
+
+CREATE TABLE public.articles (
+    id integer NOT NULL,
+    author_id integer NOT NULL,
+    slug character varying(255) NOT NULL,
+    title character varying(255) NOT NULL,
+    description character varying(255) NOT NULL,
+    body character varying(255) NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+ALTER TABLE public.articles OWNER TO "user";
+
+--
 -- Name: sessions; Type: TABLE; Schema: public; Owner: user
 --
 
