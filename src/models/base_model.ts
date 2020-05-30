@@ -6,7 +6,7 @@ const dbPool: Pool = new Pool({
     database: "realworld",
     hostname: "realworld_postgres",
     port: 5432
-}, 100);
+}, 50);
 
 export default abstract class BaseModel {
 
