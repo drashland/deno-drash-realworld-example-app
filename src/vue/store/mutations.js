@@ -1,9 +1,13 @@
 export default {
-  setError(state, errors = {}) {
-    state.errors = {};
+  setArticle(state, article) {
+    state.article = article;
   },
 
-  setIsAuthenticated(state, value = false) {
+  setError(state, errors) {
+    state.errors = errors;
+  },
+
+  setIsAuthenticated(state, value) {
     state.is_authenticated = value;
   },
 

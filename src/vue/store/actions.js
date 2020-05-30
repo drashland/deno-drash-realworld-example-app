@@ -37,6 +37,49 @@ export default {
     context.dispatch("unsetUser");
   },
 
+  createArticle({ commit }, article) {
+    return new Promise((resolve) => {
+      axios
+        .post("/articles", {
+          article
+        })
+        .then((response) => {
+          resolve(response)
+        })
+        .catch((error) => {
+          resolve(error.response);
+        });
+    });
+  },
+
+  fetchArticle(context, slug) {
+    console.log("Handling action: fetchArticle");
+    return new Promise((resolve) => {
+      axios
+        .get(`/articles/${slug}`)
+        .then((response) => {
+          context.dispatch("setArticle", response.data.article);
+          resolve(response);
+        })
+        .catch((error) => {
+          resolve(error.response);
+        });
+    });
+  },
+
+  fetchArticleComments({ commit }, slug) {
+    return new Promise((resolve) => {
+      axios
+        .get(`/articles/${slug}/comments`)
+        .then((response) => {
+          resolve(response);
+        })
+        .catch((error) => {
+          resolve(error.response);
+        });
+    });
+  },
+
   fetchArticles({ commit }, params) {
     return new Promise((resolve) => {
       axios
@@ -130,6 +173,10 @@ export default {
     });
   },
 
+  setArticle(context, article) {
+    context.commit("setArticle", article);
+  },
+
   setProfile(context, profile) {
     context.commit("setProfile", profile);
   },
@@ -138,6 +185,10 @@ export default {
     context.commit("setIsAuthenticated", true);
     context.commit("setUser", user);
     setCookie("drash_sess", user.token, 1);
+  },
+
+  unsetArticle(context) {
+    context.commit("setArticle", {});
   },
 
   unsetUser(context) {

@@ -1,6 +1,8 @@
 const state = {
+  article: {},
   articles: [],
   articles_count: 0,
+  comments: [],
   errors: {},
   is_authenticated: false,
   is_loading: false,
@@ -26,12 +28,20 @@ const state = {
 };
 
 const getters = {
+  article() {
+    return state.article;
+  },
+
   articles() {
     return state.articles;
   },
 
   articles_count() {
     return state.articles_count;
+  },
+
+  comments() {
+    return state.comments;
   },
 
   errors() {
