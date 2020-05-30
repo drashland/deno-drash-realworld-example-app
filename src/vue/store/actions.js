@@ -37,11 +37,11 @@ export default {
     context.dispatch("unsetUser");
   },
 
-  fetchArticles({ commit }, offset) {
+  fetchArticles({ commit }, params) {
     return new Promise((resolve) => {
       axios
         .get("/articles", {
-          offset: offset
+          filters: params.filters,
         })
         .then(({ data }) => {
           resolve(data)

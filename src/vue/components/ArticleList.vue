@@ -60,7 +60,7 @@ export default {
       "articles_count",
       "is_loading",
     ]),
-    listConfig() {
+    params() {
       const { type } = this;
       const filters = {
         offset: (this.currentPage - 1) * this.itemsPerPage,
@@ -91,7 +91,7 @@ export default {
   },
   watch: {
     currentPage(newValue) {
-      this.listConfig.filters.offset = (newValue - 1) * this.itemsPerPage;
+      this.params.filters.offset = (newValue - 1) * this.itemsPerPage;
       this.fetchArticles();
     },
     type() {
@@ -116,10 +116,10 @@ export default {
   },
   methods: {
     fetchArticles() {
-      this.$store.dispatch("fetchArticles", this.listConfig);
+      this.$store.dispatch("fetchArticles", this.params.filters);
     },
     resetPagination() {
-      this.listConfig.offset = 0;
+      this.params.offset = 0;
       this.currentPage = 1;
     }
   }
