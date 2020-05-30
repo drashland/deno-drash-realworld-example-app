@@ -48,7 +48,7 @@
                   class="nav-link"
                   active-class="active"
                   exact
-                  :to="{ name: 'profile' }"
+                  :to="{ name: 'profile', params: { username: profile.username } }"
                 >
                   My Articles
                 </router-link>
@@ -58,7 +58,7 @@
                   class="nav-link"
                   active-class="active"
                   exact
-                  :to="{ name: 'profile-favorites' }"
+                  :to="{ name: 'profile-favorites', params: { username: profile.username } }"
                 >
                   Favorited Articles
                 </router-link>
@@ -104,7 +104,7 @@ export default {
   },
   watch: {
     $route(to) {
-      if (to.params.username) {
+      if (to.params && to.params.username) {
         this.$store.dispatch("fetchProfile", to.params);
       }
     }
