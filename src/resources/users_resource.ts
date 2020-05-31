@@ -44,7 +44,7 @@ class RegisterResource extends Drash.Http.Resource {
         return this.errorResponse("Password field required.");
       }
       if (!ValidationService.isEmail(email)) {
-        return this.errorResponse("Email must be an email.");
+        return this.errorResponse("Email must be a valid email.");
       }
       if (!(await ValidationService.isEmailUnique(email))) {
         return this.errorResponse("Email already taken.");

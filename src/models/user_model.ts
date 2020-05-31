@@ -72,7 +72,7 @@ export class UserModel extends BaseModel {
     return null;
   }
 
-  static async getUserById(id: null|number) {
+  static async getUserById(id: number) {
     const query = `SELECT * FROM users WHERE id = '${id}';`;
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
@@ -100,6 +100,11 @@ export class UserModel extends BaseModel {
   // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * Save this model.
+   *
+   * @return Promise<UserModel>
+   */
   public async save(): Promise<UserModel> {
     // If this model already has an ID, then that means we're updating the model
     if (this.id) {
@@ -125,9 +130,17 @@ export class UserModel extends BaseModel {
     client.release();
 
     // @ts-ignore
+    //
+    // (crookse) We ignore this because getUserByEmail() can return null if the
+    // user is not found. However, in this case, it will never be null.
     return UserModel.getUserByEmail(this.email);
   }
 
+  /**
+   * Update this model.
+   *
+   * @return Promise<UserModel>
+   */
   public async update(): Promise<UserModel> {
     let query = "UPDATE users SET "
       + "username = '?', password = '?', email = '?', bio = '?', image = '?' "
@@ -142,15 +155,21 @@ export class UserModel extends BaseModel {
         this.image
       ]
     );
-    console.log(query);
     const client = await BaseModel.connect();
     await client.query(query);
     client.release();
 
     // @ts-ignore
+    // (crookse) We ignore this because getUserByEmail() can return null if the
+    // user is not found. However, in this case, it will never be null.
     return UserModel.getUserByEmail(this.email);
   }
 
+  /**
+   * Convert this object to an entity.
+   *
+   * @return UserEntity
+   */
   public toEntity(): UserEntity {
     return {
       id: this.id,
