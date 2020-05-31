@@ -114,10 +114,10 @@ class LoginResource extends Drash.Http.Resource {
       const sessionOneValue = await bcrypt.hash("sessionOne2020Drash");
       const sessionTwoValue = await bcrypt.hash("sessionTwo2020Drash");
       // @ts-ignore
-      const session = new SessionModel(sessionOneValue, sessionTwoValue, user.id);
-      session.save();
+      let session = new SessionModel(sessionOneValue, sessionTwoValue, user.id);
+      session = await session.save();
 
-      user.token = `${sessionOneValue}|::|${sessionTwoValue}`;
+      user.token = `${session.session_one}|::|${session.session_two}`;
 
       this.response.body = {
         user

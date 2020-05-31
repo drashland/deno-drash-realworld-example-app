@@ -48,7 +48,7 @@ export class SessionModel extends BaseModel {
   // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  public async save(): Promise<void> {
+  public async save(): Promise<SessionModel> {
     if (this.id) {
       throw new Error("Record already exists.");
     }
@@ -76,8 +76,8 @@ export class SessionModel extends BaseModel {
 
 function createSessionModel(session: any): SessionModel {
   return new SessionModel(
-    session.sessionOne,
-    session.sessionTwo,
+    session.session_one,
+    session.session_two,
     session.user_id,
     session.id
   );
