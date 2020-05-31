@@ -1,11 +1,6 @@
 import { Drash, bcrypt } from "../deps.ts"
 import UserModel from "../models/user_model.ts";
 import SessionModel from "../models/session_model.ts";
-import UserService from "../services/user_service.ts";
-// const test = new SessionModel()
-// await test.CREATE(SessionModel.CREATE_ONE, [1, 'sesh 2', 'sesh 3'])
-
-const sessionModel = new SessionModel();
 
 class LoginResource extends Drash.Http.Resource {
 
@@ -57,22 +52,17 @@ class LoginResource extends Drash.Http.Resource {
           const sessionOne = sessionValuesSplit[0];
           const sessionTwo = sessionValuesSplit[1];
           if (sessionOne && sessionTwo) {
-            const session = await sessionModel.SELECT(
-              SessionModel.SELECT_ONE_BY_SESSION_ONE_AND_TWO,
-              [
-                sessionOne,
-                sessionTwo
-              ]
-            );
-            console.log(session);
-            if (session && session.length) {
-              user = await UserService.getUserById(session[0].user_id);
-              delete user.password;
-              user.token = `${sessionOne}|::|${sessionTwo}`;
-              this.response.body = {
-                user
-              };
-              return this.response;
+            const session = await SessionModel.getUserSession(sessionOne, sessionTwo);
+            if (session) {
+              user = await UserModel.getUserById(session.user_id);
+              if (user) {
+                user = user.toEntity();
+                user.token = `${sessionOne}|::|${sessionTwo}`;
+                this.response.body = {
+                  user
+                };
+                return this.response;
+              }
             }
           }
         }
@@ -100,7 +90,7 @@ class LoginResource extends Drash.Http.Resource {
           };
           return this.response;
         }
-        user = await UserService.getUserByEmail(
+        user = await UserModel.getUserByEmail(
           user.email
         );
       } catch (error) {
@@ -117,6 +107,8 @@ class LoginResource extends Drash.Http.Resource {
         };
         return this.response;
       }
+
+      user = user.toEntity();
 
       console.log("Checking if passwords match.");
       const password = this.request.getBodyParam("user").password;
@@ -151,17 +143,11 @@ class LoginResource extends Drash.Http.Resource {
       // cookie.
       const sessionOneValue = await bcrypt.hash("sessionOne2020Drash");
       const sessionTwoValue = await bcrypt.hash("sessionTwo2020Drash");
-      await sessionModel.CREATE(
-        SessionModel.CREATE_ONE,
-        [
-          user.id,
-          sessionOneValue,
-          sessionTwoValue
-        ]
-      );
-      user.token = `${sessionOneValue}|::|${sessionTwoValue}`;
+      // @ts-ignore
+      const session = new SessionModel(user.id, sessionOneValue, sessionTwoValue);
+      session.save();
 
-      delete user.password;
+      user.token = `${sessionOneValue}|::|${sessionTwoValue}`;
 
       this.response.body = {
         user

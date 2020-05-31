@@ -1,5 +1,5 @@
 import { Drash } from "../deps.ts"
-import UserService from "../services/user_service.ts";
+import UserModel from "../models/user_model.ts";
 
 class ProfilesResource extends Drash.Http.Resource {
 
@@ -15,12 +15,17 @@ class ProfilesResource extends Drash.Http.Resource {
       throw new Drash.Exceptions.HttpException(400, "Username path param is required.");
     }
 
-    let user = await UserService.getUserByUsername(username);
-    delete user.password;
-
     this.response.body = {
-      profile: user
+      profile: null
     };
+
+    let user = await UserModel.getUserByUsername(username);
+    if (user) {
+      let entity = user.toEntity();
+      this.response.body = {
+        profile: entity
+      };
+    }
 
     return this.response;
   }

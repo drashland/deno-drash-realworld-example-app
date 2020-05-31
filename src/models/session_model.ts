@@ -1,83 +1,75 @@
 import BaseModel from "./base_model.ts";
 
-export default class SessionModel extends BaseModel {
+export class SessionModel extends BaseModel {
 
-    //////////////////////////////////////////////////////////////////////////////
-    // FILE MARKER - PROPERTIES - STATIC /////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////
+  public id: null|number;
+  public user_id: null|number;
+  public session_one: string;
+  public session_two: string;
 
-    // public static SELECT_ALL = "SELECT * FROM users";
-    // public static DELETE_ALL = "DELETE FROM users WHERE username = 'one'";
-    // public static UPDATE_ONE = "UPDATE users SET username = 'TEST' WHERE username = 'one'";
-    // public static CREATE_ONE = "INSERT INTO users (username, password, email) VALUES (?, ?, ?);"
-    public static SELECT_ONE_BY_SESSION_ONE_AND_TWO = "SELECT * FROM sessions WHERE session_one = ? AND session_two = ? LIMIT 1";
-    public static SELECT_ONE_BY_USER_ID = "SELECT * FROM sessions WHERE user_id = ? LIMIT 1"
-    public static CREATE_ONE = "INSERT INTO sessions (user_id, session_one, session_two) VALUES (?, ?, ?);"
+  public static SELECT_ONE_BY_USER_ID = "SELECT * FROM sessions WHERE user_id = ? LIMIT 1"
+  public static CREATE_ONE = "INSERT INTO sessions (user_id, session_one, session_two) VALUES (?, ?, ?);"
 
-    //////////////////////////////////////////////////////////////////////////////
-    // FILE MARKER - PROPERTIES - ABSTRACT ///////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////
+  constructor(
+    userId: null|number,
+    sessionOne: string,
+    sessionTwo: string,
+    id: null|number = null
+  ) {
+    super();
+    this.id = id;
+    this.user_id = userId;
+    this.session_one = sessionOne;
+    this.session_two = sessionTwo;
+  }
 
-    public primary_key: string = 'id'
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
 
-    //////////////////////////////////////////////////////////////////////////////
-    // FILE MARKER - PROPERTIES - PUBLIC /////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////
-
-    public id: number = 0
-
-    public user_id: number = 0
-
-    public session_one: string = ''
-
-    public session_two: string = ''
-
-    //////////////////////////////////////////////////////////////////////////////
-    // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////
-
-    public async validate (data: { userId: number, sessionOne: string, sessionTwo: string}): Promise<{ data: any }> {
-      //
-      // User id
-      //
-
-      // Required
-      if (!data.userId) {
-          return {
-            data: {
-              userId: ['User id must be set.'],
-            }
-          }
-      }
-
-      //
-      // session one
-      //
-
-      // Required
-      if (!data.sessionOne) {
-          return {
-            data: {
-              sessionOne: ['Session one must be set.'],
-            }
-          }
-      }
-
-      //
-      // session two
-      //
-
-      // Required
-      if (!data.sessionTwo) {
-          return {
-            data: {
-              sessionTwo: ['Session two must be set.'],
-            }
-          }
-      }
-
-      return {
-        data: true
-      };
+  static async getUserSession(sessionOne: string, sessionTwo: string): Promise<SessionModel|null> {
+    const query = `SELECT * FROM sessions WHERE session_one = ${sessionOne} AND session_two = ${sessionTwo} LIMIT 1`;
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    client.release();
+    const session = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    if (session && session.length > 0) {
+      return createSessionModel(session[0]);
     }
+    return null;
+  }
+
+  public async save(): Promise<void> {
+    if (this.id) {
+      throw new Error("Record already exists.");
+    }
+
+    let query = "INSERT INTO sessions "
+      + " (session_one, session_two, user_id)"
+      + " VALUES (?, ?, ?);"
+    query = this.prepareQuery(
+      query,
+      [
+        this.session_one,
+        this.session_two,
+        String(this.user_id)
+      ]
+    );
+    console.log(query);
+    const client = await BaseModel.connect();
+    // await client.query(query);
+    client.release();
+    return;
+  }
+  
 }
+
+function createSessionModel(session: any): SessionModel {
+  return new SessionModel(
+    session.sessionOne,
+    session.sessionTwo,
+    session.user_id,
+  );
+}
+
+export default SessionModel;
