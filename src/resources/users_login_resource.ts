@@ -145,9 +145,14 @@ class LoginResource extends Drash.Http.Resource {
   }
 
   /**
+   * Create a uniform error response for this resource.
+   *
+   * @param string message
+   *     The error message to send in the body of the response.
+   *
    * @return Drash.Http.Response
    */
-  protected errorResponse(message: string) {
+  protected errorResponse(message: string): Drash.Http.Repsonse {
     this.response.status_code = 401;
     this.response.body = {
       errors: {
