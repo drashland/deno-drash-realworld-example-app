@@ -60,7 +60,7 @@ export class UserModel extends BaseModel {
   }
 
   static async getUserById(id: null|number) {
-    const query = `SELECT * FROM users WHERE id = ${id};`;
+    const query = `SELECT * FROM users WHERE id = '${id}';`;
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
     client.release();
@@ -73,7 +73,7 @@ export class UserModel extends BaseModel {
   }
 
   static async getUserByUsername(username: string) {
-    const query = `SELECT * FROM users WHERE username = ${username};`;
+    const query = `SELECT * FROM users WHERE username = '${username}';`;
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
     client.release();
@@ -96,7 +96,7 @@ export class UserModel extends BaseModel {
 
     let query = "INSERT INTO users "
       + " (username, email, password, bio, image)"
-      + " VALUES (?, ?, ?, ?, ?);"
+      + " VALUES ('?', '?', '?', '?', '?');"
     query = this.prepareQuery(
       query,
       [
@@ -116,8 +116,8 @@ export class UserModel extends BaseModel {
 
   public async update(data: any): Promise<void> {
     let query = "UPDATE users SET "
-      + "username = ?, password = ?, email = ?, bio = ?, image = ? "
-      + `WHERE id = ${this.id};`;
+      + "username = '?', password = '?', email = '?', bio = '?', image = '?' "
+      + `WHERE id = '${this.id}';`;
     query = this.prepareQuery(
       query,
       [
