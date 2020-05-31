@@ -18,7 +18,7 @@ export default {
       console.log("Handling action: checkIfUserIsAuthenticated");
       axios
         .post("/users/login", {
-          action: "check_auth",
+          action: "check_if_user_is_authenticated",
           token: getCookie("drash_sess"),
         })
         .then((response) => {

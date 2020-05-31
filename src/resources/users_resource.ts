@@ -1,6 +1,7 @@
 import { Drash, bcrypt } from "../deps.ts"
 import UserModel from "../models/user_model.ts";
 import SessionModel from "../models/session_model.ts";
+import ValidationService from "../services/validation_service.ts";
 
 class RegisterResource extends Drash.Http.Resource {
 
@@ -27,49 +28,71 @@ class RegisterResource extends Drash.Http.Resource {
         console.log(username, email, rawPassword);
 
         // Validate
-        // if (result.data !== true) {
-        //   this.response.status_code = 422;
-        //   this.response.body = {
-        //     errors: result.data
-        //   };
-        //   return this.response;
-        // }
+        if (!username) {
+          return this.errorResponse("Username field required.");
+        }
+        if (!email) {
+          return this.errorResponse("Email field required.");
+        }
+        if (!rawPassword) {
+          return this.errorResponse("Password field required.");
+        }
+        if (!ValidationService.isEmail(email)) {
+          return this.errorResponse("Email must be an email.");
+        }
+        if (!ValidationService.isEmailUnique(email)) {
+          return this.errorResponse("Email already taken.");
+        }
+        if (!ValidationService.isPasswordStrong(rawPassword)) {
+          return this.errorResponse(
+            "Password must be 8 characters long and include 1 number, 1 "
+            + "uppercase letter, and 1 lowercase letter."
+          );
+        }
 
         // Hash password
         const password = await bcrypt.hash(rawPassword);
 
         // Create user
-        const userModel = new UserModel(
+        let user = new UserModel(
             username,
-            email,
-            password
+            password,
+            email
         );
-        userModel.save();
+        user = await user.save();
 
-        this.response.body = {
-          user: null
-        };
-
-        const user = await UserModel.getUserByUsername(username);
-        if (user) {
-          let entity = user.toEntity();
-
-          // Create session for user. We return the session values on the user
-          // object and the front-end is in charge of setting the values as a
-          // cookie.
-          const sessionOneValue = await bcrypt.hash("sessionOne2020Drash");
-          const sessionTwoValue = await bcrypt.hash("sessionTwo2020Drash");
-          const session = new SessionModel(sessionOneValue, sessionTwoValue, user.id);
-          session.save();
-          entity.token = `${sessionOneValue}|::|${sessionTwoValue}`;
-
-          // Return the newly created user
-          this.response.body = {
-            user: entity
-          };
+        if (!user) {
+          return this.errorResponse(
+            "An error occurred while trying to create your account."
+          );
         }
 
+        let entity = user.toEntity();
+
+        // Create session for user. We return the session values on the user
+        // object and the front-end is in charge of setting the values as a
+        // cookie.
+        const sessionOneValue = await bcrypt.hash("sessionOne2020Drash");
+        const sessionTwoValue = await bcrypt.hash("sessionTwo2020Drash");
+        const session = new SessionModel(sessionOneValue, sessionTwoValue, user.id);
+        session.save();
+        entity.token = `${sessionOneValue}|::|${sessionTwoValue}`;
+
+        // Return the newly created user
+        this.response.body = {
+          user: entity
+        };
         return this.response;
+    }
+
+    protected errorResponse(message: string): Drash.Http.Response {
+      this.response.status_code = 422;
+      this.response.body = {
+        errors: {
+          body: message
+        }
+      };
+      return this.response;
     }
 }
 

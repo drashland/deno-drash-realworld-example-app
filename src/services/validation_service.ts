@@ -1,3 +1,5 @@
+import UserModel from "../models/user_model.ts";
+
 export default class ValidationService {
   /**
    * @description
@@ -9,7 +11,7 @@ export default class ValidationService {
    *     - Returns true if the email passes validation.
    *     - Returns false if the email fails validation.
    */
-  public isEmail(email: string): boolean {
+  static isEmail(email: string): boolean {
     const emailRegex = new RegExp(
       /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i,
     );
@@ -24,9 +26,9 @@ export default class ValidationService {
    *     - Returns true if the email is unique.
    *     - Returns false if the email is already taken.
    */
-  public async isEmailUnique(email: string): Promise<boolean> {
-    let result = await this.SELECT(UserModel.SELECT_ALL_BY_EMAIL, [email]);
-    if (result.length) {
+  static async isEmailUnique(email: string): Promise<boolean> {
+    const user = UserModel.getUserByEmail(email);
+    if (user) {
       return false;
     }
     return true;
@@ -47,7 +49,7 @@ export default class ValidationService {
    *     - Returns true if the email is unique.
    *     - Returns false if the email is already taken.
    */
-  public isPasswordStrong(password: string): boolean {
+  static isPasswordStrong(password: string): boolean {
     return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(password);
   }
 }
