@@ -10,6 +10,17 @@ type UserEntity = {
   token?: null|string;
 };
 
+function createUserModelObject(user: any): UserModel {
+  return new UserModel(
+    user.username,
+    user.password,
+    user.email,
+    user.bio,
+    user.image,
+    user.id
+  );
+}
+
 export class UserModel extends BaseModel {
 
   //////////////////////////////////////////////////////////////////////////////
@@ -46,15 +57,17 @@ export class UserModel extends BaseModel {
     this.image = image;
   }
 
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
   static async getUserByEmail(email: string) {
     const query = `SELECT * FROM users WHERE email = '${email}';`;
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
-    console.log(dbResult);
     const user = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
-    client.release();
     if (user && user.length > 0) {
-      return createUserModel(user[0]);
+      return createUserModelObject(user[0]);
     }
     return null;
   }
@@ -65,9 +78,8 @@ export class UserModel extends BaseModel {
     const dbResult = await client.query(query);
     client.release();
     const user = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
-    client.release();
     if (user && user.length > 0) {
-      return createUserModel(user[0]);
+      return createUserModelObject(user[0]);
     }
     return null;
   }
@@ -78,9 +90,8 @@ export class UserModel extends BaseModel {
     const dbResult = await client.query(query);
     client.release();
     const user = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
-    client.release();
     if (user && user.length > 0) {
-      return createUserModel(user[0]);
+      return createUserModelObject(user[0]);
     }
     return null;
   }
@@ -89,14 +100,15 @@ export class UserModel extends BaseModel {
   // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  public async save(): Promise<void> {
+  public async save(): Promise<UserModel> {
+    // If this model already has an ID, then that means we're updating the model
     if (this.id) {
-      throw new Error("Record already exists.");
+      return this.update();
     }
 
     let query = "INSERT INTO users "
       + " (username, email, password, bio, image)"
-      + " VALUES ('?', '?', '?', '?', '?');"
+      + " VALUES (?, ?, ?, ?, ?);"
     query = this.prepareQuery(
       query,
       [
@@ -107,32 +119,36 @@ export class UserModel extends BaseModel {
         this.image
       ]
     );
-    console.log(query);
+
     const client = await BaseModel.connect();
-    // await client.query(query);
+    await client.query(query);
     client.release();
-    return;
+
+    // @ts-ignore
+    return UserModel.getUserByEmail(this.email);
   }
 
-  public async update(data: any): Promise<void> {
+  public async update(): Promise<UserModel> {
     let query = "UPDATE users SET "
       + "username = '?', password = '?', email = '?', bio = '?', image = '?' "
       + `WHERE id = '${this.id}';`;
     query = this.prepareQuery(
       query,
       [
-        data.username,
-        data.password,
-        data.email,
-        data.bio,
-        data.image
+        this.username,
+        this.password,
+        this.email,
+        this.bio,
+        this.image
       ]
     );
     console.log(query);
     const client = await BaseModel.connect();
-    // const result = await client.query(query);
+    await client.query(query);
     client.release();
-    return;
+
+    // @ts-ignore
+    return UserModel.getUserByEmail(this.email);
   }
 
   public toEntity(): UserEntity {
@@ -146,17 +162,6 @@ export class UserModel extends BaseModel {
       password: this.password,
     };
   }
-}
-
-function createUserModel(user: any): UserModel {
-  return new UserModel(
-    user.username,
-    user.password,
-    user.email,
-    user.bio,
-    user.image,
-    user.id
-  );
 }
 
 export default UserModel;

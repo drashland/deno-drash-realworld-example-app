@@ -51,7 +51,7 @@ class RegisterResource extends Drash.Http.Resource {
         };
 
         const user = await UserModel.getUserByUsername(username);
-        if (user != null) {
+        if (user) {
           let entity = user.toEntity();
 
           // Create session for user. We return the session values on the user
@@ -59,7 +59,7 @@ class RegisterResource extends Drash.Http.Resource {
           // cookie.
           const sessionOneValue = await bcrypt.hash("sessionOne2020Drash");
           const sessionTwoValue = await bcrypt.hash("sessionTwo2020Drash");
-          const session = new SessionModel(user.id, sessionOneValue, sessionTwoValue);
+          const session = new SessionModel(sessionOneValue, sessionTwoValue, user.id);
           session.save();
           entity.token = `${sessionOneValue}|::|${sessionTwoValue}`;
 
