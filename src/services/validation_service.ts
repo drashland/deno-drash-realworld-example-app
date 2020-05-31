@@ -1,6 +1,10 @@
 import UserModel from "../models/user_model.ts";
 
 export default class ValidationService {
+  static decodeInput(input: string): string {
+    return decodeURIComponent(input);
+  }
+
   /**
    * @description
    * Validate that the given email passes validation by testing it against a
@@ -27,7 +31,7 @@ export default class ValidationService {
    *     - Returns false if the email is already taken.
    */
   static async isEmailUnique(email: string): Promise<boolean> {
-    const user = UserModel.getUserByEmail(email);
+    const user = await UserModel.getUserByEmail(email);
     if (user) {
       return false;
     }
