@@ -3,7 +3,7 @@ import BaseModel from "./base_model.ts";
 type UserEntity = {
   bio?: string;
   email: string;
-  id?: null|number;
+  id?: number;
   image?: string;
   password: string;
   username: string;
@@ -31,7 +31,7 @@ export class UserModel extends BaseModel {
 
   public bio: string;
   public email: string;
-  public id: null|number;
+  public id: number;
   public image: string;
   public password: string;
   public username: string;
@@ -46,7 +46,7 @@ export class UserModel extends BaseModel {
     email: string,
     bio: string = "",
     image: string = "https://static.productionready.io/images/smiley-cyrus.jpg",
-    id: null|number = null
+    id: number = -1
   ) {
     super();
     this.id = id;

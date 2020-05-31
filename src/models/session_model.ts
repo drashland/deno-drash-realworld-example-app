@@ -3,18 +3,30 @@ import BaseModel from "./base_model.ts";
 export class SessionModel extends BaseModel {
 
   public id: null|number;
-  public user_id: null|number;
+  public user_id: number;
   public session_one: string;
   public session_two: string;
 
   public static SELECT_ONE_BY_USER_ID = "SELECT * FROM sessions WHERE user_id = ? LIMIT 1"
   public static CREATE_ONE = "INSERT INTO sessions (user_id, session_one, session_two) VALUES (?, ?, ?);"
 
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - CONSTRCUTOR /////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * Construct an object of this class.
+   *
+   * @param string sessionOne
+   * @param string sessionTwo
+   * @param number userId
+   * @param number id
+   */
   constructor(
     sessionOne: string,
     sessionTwo: string,
-    userId: null|number,
-    id: null|number = null
+    userId: number,
+    id: number = -1
   ) {
     super();
     this.session_one = sessionOne;
@@ -71,7 +83,7 @@ export class SessionModel extends BaseModel {
     // @ts-ignore
     return SessionModel.getUserSession(this.session_one, this.session_two);
   }
-  
+
 }
 
 function createSessionModel(session: any): SessionModel {

@@ -1,6 +1,7 @@
 import { Drash, bcrypt } from "../deps.ts"
 import UserModel from "../models/user_model.ts";
 import SessionModel from "../models/session_model.ts";
+import ValidationService from "../services/validation_service.ts";
 
 class LoginResource extends Drash.Http.Resource {
 
@@ -101,6 +102,9 @@ class LoginResource extends Drash.Http.Resource {
     if (!inputUser.email) {
       return this.errorResponse("Email field required.");
     }
+    if (!ValidationService.isEmail(inputUser.email)) {
+      return this.errorResponse("Email must be a valid email.");
+    }
 
     // Convert the user to a real user model object
     const user = await UserModel.getUserByEmail(
@@ -112,18 +116,11 @@ class LoginResource extends Drash.Http.Resource {
       return this.errorResponse("Invalid user credentials.");
     }
 
-    let entity = user.toEntity();
-
-    console.log("Checking if passwords match.");
     const password = this.request.getBodyParam("user").password;
     if (!password) {
       return this.errorResponse("Password field required.");
     }
-    const passwordsMatch = await bcrypt.compare(
-      password,
-      user.password
-    );
-    if (!passwordsMatch) {
+    if (! (await ValidationService.isPasswordCorrect(password, user.password))) {
       console.log("Passwords do not match.");
       return this.errorResponse("Invalid user credentials.");
     }
@@ -135,6 +132,8 @@ class LoginResource extends Drash.Http.Resource {
     const sessionTwo = await bcrypt.hash("sessionTwo2020Drash");
     let session = new SessionModel(sessionOne, sessionTwo, user.id);
     session = await session.save();
+
+    let entity = user.toEntity();
     entity.token = `${session.session_one}|::|${session.session_two}`;
 
     this.response.body = {
@@ -152,7 +151,7 @@ class LoginResource extends Drash.Http.Resource {
    *
    * @return Drash.Http.Response
    */
-  protected errorResponse(message: string): Drash.Http.Repsonse {
+  protected errorResponse(message: string): Drash.Http.Response {
     this.response.status_code = 401;
     this.response.body = {
       errors: {

@@ -1,3 +1,4 @@
+import { bcrypt } from "../deps.ts";
 import UserModel from "../models/user_model.ts";
 
 export default class ValidationService {
@@ -36,6 +37,21 @@ export default class ValidationService {
       return false;
     }
     return true;
+  }
+
+  /**
+   * @description
+   * Validate that the two given passwords match.
+   *
+   * @return boolean
+   *     - Returns true if the two passwords match.
+   *     - Returns false if the two passwords do not match.
+   */
+  static async isPasswordCorrect(
+    passwordOne: string,
+    passwordTwo: string
+  ): Promise<boolean> {
+    return await bcrypt.compare(passwordOne, passwordTwo);
   }
 
   /**
