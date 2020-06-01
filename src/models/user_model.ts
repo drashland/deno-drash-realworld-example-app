@@ -101,6 +101,31 @@ export class UserModel extends BaseModel {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
+   * Delete this model.
+   *
+   * @return Promise<boolean>
+   */
+  public async delete(): Promise<UserModel> {
+    let query = `DELETE FROM users WHERE id = ?`;
+    query = this.prepareQuery(
+      query,
+      [
+        this.id,
+      ]
+    );
+
+    try {
+      const client = await BaseModel.connect();
+      await client.query(query);
+      client.release();
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Save this model.
    *
    * @return Promise<UserModel>
