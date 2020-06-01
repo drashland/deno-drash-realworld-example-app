@@ -5,7 +5,7 @@ export type Article = {
   body: string;
   created_at: number;
   description: string;
-  id?: null|number;
+  id?: number;
   slug?: string;
   title: string;
   updated_at: number;
@@ -13,45 +13,66 @@ export type Article = {
 
 export class ArticleModel extends BaseModel {
 
-  protected QUERY_CREATE_ARTICLE: string = "INSERT INTO articles (author_id, slug, title, description, body, created_at, updated_at) VALUES (?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?));"
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
 
   public author_id: number;
   public body: string;
   public created_at: number;
   public description: string;
-  public id: null|number;
-  public slug: string = "";
+  public id: number;
+  public slug: string;
   public title: string;
   public updated_at: number;
 
-  public async validate(
-    data: { username: string; email: string; password: string },
-  ): Promise<{ data: any }> {
-    return {
-      data: true
-    };
-  }
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - CONSTRCUTOR /////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
 
   constructor(
     authorId: number,
     title: string,
     description: string,
     body: string,
+    slug: string = "",
+    createdAt = Date.now(),
+    updatedAt = Date.now()
+    id: number = -1
   ) {
     super();
-    this.id = null;
+    this.id = id;
     this.author_id = authorId;
-    this.slug = this.createSlug(title);
     this.title = title;
     this.description = description;
     this.body = body;
-    this.created_at = Date.now();
-    this.updated_at = Date.now();
+    this.slug = this.id == -1
+      ? this.createSlug(title)
+      : slug;
+    this.created_at = createdAt;
+    this.updated_at = updatedAt;
   }
 
-  public async save(): Promise<string|void> {
-    try {
-      const query = this.prepare(this.QUERY_CREATE_ARTICLE, [
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * Save this model.
+   *
+   * @return Promise<ArticleModel>
+   */
+  public async save(): Promise<ArticleModel> {
+    // If this model already has an ID, then that means we're updating the model
+    if (this.id != -1) {
+      return this.update();
+    }
+
+    let query = "INSERT INTO articles "
+      + "(author_id, title, description, body, slug, created_at, updated_at) "
+      + "VALUES (?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?));"
+    query = this.prepareQuery(
+      query, [
         String(this.author_id),
         this.slug,
         this.title,
@@ -59,17 +80,53 @@ export class ArticleModel extends BaseModel {
         this.body,
         String(this.created_at),
         String(this.updated_at)
-      ]);
-      console.log(query);
-      const client = await this.connect();
-      client.query(query);
-      client.release();
-    } catch (error) {
-      return error.message;
-    }
+      ]
+    );
+
+    const client = await BaseModel.connect();
+    client.query(query);
+    client.release();
+
+    // @ts-ignore
+    //
+    // (crookse) We ignore this because getArticleBySlug() can return null if
+    // the article is not found. However, in this case, it will never be null.
+    return ArticleModel.getArticleBySlug(this.slug);
   }
 
+  /**
+   * Update this model.
+   *
+   * @return Promise<ArticleModel>
+   */
+  public async update(): Promise<ArticleModel> {
+    let query = "UPDATE articles SET "
+      + "title = ?, description = ?, body = ?, updatedAt = ? "
+      + `WHERE id = '${this.id}';`;
+    query = this.prepareQuery(
+      query,
+      [
+        this.title,
+        this.description,
+        this.body,
+        Date.now()
+      ]
+    );
+    const client = await BaseModel.connect();
+    await client.query(query);
+    client.release();
+
+    // @ts-ignore
+    // (crookse) We ignore this because getUserByEmail() can return null if the
+    // user is not found. However, in this case, it will never be null.
+    return ArticleModel.getArticleById(this.id);
+  }
+
+
+
   protected createSlug(title: string): string {
-    return title.toLowerCase().replace(/[^a-zA-Z ]/g, "").replace(/\s/g, "-");
+    return title.toLowerCase()
+      .replace(/[^a-zA-Z ]/g, "")
+      .replace(/\s/g, "-");
   }
 }
