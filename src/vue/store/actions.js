@@ -148,10 +148,20 @@ export default {
   updateUser(context, user) {
     console.log("Handling action: updateUser");
     return new Promise((resolve) => {
+      let params = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        bio: user.bio,
+        image: user.image,
+        token: user.token
+      };
+      if (user.password) {
+        params.password = user.password;
+      }
+      console.log(params);
       axios
-        .post("/user", {
-          user
-        })
+        .post("/user", params)
         .then((response) => {
           console.log("User updated successfuly.");
           context.dispatch("setUser", response.data.user);
