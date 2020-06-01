@@ -37,7 +37,7 @@ export class ArticleModel extends BaseModel {
     body: string,
     slug: string = "",
     createdAt = Date.now(),
-    updatedAt = Date.now()
+    updatedAt = Date.now(),
     id: number = -1
   ) {
     super();
@@ -126,7 +126,7 @@ export class ArticleModel extends BaseModel {
    */
   public async update(): Promise<ArticleModel> {
     let query = "UPDATE articles SET "
-      + "title = ?, description = ?, body = ?, updatedAt = ? "
+      + "title = ?, description = ?, body = ?, updatedAt = to_timestamp(?) "
       + `WHERE id = '${this.id}';`;
     query = this.prepareQuery(
       query,
@@ -134,7 +134,7 @@ export class ArticleModel extends BaseModel {
         this.title,
         this.description,
         this.body,
-        Date.now()
+        String(Date.now())
       ]
     );
     const client = await BaseModel.connect();
