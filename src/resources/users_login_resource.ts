@@ -68,7 +68,6 @@ class LoginResource extends Drash.Http.Resource {
         const session = await SessionModel.getUserSession(sessionOne, sessionTwo);
         if (session) {
           let user = await UserModel.getUserById(session.user_id);
-          console.log(user);
           if (user) {
             let entity = user.toEntity();
             entity.token = `${session.session_one}|::|${session.session_two}`;
