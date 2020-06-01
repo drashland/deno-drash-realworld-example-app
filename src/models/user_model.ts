@@ -27,8 +27,6 @@ export class UserModel extends BaseModel {
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  public static UPDATE_ONE = "UPDATE users SET username = ?, password = ?, email = ?, bio = ?, image = ?  WHERE id = ?";
-
   public bio: string;
   public email: string;
   public id: number;
@@ -105,7 +103,7 @@ export class UserModel extends BaseModel {
    *
    * @return Promise<boolean>
    */
-  public async delete(): Promise<UserModel> {
+  public async delete(): Promise<boolean> {
     let query = `DELETE FROM users WHERE id = ?`;
     query = this.prepareQuery(
       query,
