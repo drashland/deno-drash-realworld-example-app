@@ -58,6 +58,31 @@ export class ArticleModel extends BaseModel {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
+   * Delete this model.
+   *
+   * @return Promise<boolean>
+   */
+  public async delete(): Promise<boolean> {
+    let query = `DELETE FROM articles WHERE id = ?`;
+    query = this.prepareQuery(
+      query,
+      [
+        String(this.id),
+      ]
+    );
+
+    try {
+      const client = await BaseModel.connect();
+      await client.query(query);
+      client.release();
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Save this model.
    *
    * @return Promise<ArticleModel>
