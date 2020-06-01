@@ -69,6 +69,11 @@ export class SessionModel extends BaseModel {
   // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * Save this model.
+   *
+   * @return Promise<SessionModel>
+   */
   public async save(): Promise<SessionModel> {
     if (this.id != -1) {
       throw new Error("Session record already exists.");
@@ -90,6 +95,8 @@ export class SessionModel extends BaseModel {
     client.release();
 
     // @ts-ignore
+    // (crookse) We ignore this because getUserSession() can return null if the
+    // session is not found. However, in this case, it will never be null.
     return SessionModel.getUserSession(this.session_one, this.session_two);
   }
 
