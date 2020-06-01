@@ -1,6 +1,6 @@
 import { Pool, PoolClient } from "../deps.ts";
 
-const dbPool = new Pool({
+export const dbPool = new Pool({
     user: "user",
     password: "userpassword",
     database: "realworld",

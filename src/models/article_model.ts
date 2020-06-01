@@ -1,6 +1,6 @@
 import BaseModel from "./base_model.ts";
 
-export type Article = {
+export type ArticleEntity = {
   author_id: number;
   body: string;
   created_at: number;
@@ -9,6 +9,19 @@ export type Article = {
   slug?: string;
   title: string;
   updated_at: number;
+}
+
+function createArticleModelObject(article: ArticleEntity): ArticleModel {
+  return new ArticleModel(
+    article.author_id,
+    article.title,
+    article.description,
+    article.body,
+    article.slug,
+    article.created_at,
+    article.updated_at,
+    article.id
+  );
 }
 
 export class ArticleModel extends BaseModel {
@@ -51,6 +64,22 @@ export class ArticleModel extends BaseModel {
       : slug;
     this.created_at = createdAt;
     this.updated_at = updatedAt;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  static async getArticleBySlug(slug: string) {
+    const query = `SELECT * FROM articles WHERE slug = '${slug}';`;
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    client.release();
+    const user = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    if (user && user.length > 0) {
+      return createArticleModelObject(user[0]);
+    }
+    return null;
   }
 
   //////////////////////////////////////////////////////////////////////////////
