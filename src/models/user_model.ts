@@ -5,7 +5,7 @@ type UserEntity = {
   email: string;
   id?: number;
   image?: string;
-  password: string;
+  password?: string;
   username: string;
   token?: null|string;
 };
@@ -178,7 +178,6 @@ export class UserModel extends BaseModel {
       bio: this.bio,
       image: this.image,
       token: null,
-      password: this.password,
     };
   }
 }
