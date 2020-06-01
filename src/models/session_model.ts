@@ -1,83 +1,106 @@
 import BaseModel from "./base_model.ts";
 
-export default class SessionModel extends BaseModel {
-
-    //////////////////////////////////////////////////////////////////////////////
-    // FILE MARKER - PROPERTIES - STATIC /////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////
-
-    // public static SELECT_ALL = "SELECT * FROM users";
-    // public static DELETE_ALL = "DELETE FROM users WHERE username = 'one'";
-    // public static UPDATE_ONE = "UPDATE users SET username = 'TEST' WHERE username = 'one'";
-    // public static CREATE_ONE = "INSERT INTO users (username, password, email) VALUES (?, ?, ?);"
-    public static SELECT_ONE_BY_SESSION_ONE_AND_TWO = "SELECT * FROM sessions WHERE session_one = ? AND session_two = ? LIMIT 1";
-    public static SELECT_ONE_BY_USER_ID = "SELECT * FROM sessions WHERE user_id = ? LIMIT 1"
-    public static CREATE_ONE = "INSERT INTO sessions (user_id, session_one, session_two) VALUES (?, ?, ?);"
-
-    //////////////////////////////////////////////////////////////////////////////
-    // FILE MARKER - PROPERTIES - ABSTRACT ///////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////
-
-    public primary_key: string = 'id'
-
-    //////////////////////////////////////////////////////////////////////////////
-    // FILE MARKER - PROPERTIES - PUBLIC /////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////
-
-    public id: number = 0
-
-    public user_id: number = 0
-
-    public session_one: string = ''
-
-    public session_two: string = ''
-
-    //////////////////////////////////////////////////////////////////////////////
-    // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////
-
-    public async validate (data: { userId: number, sessionOne: string, sessionTwo: string}): Promise<{ data: any }> {
-      //
-      // User id
-      //
-
-      // Required
-      if (!data.userId) {
-          return {
-            data: {
-              userId: ['User id must be set.'],
-            }
-          }
-      }
-
-      //
-      // session one
-      //
-
-      // Required
-      if (!data.sessionOne) {
-          return {
-            data: {
-              sessionOne: ['Session one must be set.'],
-            }
-          }
-      }
-
-      //
-      // session two
-      //
-
-      // Required
-      if (!data.sessionTwo) {
-          return {
-            data: {
-              sessionTwo: ['Session two must be set.'],
-            }
-          }
-      }
-
-      return {
-        data: true
-      };
-    }
+function createSessionModel(session: any): SessionModel {
+  return new SessionModel(
+    session.session_one,
+    session.session_two,
+    session.user_id,
+    session.id
+  );
 }
+
+export class SessionModel extends BaseModel {
+
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  public id: number;
+  public user_id: number;
+  public session_one: string;
+  public session_two: string;
+
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - CONSTRCUTOR /////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * Construct an object of this class.
+   *
+   * @param string sessionOne
+   * @param string sessionTwo
+   * @param number userId
+   * @param number id
+   */
+  constructor(
+    sessionOne: string,
+    sessionTwo: string,
+    userId: number,
+    id: number = -1
+  ) {
+    super();
+    this.session_one = sessionOne;
+    this.session_two = sessionTwo;
+    this.user_id = userId;
+    this.id = id;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  static async getUserSession(
+    sessionOne: string,
+    sessionTwo: string
+  ): Promise<SessionModel|null> {
+    const query = "SELECT * FROM sessions "
+      + `WHERE session_one = '${sessionOne}' AND session_two = '${sessionTwo}' `
+      + "LIMIT 1;";
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    client.release();
+    const session = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    if (session && session.length > 0) {
+      return createSessionModel(session[0]);
+    }
+    return null;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * Save this model.
+   *
+   * @return Promise<SessionModel>
+   */
+  public async save(): Promise<SessionModel> {
+    if (this.id != -1) {
+      throw new Error("Session record already exists.");
+    }
+
+    let query = "INSERT INTO sessions "
+      + " (user_id, session_one, session_two)"
+      + " VALUES (?, ?, ?);"
+    query = this.prepareQuery(
+      query,
+      [
+        String(this.user_id),
+        this.session_one,
+        this.session_two,
+      ]
+    );
+    const client = await BaseModel.connect();
+    await client.query(query);
+    client.release();
+
+    // @ts-ignore
+    // (crookse) We ignore this because getUserSession() can return null if the
+    // session is not found. However, in this case, it will never be null.
+    return SessionModel.getUserSession(this.session_one, this.session_two);
+  }
+
+}
+
+export default SessionModel;

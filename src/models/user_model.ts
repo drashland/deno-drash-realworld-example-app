@@ -1,187 +1,208 @@
 import BaseModel from "./base_model.ts";
 
-export default class UserModel extends BaseModel {
+export type UserEntity = {
+  bio?: string;
+  email: string;
+  id?: number;
+  image?: string;
+  password?: string;
+  username: string;
+  token?: null|string;
+};
+
+function createUserModelObject(user: any): UserModel {
+  return new UserModel(
+    user.username,
+    user.password,
+    user.email,
+    user.bio,
+    user.image,
+    user.id
+  );
+}
+
+export class UserModel extends BaseModel {
+
   //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - PROPERTIES - STATIC /////////////////////////////////////////
+  // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  public static CREATE_ONE =
-    "INSERT INTO users (username, email, password) VALUES (?, ?, ?);";
-  public static DELETE_ALL = "DELETE FROM users WHERE username = 'one'";
-  public static SELECT_ALL = "SELECT * FROM users";
-  public static SELECT_ALL_BY_EMAIL = "SELECT * FROM users WHERE email = ?";
-  public static SELECT_ALL_BY_ID = "SELECT * FROM users WHERE id = ?";
-  public static SELECT_ALL_BY_USERNAME =
-    "SELECT * FROM users WHERE username = ?";
-  public static UPDATE_ONE =
-    "UPDATE users SET username = ?, password = ?, email = ?, bio = ?, image = ?  WHERE id = ?";
+  public bio: string;
+  public email: string;
+  public id: number;
+  public image: string;
+  public password: string;
+  public username: string;
 
   //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - PROPERTIES - ABSTRACT ///////////////////////////////////////
+  // FILE MARKER - CONSTRCUTOR /////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  public primary_key: string = "id";
+  constructor(
+    username: string,
+    password: string,
+    email: string,
+    bio: string = "",
+    image: string = "https://static.productionready.io/images/smiley-cyrus.jpg",
+    id: number = -1
+  ) {
+    super();
+    this.id = id;
+    this.username = username;
+    this.password = password;
+    this.email = email;
+    this.bio = bio;
+    this.image = image;
+  }
 
   //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - PROPERTIES - PUBLIC /////////////////////////////////////////
+  // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  public id: number = 0;
+  static async getUserByEmail(email: string) {
+    const query = `SELECT * FROM users WHERE email = '${email}';`;
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    const user = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    if (user && user.length > 0) {
+      return createUserModelObject(user[0]);
+    }
+    return null;
+  }
 
-  public username: string = "";
+  static async getUserById(id: number) {
+    const query = `SELECT * FROM users WHERE id = '${id}';`;
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    client.release();
+    const user = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    if (user && user.length > 0) {
+      return createUserModelObject(user[0]);
+    }
+    return null;
+  }
 
-  public password: string = "";
-
-  public email: string = "";
-
-  public created_on: any = "";
-
-  public last_login: any = null;
-
-  public image: string = "";
-
-  public bio: string = "";
+  static async getUserByUsername(username: string) {
+    const query = `SELECT * FROM users WHERE username = '${username}';`;
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    client.release();
+    const user = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    if (user && user.length > 0) {
+      return createUserModelObject(user[0]);
+    }
+    return null;
+  }
 
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @description
-   * Validate the given username, email, and password.
+   * Delete this model.
    *
-   * @return Promise<{ data: any }>
-   *     - Returns a data field with errors if there are errors.
-   *     - Returns a data field with true if validation passes.
+   * @return Promise<boolean>
    */
-  public async validate(
-    data: { username: string; email: string; password: string },
-  ): Promise<{ data: any }> {
-    //
-    // Username
-    //
-
-    // Required
-    if (!data.username) {
-      return {
-        data: {
-          username: ["Username field is required."],
-        },
-      };
-    }
-
-    //
-    // Email
-    //
-
-    // Required
-    if (!data.email) {
-      return {
-        data: {
-          email: ["Email field is required."],
-        },
-      };
-    }
-
-    // Matches an email address
-    const hasValidFormat = this.validateEmailFormat(data.email);
-    if (hasValidFormat === false) {
-      return {
-        data: {
-          email: ["Email must be a valid email address."],
-        },
-      };
-    }
-
-    // Doesn't already exist
-    const isUnique = await this.validateEmailUnique(data.email);
-    if (!isUnique) {
-      return {
-        data: {
-          email: ["Email aready taken."],
-        },
-      };
-    }
-
-    //
-    // Password
-    //
-
-    // Required
-    if (!data.password) {
-      return {
-        data: {
-          password: ["Password field is required."],
-        },
-      };
-    }
-
-    // Min 8 characters, max any, 1 uppercase, 1 lowercase, 1 number
-    const isStrong = this.validatePasswordFormat(data.password);
-    if (isStrong === false) {
-      return {
-        data: {
-          password: [
-            "Password must contain the following: 8 characters, 1 number and 1 uppercase and lowercase letter.",
-          ],
-        },
-      };
-    }
-
-    return {
-      data: true,
-    };
-  }
-
-  /**
-   * @description
-   * Validate that the given email passes validation by testing it against a
-   * regular expression. The regular expression tests to see if the given email
-   * is actually an email.
-   *
-   * @return boolean
-   *     - Returns true if the email passes validation.
-   *     - Returns false if the email fails validation.
-   */
-  public validateEmailFormat(email: string): boolean {
-    const emailRegex = new RegExp(
-      /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i,
+  public async delete(): Promise<boolean> {
+    let query = `DELETE FROM users WHERE id = ?`;
+    query = this.prepareQuery(
+      query,
+      [
+        String(this.id),
+      ]
     );
-    return emailRegex.test(email);
-  }
 
-  /**
-   * @description
-   *  Validate that the given email is unique in the database.
-   *
-   * @return boolean
-   *     - Returns true if the email is unique.
-   *     - Returns false if the email is already taken.
-   */
-  public async validateEmailUnique(email: string): Promise<boolean> {
-    let result = await this.SELECT(UserModel.SELECT_ALL_BY_EMAIL, [email]);
-    if (result.length) {
+    try {
+      const client = await BaseModel.connect();
+      await client.query(query);
+      client.release();
+    } catch (error) {
+      console.log(error);
       return false;
     }
     return true;
   }
 
   /**
-   * @description
-   * Validate that the given password passes validation by testing it against a
-   * regular expression. The regular expression tests to see if the given
-   * password meets the following requirements:
+   * Save this model.
    *
-   *     - Is 8 characters long
-   *     - Includes 1 number
-   *     - Includes 1 uppercase letter
-   *     - Includes 1 lowercase letter
-   *
-   * @return boolean
-   *     - Returns true if the email is unique.
-   *     - Returns false if the email is already taken.
+   * @return Promise<UserModel>
    */
-  public validatePasswordFormat(password: string): boolean {
-    return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(password);
+  public async save(): Promise<UserModel> {
+    // If this model already has an ID, then that means we're updating the model
+    if (this.id != -1) {
+      return this.update();
+    }
+
+    let query = "INSERT INTO users "
+      + " (username, email, password, bio, image)"
+      + " VALUES (?, ?, ?, ?, ?);"
+    query = this.prepareQuery(
+      query,
+      [
+        this.username,
+        this.email,
+        this.password,
+        this.bio,
+        this.image
+      ]
+    );
+
+    const client = await BaseModel.connect();
+    await client.query(query);
+    client.release();
+
+    // @ts-ignore
+    //
+    // (crookse) We ignore this because getUserByEmail() can return null if the
+    // user is not found. However, in this case, it will never be null.
+    return UserModel.getUserByEmail(this.email);
+  }
+
+  /**
+   * Update this model.
+   *
+   * @return Promise<UserModel>
+   */
+  public async update(): Promise<UserModel> {
+    let query = "UPDATE users SET "
+      + "username = ?, password = ?, email = ?, bio = ?, image = ? "
+      + `WHERE id = '${this.id}';`;
+    query = this.prepareQuery(
+      query,
+      [
+        this.username,
+        this.password,
+        this.email,
+        this.bio,
+        this.image
+      ]
+    );
+    const client = await BaseModel.connect();
+    await client.query(query);
+    client.release();
+
+    // @ts-ignore
+    // (crookse) We ignore this because getUserByEmail() can return null if the
+    // user is not found. However, in this case, it will never be null.
+    return UserModel.getUserByEmail(this.email);
+  }
+
+  /**
+   * Convert this object to an entity.
+   *
+   * @return UserEntity
+   */
+  public toEntity(): UserEntity {
+    return {
+      id: this.id,
+      username: this.username,
+      email: this.email,
+      bio: this.bio,
+      image: this.image,
+      token: null,
+    };
   }
 }
+
+export default UserModel;
