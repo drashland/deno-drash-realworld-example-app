@@ -35,7 +35,8 @@ export default {
     context.dispatch("unsetUser");
   },
 
-  createArticle({ commit }, article) {
+  createArticle(context, article) {
+    article.author_id = context.getters.user.id;
     return new Promise((resolve) => {
       axios
         .post("/articles", {
