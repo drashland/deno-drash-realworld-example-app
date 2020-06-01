@@ -11,13 +11,14 @@ function createSessionModel(session: any): SessionModel {
 
 export class SessionModel extends BaseModel {
 
-  public id: null|number;
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  public id: number;
   public user_id: number;
   public session_one: string;
   public session_two: string;
-
-  public static SELECT_ONE_BY_USER_ID = "SELECT * FROM sessions WHERE user_id = ? LIMIT 1"
-  public static CREATE_ONE = "INSERT INTO sessions (user_id, session_one, session_two) VALUES (?, ?, ?);"
 
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - CONSTRCUTOR /////////////////////////////////////////////////
