@@ -111,6 +111,8 @@ class LoginResource extends Drash.Http.Resource {
       inputUser.email
     );
 
+    console.log(user);
+
     if (!user) {
       console.log("User not found.");
       return this.errorResponse("Invalid user credentials.");

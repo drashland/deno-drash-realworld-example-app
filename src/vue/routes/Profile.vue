@@ -102,10 +102,5 @@ export default {
       this.$store.dispatch("setFollowProfile", this.$route.params);
     }
   },
-  watch: {
-    $route(to) {
-      this.$store.dispatch("fetchProfile", to.params);
-    }
-  }
 };
 </script>

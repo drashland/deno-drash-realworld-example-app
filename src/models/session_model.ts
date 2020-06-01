@@ -61,8 +61,8 @@ export class SessionModel extends BaseModel {
   //////////////////////////////////////////////////////////////////////////////
 
   public async save(): Promise<SessionModel> {
-    if (this.id) {
-      throw new Error("Record already exists.");
+    if (this.id != -1) {
+      throw new Error("Session record already exists.");
     }
 
     let query = "INSERT INTO sessions "

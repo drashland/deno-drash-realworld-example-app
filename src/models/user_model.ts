@@ -107,7 +107,7 @@ export class UserModel extends BaseModel {
    */
   public async save(): Promise<UserModel> {
     // If this model already has an ID, then that means we're updating the model
-    if (this.id) {
+    if (this.id != -1) {
       return this.update();
     }
 
@@ -143,7 +143,7 @@ export class UserModel extends BaseModel {
    */
   public async update(): Promise<UserModel> {
     let query = "UPDATE users SET "
-      + "username = '?', password = '?', email = '?', bio = '?', image = '?' "
+      + "username = ?, password = ?, email = ?, bio = ?, image = ? "
       + `WHERE id = '${this.id}';`;
     query = this.prepareQuery(
       query,

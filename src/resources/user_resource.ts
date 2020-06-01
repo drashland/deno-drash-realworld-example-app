@@ -41,27 +41,40 @@ export default class UserResource extends Drash.Http.Resource {
   public async POST() {
     console.log("Handling UserResource POST.");
     console.log("Updating the user with the following information:");
-    let userDetails = this.request.getBodyParam("user");
-    console.log(userDetails);
+    let inputUser = this.request.getBodyParam("user");
+    console.log(inputUser);
 
     // Keep track of the user's token because we'll need to send it back in the
     // response. Otherwise, the user will be logged out.
-    let token = userDetails.token;
+    const token = inputUser.token;
 
     this.response.body = {
       user: null,
     };
 
-    const user = await UserModel.getUserById(userDetails.id);
-    if (user) {
-      user.update(userDetails);
-      let entity = user.toEntity();
-      entity.token = token;
+    let user = await UserModel.getUserById(inputUser.id);
 
+    if (!user) {
+      console.log("User not found.");
       this.response.body = {
-        user,
+        errors: {
+          body: "Error updating your profile."
+        }
       };
+      return this.response;
     }
+
+    user.username = inputUser.username;
+    user.bio = inputUser.bio;
+    user = await user.save();
+    console.log(user);
+
+    let entity = user.toEntity();
+    entity.token = token;
+
+    this.response.body = {
+      user: entity
+    };
 
     return this.response;
   }
