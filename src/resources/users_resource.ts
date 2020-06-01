@@ -19,7 +19,7 @@ class RegisterResource extends Drash.Http.Resource {
      *     }
      */
     public async POST() {
-        // Gather data
+      // Gather data
       const username = ValidationService.decodeInput(
         this.request.getBodyParam('username')
       );
@@ -56,13 +56,10 @@ class RegisterResource extends Drash.Http.Resource {
         );
       }
 
-      // Hash password
-      const password = await bcrypt.hash(rawPassword);
-
       // Create user
       let user = new UserModel(
           username,
-          password,
+          await bcrypt.hash(rawPassword), // HASH THE PASSWORD
           email
       );
       user = await user.save();
@@ -94,6 +91,10 @@ class RegisterResource extends Drash.Http.Resource {
       };
       return this.response;
     }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - PROTECTED /////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
 
     protected errorResponse(message: string): Drash.Http.Response {
       this.response.status_code = 422;
