@@ -1,6 +1,6 @@
 import BaseModel from "./base_model.ts";
 
-type UserEntity = {
+export type UserEntity = {
   bio?: string;
   email: string;
   id?: number;

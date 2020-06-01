@@ -1,5 +1,14 @@
 import BaseModel from "./base_model.ts";
 
+function createSessionModel(session: any): SessionModel {
+  return new SessionModel(
+    session.session_one,
+    session.session_two,
+    session.user_id,
+    session.id
+  );
+}
+
 export class SessionModel extends BaseModel {
 
   public id: null|number;
@@ -84,15 +93,6 @@ export class SessionModel extends BaseModel {
     return SessionModel.getUserSession(this.session_one, this.session_two);
   }
 
-}
-
-function createSessionModel(session: any): SessionModel {
-  return new SessionModel(
-    session.session_one,
-    session.session_two,
-    session.user_id,
-    session.id
-  );
 }
 
 export default SessionModel;
