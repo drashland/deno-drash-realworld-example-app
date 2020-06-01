@@ -2,7 +2,21 @@ import { bcrypt } from "../deps.ts";
 import UserModel from "../models/user_model.ts";
 
 export default class ValidationService {
-  static decodeInput(input: string): string {
+  /**
+   * Decode any encoded strings.
+   *
+   * @param string input
+   *     The string to decode.
+   *
+   * @return string|undefined
+   *     - Returns the decoded string.
+   *     - Returns the input back if it is not a string. This method only
+   *       decodes strings.
+   */
+  static decodeInput(input: string): any {
+    if ((typeof input) !== "string") {
+      return input;
+    }
     return decodeURIComponent(input);
   }
 

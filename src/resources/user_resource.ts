@@ -1,5 +1,6 @@
 import { Drash, bcrypt } from "../deps.ts";
 import UserModel from "../models/user_model.ts";
+import ValidationService from "../services/validation_service.ts";
 
 export default class UserResource extends Drash.Http.Resource {
   static paths = [
@@ -40,19 +41,27 @@ export default class UserResource extends Drash.Http.Resource {
    */
   public async POST() {
     console.log("Handling UserResource POST.");
-    console.log("Updating the user with the following information:");
-    let inputUser = this.request.getBodyParam("user");
-    console.log(inputUser);
 
-    // Keep track of the user's token because we'll need to send it back in the
-    // response. Otherwise, the user will be logged out.
-    const token = inputUser.token;
+    // Gather data
+    const id = this.request.getBodyParam("id");
+    const username = ValidationService.decodeInput(
+      this.request.getBodyParam('username')
+    );
+    const email = ValidationService.decodeInput(
+      this.request.getBodyParam('email')
+    );
+    const rawPassword = ValidationService.decodeInput(
+      this.request.getBodyParam('password')
+    );
+    const bio = ValidationService.decodeInput(
+      this.request.getBodyParam("bio")
+    );
+    const image = ValidationService.decodeInput(
+      this.request.getBodyParam("image")
+    );
+    const token = this.request.getBodyParam("token");
 
-    this.response.body = {
-      user: null,
-    };
-
-    let user = await UserModel.getUserById(inputUser.id);
+    let user = await UserModel.getUserById(id);
 
     if (!user) {
       console.log("User not found.");
@@ -64,18 +73,64 @@ export default class UserResource extends Drash.Http.Resource {
       return this.response;
     }
 
-    user.username = inputUser.username;
-    user.bio = inputUser.bio;
+    // Validate
+    console.log("Validating inputs.");
+    if (!username) {
+      return this.errorResponse("Username field required.");
+    }
+    if (!image) {
+      return this.errorResponse("Image field required.");
+    }
+    if (!email) {
+      return this.errorResponse("Email field required.");
+    }
+    if (!ValidationService.isEmail(email)) {
+      return this.errorResponse("Email must be a valid email.");
+    }
+    if (email != user.email) {
+      if (!(await ValidationService.isEmailUnique(email))) {
+        return this.errorResponse("Email already taken.");
+      }
+    }
+    if (rawPassword) {
+      if (!ValidationService.isPasswordStrong(rawPassword)) {
+        return this.errorResponse(
+          "Password must be 8 characters long and include 1 number, 1 "
+          + "uppercase letter, and 1 lowercase letter."
+        );
+      }
+    }
+
+    user.username = username;
+    user.bio = bio ?? "";
+    user.image = image;
+    if (rawPassword) {
+      user.password = await bcrypt.hash(rawPassword); // HASH THE PASSWORD
+    }
     user = await user.save();
-    console.log(user);
 
     let entity = user.toEntity();
+    // Make sure to pass the user's session token back to them
     entity.token = token;
 
     this.response.body = {
       user: entity
     };
 
+    return this.response;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - PROTECTED /////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  protected errorResponse(message: string): Drash.Http.Response {
+    this.response.status_code = 422;
+    this.response.body = {
+      errors: {
+        body: message
+      }
+    };
     return this.response;
   }
 }
