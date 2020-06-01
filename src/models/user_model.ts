@@ -108,7 +108,7 @@ export class UserModel extends BaseModel {
     query = this.prepareQuery(
       query,
       [
-        this.id,
+        String(this.id),
       ]
     );
 
