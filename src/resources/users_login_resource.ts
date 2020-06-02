@@ -99,10 +99,10 @@ class LoginResource extends Drash.Http.Resource {
     const inputUser = this.request.getBodyParam("user");
 
     if (!inputUser.email) {
-      return this.errorResponse("Email field required.");
+      return this.errorResponse(422, "Email field required.");
     }
     if (!ValidationService.isEmail(inputUser.email)) {
-      return this.errorResponse("Email must be a valid email.");
+      return this.errorResponse(422, "Email must be a valid email.");
     }
 
     // Convert the user to a real user model object
@@ -114,16 +114,16 @@ class LoginResource extends Drash.Http.Resource {
 
     if (!user) {
       console.log("User not found.");
-      return this.errorResponse("Invalid user credentials.");
+      return this.errorResponse(422, "Invalid user credentials.");
     }
 
     const password = this.request.getBodyParam("user").password;
     if (!password) {
-      return this.errorResponse("Password field required.");
+      return this.errorResponse(422, "Password field required.");
     }
     if (! (await ValidationService.isPasswordCorrect(password, user.password))) {
       console.log("Passwords do not match.");
-      return this.errorResponse("Invalid user credentials.");
+      return this.errorResponse(422, "Invalid user credentials.");
     }
 
     // Create session for user. We return the session values on the user
@@ -141,24 +141,6 @@ class LoginResource extends Drash.Http.Resource {
       user: entity
     }
 
-    return this.response;
-  }
-
-  /**
-   * Create a uniform error response for this resource.
-   *
-   * @param string message
-   *     The error message to send in the body of the response.
-   *
-   * @return Drash.Http.Response
-   */
-  protected errorResponse(message: string): Drash.Http.Response {
-    this.response.status_code = 401;
-    this.response.body = {
-      errors: {
-        body: [message]
-      }
-    };
     return this.response;
   }
 }
