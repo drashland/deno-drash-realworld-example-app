@@ -48,7 +48,7 @@
                   class="nav-link"
                   active-class="active"
                   exact
-                  :to="{ name: 'profile' }"
+                  :to="{ name: 'profile', params: { username: profile.username } }"
                 >
                   My Articles
                 </router-link>
@@ -58,7 +58,7 @@
                   class="nav-link"
                   active-class="active"
                   exact
-                  :to="{ name: 'profile-favorites' }"
+                  :to="{ name: 'profile-favorites', params: { username: profile.username }  }"
                 >
                   Favorited Articles
                 </router-link>
@@ -102,10 +102,5 @@ export default {
       this.$store.dispatch("setFollowProfile", this.$route.params);
     }
   },
-  watch: {
-    $route(to) {
-      this.$store.dispatch("fetchProfile", to.params);
-    }
-  }
 };
 </script>
