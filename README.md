@@ -22,9 +22,8 @@ Navigate to `localhost:1667`
 # Features
 
 - [x] Docker compose environment
-- [ ] Middleware
-    - [x] Logging
-    - [x] Authentication (/ route)
+- [x] Logging
+- [x] Authentication (/users/login)
 - [x] User accounts
     - [x] Postgres DB to hold user accounts with a seeder
     - [x] Registration

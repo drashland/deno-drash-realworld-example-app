@@ -38,37 +38,37 @@
       </div>
     </div>
 
-    <!-- <div class="container">                           -->
-    <!--   <div class="row">                               -->
-    <!--     <div class="col-xs-12 col-md-10 offset-md-1"> -->
-    <!--       <div class="articles-toggle">               -->
-    <!--         <ul class="nav nav-pills outline-active"> -->
-    <!--           <li class="nav-item">                   -->
-    <!--             <router-link                          -->
-    <!--               class="nav-link"                    -->
-    <!--               active-class="active"               -->
-    <!--               exact                               -->
-    <!--               :to="{ name: 'profile' }"           -->
-    <!--             >                                     -->
-    <!--               My Articles                         -->
-    <!--             </router-link>                        -->
-    <!--           </li>                                   -->
-    <!--           <li class="nav-item">                   -->
-    <!--             <router-link                          -->
-    <!--               class="nav-link"                    -->
-    <!--               active-class="active"               -->
-    <!--               exact                               -->
-    <!--               :to="{ name: 'profile-favorites' }" -->
-    <!--             >                                     -->
-    <!--               Favorited Articles                  -->
-    <!--             </router-link>                        -->
-    <!--           </li>                                   -->
-    <!--         </ul>                                     -->
-    <!--       </div>                                      -->
-    <!--       <router-view></router-view>                 -->
-    <!--     </div>                                        -->
-    <!--   </div>                                          -->
-    <!-- </div>                                            -->
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12 col-md-10 offset-md-1">
+          <div class="articles-toggle">
+            <ul class="nav nav-pills outline-active">
+              <li class="nav-item">
+                <router-link
+                  class="nav-link"
+                  active-class="active"
+                  exact
+                  :to="{ name: 'profile', params: { username: profile.username } }"
+                >
+                  My Articles
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link
+                  class="nav-link"
+                  active-class="active"
+                  exact
+                  :to="{ name: 'profile-favorites', params: { username: profile.username }  }"
+                >
+                  Favorited Articles
+                </router-link>
+              </li>
+            </ul>
+          </div>
+          <router-view></router-view>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 

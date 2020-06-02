@@ -1,11 +1,10 @@
 import { Drash, bcrypt } from "../deps.ts"
+import BaseResource from "./base_resource.ts"
 import UserModel from "../models/user_model.ts";
 import SessionModel from "../models/session_model.ts";
-import UserService from "../services/user_service.ts";
+import ValidationService from "../services/validation_service.ts";
 
-const sessionModel = new SessionModel();
-
-class RegisterResource extends Drash.Http.Resource {
+class RegisterResource extends BaseResource {
 
     static paths = [
         "/users",
@@ -21,65 +20,79 @@ class RegisterResource extends Drash.Http.Resource {
      *     }
      */
     public async POST() {
-        // Gather data
-        const username = decodeURIComponent(this.request.getBodyParam('username'));
-        const email = decodeURIComponent(this.request.getBodyParam('email'));
-        const rawPassword = decodeURIComponent(this.request.getBodyParam('password'));
+      // Gather data
+      const username = ValidationService.decodeInput(
+        this.request.getBodyParam('username')
+      );
+      const email = ValidationService.decodeInput(
+        this.request.getBodyParam('email')
+      );
+      const rawPassword = ValidationService.decodeInput(
+        this.request.getBodyParam('password')
+      );
 
-        console.log("Creating the following user:");
-        console.log(username, email, rawPassword);
+      console.log("Creating the following user:");
+      console.log(username, email, rawPassword);
 
-        // Validate
-        const userModel = new UserModel();
-        const result = await userModel.validate({
+      // Validate
+      if (!username) {
+        return this.errorResponse(422, "Username field required.");
+      }
+      if (!email) {
+        return this.errorResponse(422, "Email field required.");
+      }
+      if (!rawPassword) {
+        return this.errorResponse(422, "Password field required.");
+      }
+      if (!ValidationService.isEmail(email)) {
+        return this.errorResponse(422, "Email must be a valid email.");
+      }
+      if (!(await ValidationService.isEmailUnique(email))) {
+        return this.errorResponse(422, "Email already taken.");
+      }
+      if (!ValidationService.isPasswordStrong(rawPassword)) {
+        return this.errorResponse(
+          422,
+          "Password must be 8 characters long and include 1 number, 1 "
+          + "uppercase letter, and 1 lowercase letter."
+        );
+      }
+
+      // Create user
+      let user = new UserModel(
           username,
-          email,
-          password: rawPassword
-        });
-        if (result.data !== true) {
-          this.response.status_code = 422;
-          this.response.body = {
-            errors: result.data
-          };
-          return this.response;
-        }
+          await bcrypt.hash(rawPassword), // HASH THE PASSWORD
+          email
+      );
+      user = await user.save();
 
-        // Hash password
-        const password = await bcrypt.hash(rawPassword);
-
-        // Create user
-        await userModel.CREATE(
-          UserModel.CREATE_ONE,
-          [
-            username,
-            email,
-            password
-          ]
+      if (!user) {
+        return this.errorResponse(
+          422,
+          "An error occurred while trying to create your account."
         );
+      }
 
-        let user = await UserService.getUserByUsername(username);
+      let entity = user.toEntity();
 
-        // Create session for user. We return the session values on the user
-        // object and the front-end is in charge of setting the values as a
-        // cookie.
-        const sessionOneValue = await bcrypt.hash("sessionOne2020Drash");
-        const sessionTwoValue = await bcrypt.hash("sessionTwo2020Drash");
-        await sessionModel.CREATE(
-          SessionModel.CREATE_ONE,
-          [
-            user.id,
-            sessionOneValue,
-            sessionTwoValue
-          ]
-        );
-        user.token = `${sessionOneValue}|::|${sessionTwoValue}`;
+      // Create session for user. We return the session values on the user
+      // object and the front-end is in charge of setting the values as a
+      // cookie.
+      const sessionOneValue = await bcrypt.hash("sessionOne2020Drash");
+      const sessionTwoValue = await bcrypt.hash("sessionTwo2020Drash");
+      const session = new SessionModel(
+        sessionOneValue,
+        sessionTwoValue,
+        user.id
+      );
+      session.save();
+      entity.token = `${sessionOneValue}|::|${sessionTwoValue}`;
 
-        // Return the newly created user
-        this.response.body = {
-          user
-        };
-
-        return this.response;
+      // Return the newly created user
+      this.response.body = {
+        user: entity
+      };
+      return this.response;
     }
 }
 

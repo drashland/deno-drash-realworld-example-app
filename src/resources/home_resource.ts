@@ -1,6 +1,7 @@
 import { Drash } from "../deps.ts"
+import BaseResource from "./base_resource.ts"
 
-class HomeResource extends Drash.Http.Resource {
+class HomeResource extends BaseResource {
 
   static paths = [
     "/",
