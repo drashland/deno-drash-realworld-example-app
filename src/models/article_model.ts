@@ -70,24 +70,16 @@ export class ArticleModel extends BaseModel {
   // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  static async getArticle(authorId: number) {
-    return {
-        "slug": "how-to-train-your-dragon",
-        "title": "How to train your dragon",
-        "description": "Ever wonder how?",
-        "body": "It takes a Jacobian",
-        "tagList": ["dragons", "training"],
-        "createdAt": "2016-02-18T03:22:56.637Z",
-        "updatedAt": "2016-02-18T03:48:35.824Z",
-        "favorited": false,
-        "favoritesCount": 0,
-        "author": {
-          "username": "jake",
-          "bio": "I work at statefarm",
-          "image": "https://i.stack.imgur.com/xHWG8.jpg",
-          "following": false
-        }
+  static async getArticleBySlug(slug: string) {
+    const query = "SELECT * FROM articles "
+      + ` WHERE slug = '${slug}';`;
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    const article = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    if (article && article.length > 0) {
+      return createArticleModelObject(article[0]);
     }
+    return null;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -147,14 +139,31 @@ export class ArticleModel extends BaseModel {
     );
 
     const client = await BaseModel.connect();
-    client.query(query);
+    await client.query(query);
     client.release();
 
     // @ts-ignore
     //
     // (crookse) We ignore this because getArticleBySlug() can return null if
     // the article is not found. However, in this case, it will never be null.
-    return ArticleModel.getArticle(this.author_id);
+    return ArticleModel.getArticleBySlug(this.slug);
+  }
+
+  /**
+   * Convert this object to an entity.
+   *
+   * @return ArticleEntity
+   */
+  public toEntity(): ArticleEntity {
+    return {
+      id: this.id,
+      author_id: this.author_id,
+      title: this.title,
+      description: this.description,
+      body: this.body,
+      created_at: this.created_at,
+      updated_at: this.updated_at
+    };
   }
 
   /**
@@ -189,7 +198,7 @@ export class ArticleModel extends BaseModel {
 
   protected createSlug(title: string): string {
     return title.toLowerCase()
-      .replace(/[^a-zA-Z ]/g, "")
+      .replace(/[^a-zA-Z0-9 ]/g, "")
       .replace(/\s/g, "-");
   }
 }

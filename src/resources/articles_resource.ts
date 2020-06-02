@@ -8,45 +8,53 @@ class ArticlesResource extends Drash.Http.Resource {
     "/articles/:slug",
   ];
 
-  public GET() {
-    this.response.body = {
-      "article": {
-        "slug": "how-to-train-your-dragon",
-        "title": "How to train your dragon",
-        "description": "Ever wonder how?",
-        "body": "It takes a Jacobian",
-        "tagList": ["dragons", "training"],
-        "createdAt": "2016-02-18T03:22:56.637Z",
-        "updatedAt": "2016-02-18T03:48:35.824Z",
-        "favorited": false,
-        "favoritesCount": 0,
-        "author": {
-          "username": "jake",
-          "bio": "I work at statefarm",
-          "image": "https://i.stack.imgur.com/xHWG8.jpg",
-          "following": false
+  public async GET() {
+    const article = await ArticleModel.getArticleBySlug(
+      this.request.getPathParam("slug")
+    );
+
+    if (!article) {
+      this.response.status_code = 404;
+      this.response.body = {
+        errors: {
+          body: ["Article not found."]
         }
-      }
+      };
+      return this.response;
+    }
+
+    this.response.body = {
+      article: article.toEntity()
     };
+
     return this.response;
   }
 
   public async POST() {
     const inputArticle: ArticleEntity = this.request.getBodyParam("article");
+
     let article: ArticleModel = new ArticleModel(
       inputArticle.author_id,
       inputArticle.title,
       inputArticle.description,
       inputArticle.body
     );
-    try {
-      article = await article.save();
-    } catch (error) {
-      console.log(error);
+    article = await article.save();
+
+    if (!article) {
+      this.response.status_code = 500;
+      this.response.body = {
+        errors: {
+          body: ["Article could not be saved."]
+        }
+      };
+      return this.response;
     }
+
     this.response.body = {
-      article
+      article: article.toEntity()
     };
+
     return this.response;
   }
 }
