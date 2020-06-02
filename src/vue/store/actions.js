@@ -36,6 +36,7 @@ export default {
   },
 
   createArticle(context, article) {
+    console.log("Handling action: createArticle");
     article.author_id = context.getters.user.id;
     return new Promise((resolve) => {
       axios

@@ -12,7 +12,6 @@ export const execute = async (query: string) => {
   try {
     await client.connect();
     await client.query(query);
-    console.log("Migration successful.");
   } catch (error) {
     console.log(error);
   }

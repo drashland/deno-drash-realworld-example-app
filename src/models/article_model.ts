@@ -70,16 +70,24 @@ export class ArticleModel extends BaseModel {
   // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  static async getArticleBySlug(slug: string) {
-    const query = `SELECT * FROM articles WHERE slug = '${slug}';`;
-    const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
-    client.release();
-    const user = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
-    if (user && user.length > 0) {
-      return createArticleModelObject(user[0]);
+  static async getArticle(authorId: number) {
+    return {
+        "slug": "how-to-train-your-dragon",
+        "title": "How to train your dragon",
+        "description": "Ever wonder how?",
+        "body": "It takes a Jacobian",
+        "tagList": ["dragons", "training"],
+        "createdAt": "2016-02-18T03:22:56.637Z",
+        "updatedAt": "2016-02-18T03:48:35.824Z",
+        "favorited": false,
+        "favoritesCount": 0,
+        "author": {
+          "username": "jake",
+          "bio": "I work at statefarm",
+          "image": "https://i.stack.imgur.com/xHWG8.jpg",
+          "following": false
+        }
     }
-    return null;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -123,17 +131,18 @@ export class ArticleModel extends BaseModel {
     }
 
     let query = "INSERT INTO articles "
-      + "(author_id, title, description, body, slug, created_at, updated_at) "
-      + "VALUES (?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?));"
+      + " (author_id, title, description, body, slug, created_at, updated_at)"
+      + " VALUES (?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?));"
     query = this.prepareQuery(
-      query, [
+      query,
+      [
         String(this.author_id),
-        this.slug,
         this.title,
         this.description,
         this.body,
-        String(this.created_at),
-        String(this.updated_at)
+        this.createSlug(this.title),
+        String(Date.now()),
+        String(Date.now())
       ]
     );
 
@@ -145,7 +154,7 @@ export class ArticleModel extends BaseModel {
     //
     // (crookse) We ignore this because getArticleBySlug() can return null if
     // the article is not found. However, in this case, it will never be null.
-    return ArticleModel.getArticleBySlug(this.slug);
+    return ArticleModel.getArticle(this.author_id);
   }
 
   /**

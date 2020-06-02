@@ -1,5 +1,5 @@
 import { Drash } from "../deps.ts"
-import { ArticleModel, Article } from "../models/article_model.ts";
+import { ArticleModel, ArticleEntity } from "../models/article_model.ts";
 
 class ArticlesResource extends Drash.Http.Resource {
 
@@ -31,17 +31,22 @@ class ArticlesResource extends Drash.Http.Resource {
     return this.response;
   }
 
-  public POST() {
-    const inputArticle: Article = this.request.getBodyParam("article");
-    const article: ArticleModel = new ArticleModel(
+  public async POST() {
+    const inputArticle: ArticleEntity = this.request.getBodyParam("article");
+    let article: ArticleModel = new ArticleModel(
       inputArticle.author_id,
       inputArticle.title,
       inputArticle.description,
       inputArticle.body
     );
-    console.log(article);
-    const result = article.save();
-    this.response.body = result;
+    try {
+      article = await article.save();
+    } catch (error) {
+      console.log(error);
+    }
+    this.response.body = {
+      article
+    };
     return this.response;
   }
 }
