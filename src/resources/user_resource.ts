@@ -65,36 +65,32 @@ export default class UserResource extends Drash.Http.Resource {
 
     if (!user) {
       console.log("User not found.");
-      this.response.body = {
-        errors: {
-          body: "Error updating your profile."
-        }
-      };
-      return this.response;
+      return this.errorResponse(404, "Error updating your profile.");
     }
 
     // Validate
     console.log("Validating inputs.");
     if (!username) {
-      return this.errorResponse("Username field required.");
+      return this.errorResponse(422, "Username field required.");
     }
     if (!image) {
-      return this.errorResponse("Image field required.");
+      return this.errorResponse(422, "Image field required.");
     }
     if (!email) {
-      return this.errorResponse("Email field required.");
+      return this.errorResponse(422, "Email field required.");
     }
     if (!ValidationService.isEmail(email)) {
-      return this.errorResponse("Email must be a valid email.");
+      return this.errorResponse(422, "Email must be a valid email.");
     }
     if (email != user.email) {
       if (!(await ValidationService.isEmailUnique(email))) {
-        return this.errorResponse("Email already taken.");
+        return this.errorResponse(422, "Email already taken.");
       }
     }
     if (rawPassword) {
       if (!ValidationService.isPasswordStrong(rawPassword)) {
         return this.errorResponse(
+          422,
           "Password must be 8 characters long and include 1 number, 1 "
           + "uppercase letter, and 1 lowercase letter."
         );
@@ -117,20 +113,6 @@ export default class UserResource extends Drash.Http.Resource {
       user: entity
     };
 
-    return this.response;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - METHODS - PROTECTED /////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-
-  protected errorResponse(message: string): Drash.Http.Response {
-    this.response.status_code = 422;
-    this.response.body = {
-      errors: {
-        body: message
-      }
-    };
     return this.response;
   }
 }

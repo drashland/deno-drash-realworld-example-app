@@ -35,22 +35,23 @@ class RegisterResource extends Drash.Http.Resource {
 
       // Validate
       if (!username) {
-        return this.errorResponse("Username field required.");
+        return this.errorResponse(422, "Username field required.");
       }
       if (!email) {
-        return this.errorResponse("Email field required.");
+        return this.errorResponse(422, "Email field required.");
       }
       if (!rawPassword) {
-        return this.errorResponse("Password field required.");
+        return this.errorResponse(422, "Password field required.");
       }
       if (!ValidationService.isEmail(email)) {
-        return this.errorResponse("Email must be a valid email.");
+        return this.errorResponse(422, "Email must be a valid email.");
       }
       if (!(await ValidationService.isEmailUnique(email))) {
-        return this.errorResponse("Email already taken.");
+        return this.errorResponse(422, "Email already taken.");
       }
       if (!ValidationService.isPasswordStrong(rawPassword)) {
         return this.errorResponse(
+          422,
           "Password must be 8 characters long and include 1 number, 1 "
           + "uppercase letter, and 1 lowercase letter."
         );
@@ -66,6 +67,7 @@ class RegisterResource extends Drash.Http.Resource {
 
       if (!user) {
         return this.errorResponse(
+          422,
           "An error occurred while trying to create your account."
         );
       }
@@ -88,20 +90,6 @@ class RegisterResource extends Drash.Http.Resource {
       // Return the newly created user
       this.response.body = {
         user: entity
-      };
-      return this.response;
-    }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - METHODS - PROTECTED /////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-
-    protected errorResponse(message: string): Drash.Http.Response {
-      this.response.status_code = 422;
-      this.response.body = {
-        errors: {
-          body: message
-        }
       };
       return this.response;
     }
