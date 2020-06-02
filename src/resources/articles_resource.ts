@@ -1,7 +1,8 @@
 import { Drash } from "../deps.ts"
+import BaseResource from "./base_resource.ts"
 import { ArticleModel, ArticleEntity } from "../models/article_model.ts";
 
-class ArticlesResource extends Drash.Http.Resource {
+class ArticlesResource extends BaseResource {
 
   static paths = [
     "/articles",

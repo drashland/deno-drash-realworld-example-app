@@ -1,7 +1,8 @@
 import { Drash } from "../deps.ts"
+import BaseResource from "./base_resource.ts"
 import UserModel from "../models/user_model.ts";
 
-class ProfilesResource extends Drash.Http.Resource {
+class ProfilesResource extends BaseResource {
 
   static paths = [
     "/profiles/:username",
