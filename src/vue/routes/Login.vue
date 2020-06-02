@@ -63,7 +63,6 @@ export default {
     async onSubmit(email, password) {
       swal({
           text: "Logging you in... Please wait...",
-          timer: 500,
           buttons: false,
         })
         .then(async () => {
@@ -74,6 +73,7 @@ export default {
         })
         .then((response) => {
           if (response === true) {
+            swal.close();
             return this.$router.push({ name: "home" });
           }
           swal({
