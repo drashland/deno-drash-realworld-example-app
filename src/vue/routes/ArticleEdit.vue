@@ -96,15 +96,14 @@ export default {
       // that means we're updating the article--not creating a new one.
       let action = slug ? "updateArticle" : "createArticle";
       swal({
-          text: "Please wait...",
-          timer: 500,
-          buttons: false,
-        })
-        .then(async () => {
-          this.publishing_article = true;
-          return await this.$store.dispatch(action, this.article);
-        })
+        text: "Please wait...",
+        buttons: false,
+      });
+      this.publishing_article = true;
+      this.$store.dispatch(action, this.article)
         .then((response) => {
+          swal.close();
+          console.log(response);
           this.publishing_article = false;
           this.$store.dispatch("unsetArticle");
           this.tag_input = null;

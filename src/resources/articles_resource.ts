@@ -9,29 +9,18 @@ class ArticlesResource extends BaseResource {
     "/articles/:slug",
   ];
 
-  public async GET() {
-    const article = await ArticleModel.getArticleBySlug(
-      this.request.getPathParam("slug")
-    );
+  public async GET(): Promise<Drash.Http.Response> {
+    console.log("Handling ArticlesResource GET");
 
-    if (!article) {
-      this.response.status_code = 404;
-      this.response.body = {
-        errors: {
-          body: ["Article not found."]
-        }
-      };
-      return this.response;
+    const slug = this.request.getPathParam("slug");
+    if (slug) {
+      return await this.getArticle(slug);
     }
 
-    this.response.body = {
-      article: article.toEntity()
-    };
-
-    return this.response;
+    return await this.getArticles();
   }
 
-  public async POST() {
+  public async POST(): Promise<Drash.Http.Response> {
     const inputArticle: ArticleEntity = this.request.getBodyParam("article");
 
     let article: ArticleModel = new ArticleModel(
@@ -56,6 +45,39 @@ class ArticlesResource extends BaseResource {
       article: article.toEntity()
     };
 
+    return this.response;
+  }
+
+  protected async getArticle(slug: string): Promise<Drash.Http.Response> {
+    const article = await ArticleModel.getArticleBySlug(slug);
+
+    if (!article) {
+      this.response.status_code = 404;
+      this.response.body = {
+        errors: {
+          body: ["Article not found."]
+        }
+      };
+      return this.response;
+    }
+
+    this.response.body = {
+      article: article.toEntity()
+    };
+
+    return this.response;
+  }
+
+  protected async getArticles(): Promise<Drash.Http.Response> {
+    const articles: ArticleModel[] = await ArticleModel.getAllArticles();
+    const entities: ArticleEntity[] = articles.map((article: ArticleModel) => {
+      return article.toEntity();
+    });
+    console.log(entities);
+
+    this.response.body = {
+      articles: entities
+    };
     return this.response;
   }
 }

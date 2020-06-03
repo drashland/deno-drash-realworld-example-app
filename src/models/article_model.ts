@@ -70,6 +70,19 @@ export class ArticleModel extends BaseModel {
   // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
+  static async getAllArticles(): Promise<ArticleModel[]|[]> {
+    const query = "SELECT * FROM articles";
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    let articles = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    if (articles && articles.length > 0) {
+      return articles.map((article) => {
+        return createArticleModelObject(article);
+      });
+    }
+    return [];
+  }
+
   static async getArticleBySlug(slug: string) {
     const query = "SELECT * FROM articles "
       + ` WHERE slug = '${slug}';`;
@@ -161,6 +174,7 @@ export class ArticleModel extends BaseModel {
       title: this.title,
       description: this.description,
       body: this.body,
+      slug: this.slug,
       created_at: this.created_at,
       updated_at: this.updated_at
     };
@@ -193,8 +207,6 @@ export class ArticleModel extends BaseModel {
     // user is not found. However, in this case, it will never be null.
     return ArticleModel.getArticleById(this.id);
   }
-
-
 
   protected createSlug(title: string): string {
     return title.toLowerCase()

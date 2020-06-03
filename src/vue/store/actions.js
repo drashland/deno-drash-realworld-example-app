@@ -80,7 +80,7 @@ export default {
     });
   },
 
-  fetchArticles({ commit }, params) {
+  fetchArticles(context, params) {
     return new Promise((resolve) => {
       axios
         .get("/articles", {
@@ -90,11 +90,12 @@ export default {
             tag: params.tag,
           }
         })
-        .then(({ data }) => {
-          resolve(data)
+        .then((response) => {
+          context.dispatch("setArticles", response.data.articles);
+          resolve(response)
         })
-        .catch(error => {
-          resolve(undefined);
+        .catch((error) => {
+          resolve(error.response);
         });
     });
   },
@@ -175,6 +176,10 @@ export default {
 
   setArticle(context, article) {
     context.commit("setArticle", article);
+  },
+  
+  setArticles(context, articles) {
+    context.commit("setArticles", articles);
   },
 
   setProfile(context, profile) {

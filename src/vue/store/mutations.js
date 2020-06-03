@@ -3,6 +3,10 @@ export default {
     state.article = article;
   },
 
+  setArticles(state, articles) {
+    state.articles = articles;
+  },
+
   setError(state, errors) {
     state.errors = errors;
   },
