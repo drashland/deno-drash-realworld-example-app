@@ -84,5 +84,12 @@ export default {
         });
     }
   },
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      console.log("Resetting login form fields.");
+      vm.email = null;
+      vm.password = null;
+    });
+  }
 };
 </script>

@@ -69,7 +69,6 @@ export default {
   name: "Settings",
   computed: {
     ...mapGetters([
-      "is_authenticated",
       "user",
     ])
   },

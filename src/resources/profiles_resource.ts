@@ -11,9 +11,15 @@ class ProfilesResource extends BaseResource {
   public async GET() {
     console.log("Handling ProfilesResource GET.");
     const username = this.request.getPathParam("username");
+    console.log(`Handling the following user's profile: ${username}.`);
 
     if (!username) {
-      throw new Drash.Exceptions.HttpException(400, "Username path param is required.");
+      this.response.status_code = 422;
+      this.response.body = {
+        errors: {
+          username: ["Username path param is required."]
+        }
+      };
     }
 
     this.response.body = {

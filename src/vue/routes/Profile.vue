@@ -95,12 +95,19 @@ export default {
       return false;
     },
     follow() {
-      if (!this.isAuthenticated) return;
+      if (!this.is_authenticated) return;
       this.$store.dispatch("setFollowProfile", this.$route.params);
     },
     unfollow() {
       this.$store.dispatch("setFollowProfile", this.$route.params);
     }
   },
+  watch: {
+    $route(to) {
+      if (to.params.username) {
+        this.$store.dispatch("fetchProfile", to.params);
+      }
+    }
+  }
 };
 </script>
