@@ -95,9 +95,12 @@ export default {
         this.$router.push({ name: "login" });
         return;
       }
-      this.$store.dispatch("setFavoriteArticle", {
-        article_slug: this.article.slug,
-        value: !this.article.favorited
+      const action = this.article.favorited
+        ? "unset"
+        : "set";
+      this.$store.dispatch("toggleArticleFavorite", {
+        slug: this.article.slug,
+        action: action
       });
     }
   }

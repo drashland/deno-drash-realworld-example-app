@@ -12,3 +12,12 @@ await execute(`CREATE TABLE public.articles (
   created_at timestamp without time zone NOT NULL,
   updated_at timestamp without time zone NOT NULL
 );`);
+
+await execute(`DROP TABLE IF EXISTS public.articles_favorites;`);
+
+await execute(`CREATE TABLE public.articles_favorites (
+  id serial PRIMARY KEY,
+  article_id integer NOT NULL,
+  author_id integer NOT NULL,
+  value boolean NOT NULL
+);`);

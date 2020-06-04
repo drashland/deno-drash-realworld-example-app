@@ -193,19 +193,20 @@ export default {
     setCookie("drash_sess", user.token, 1);
   },
 
-  toggleArticleFavorite(context, slug, action) {
+  toggleArticleFavorite(context, params) {
+    console.log(`Handling action: toggleArtileFavorite (${params.action})`);
     return new Promise((resolve) => {
       axios
-        .post(`/articles/${slug}/favorite`, {
-          action
+        .post(`/articles/${params.slug}/favorite`, {
+          action: params.action
         })
         .then((response) => {
-          console.log("setArticleFavorite successful.");
+          console.log("toggleArticleFavorite successful.");
           console.log(response);
           resolve(true);
         })
         .catch((error) => {
-          console.log("setArticleFavorite unsuccessful.");
+          console.log("toggleArticleFavorite unsuccessful.");
           resolve(error.response.data);
         });
     });

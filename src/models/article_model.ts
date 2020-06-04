@@ -97,6 +97,7 @@ export class ArticleModel extends BaseModel {
   }
 
   static async getAllArticlesWithAuthors(filters: Filters): Promise<ArticleModel[]|[]> {
+    console.log(filters);
     let query = "SELECT * FROM articles ";
     query += " INNER JOIN users ON articles.author_id=users.id ";
     if (filters.author) {
@@ -105,6 +106,7 @@ export class ArticleModel extends BaseModel {
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
     let articles = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    console.log(articles);
     if (articles && articles.length > 0) {
       return articles.map((article: any) => {
         let model = createArticleModelObject(article);

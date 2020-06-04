@@ -1,6 +1,7 @@
 import { Drash } from "../deps.ts"
 import BaseResource from "./base_resource.ts"
 import { ArticleModel, ArticleEntity, Filters as ArticleFilters } from "../models/article_model.ts";
+import { ArticlesFavoritesModel } from "../models/articles_favorites_model.ts";
 import UserModel from "../models/user_model.ts";
 
 class ArticlesResource extends BaseResource {
@@ -27,11 +28,8 @@ class ArticlesResource extends BaseResource {
   }
 
   public async POST(): Promise<Drash.Http.Response> {
-    if (this.request.url_path.contains("/favorite")) {
-      return await this.toggleFavorite(
-        this.request.getBodyParam("slug"),
-        this.request.getBodyParam("action")
-      );
+    if (this.request.url_path.includes("/favorite")) {
+      return await this.toggleFavorite();
     }
 
     return await this.createArticle();
@@ -44,7 +42,7 @@ class ArticlesResource extends BaseResource {
   /**
    * @return Promise<Drash.Http.Response>
    */
-  protected createArticle(): Promise<Drash.Http.Response> {
+  protected async createArticle(): Promise<Drash.Http.Response> {
     const inputArticle: ArticleEntity = this.request.getBodyParam("article");
 
     let article: ArticleModel = new ArticleModel(
@@ -56,13 +54,7 @@ class ArticlesResource extends BaseResource {
     article = await article.save();
 
     if (!article) {
-      this.response.status_code = 500;
-      this.response.body = {
-        errors: {
-          body: ["Article could not be saved."]
-        }
-      };
-      return this.response;
+      return this.errorResponse(500, "Article could not be saved.");
     }
 
     this.response.body = {
@@ -153,18 +145,31 @@ class ArticlesResource extends BaseResource {
   /**
    * @return Promise<Drash.Http.Response>
    */
-  protected async toggleFavorite(
-    slug: string,
-    action: string
-  ): Promise<Drash.Http.Response> {
+  protected async toggleFavorite(): Promise<Drash.Http.Response> {
+    const slug = this.request.getPathParam("slug");
+    const article = await ArticleModel.getArticleBySlug(slug);
+    if (!article) {
+      return this.errorResponse(404, `Article with slug "${slug}" not found.`);
+    }
+    const action = this.request.getBodyParam("action");
+    let favorite: any;
     switch (action) {
-      case: "set":
-        ArticleModel.setArticleFavorite(slug);
+      case "set":
+        favorite = new ArticlesFavoritesModel(
+          article.id,
+          article.author_id,
+          true
+        );
+        await favorite.save();
         break;
-      case: "unset":
-        ArticleModel.unsetArticleFavorite(slug);
+      case "unset":
+        favorite = await ArticlesFavoritesModel.getByArticleId(article.id);
+        favorite.value = false;
+        await favorite.save();
         break;
     }
+    this.response.body = true;
+    return this.response;
   }
 }
 

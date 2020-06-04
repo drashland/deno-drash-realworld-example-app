@@ -85,7 +85,10 @@ export default {
       const action = this.article.favorited
         ? "unset"
         : "set";
-      this.$store.dispatch("toggleArticleFavorite", this.article.slug, action);
+      this.$store.dispatch("toggleArticleFavorite", {
+        slug: this.article.slug,
+        action: action
+      });
     },
     toggleFollow() {
       if (!this.is_authenticated) {
