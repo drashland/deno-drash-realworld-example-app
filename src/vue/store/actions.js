@@ -178,7 +178,7 @@ export default {
   setArticle(context, article) {
     context.commit("setArticle", article);
   },
-  
+
   setArticles(context, articles) {
     context.commit("setArticles", articles);
   },
@@ -191,6 +191,24 @@ export default {
     context.commit("setIsAuthenticated", true);
     context.commit("setUser", user);
     setCookie("drash_sess", user.token, 1);
+  },
+
+  toggleArticleFavorite(context, slug, action) {
+    return new Promise((resolve) => {
+      axios
+        .post(`/articles/${slug}/favorite`, {
+          action
+        })
+        .then((response) => {
+          console.log("setArticleFavorite successful.");
+          console.log(response);
+          resolve(true);
+        })
+        .catch((error) => {
+          console.log("setArticleFavorite unsuccessful.");
+          resolve(error.response.data);
+        });
+    });
   },
 
   unsetArticle(context) {

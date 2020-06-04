@@ -59,8 +59,6 @@ class LoginResource extends BaseResource {
   protected async checkIfUserIsAuthenticated(): Promise<Drash.Http.Response> {
     console.log("Checking if user has a session.");
     const sessionValues = this.request.getBodyParam("token");
-    console.log("Using the following session values:");
-    console.log(sessionValues);
     if (sessionValues) {
       const sessionValuesSplit = sessionValues.split("|::|");
       const sessionOne = sessionValuesSplit[0];
@@ -75,6 +73,7 @@ class LoginResource extends BaseResource {
             this.response.body = {
               user: entity
             };
+            console.log("User has an active session.");
             return this.response;
           }
         }

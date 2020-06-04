@@ -8,6 +8,7 @@ class ArticlesResource extends BaseResource {
   static paths = [
     "/articles",
     "/articles/:slug",
+    "/articles/:slug/favorite",
   ];
 
   //////////////////////////////////////////////////////////////////////////////
@@ -26,6 +27,24 @@ class ArticlesResource extends BaseResource {
   }
 
   public async POST(): Promise<Drash.Http.Response> {
+    if (this.request.url_path.contains("/favorite")) {
+      return await this.toggleFavorite(
+        this.request.getBodyParam("slug"),
+        this.request.getBodyParam("action")
+      );
+    }
+
+    return await this.createArticle();
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - PROTECTED /////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @return Promise<Drash.Http.Response>
+   */
+  protected createArticle(): Promise<Drash.Http.Response> {
     const inputArticle: ArticleEntity = this.request.getBodyParam("article");
 
     let article: ArticleModel = new ArticleModel(
@@ -52,10 +71,6 @@ class ArticlesResource extends BaseResource {
 
     return this.response;
   }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - METHODS - PROTECTED /////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
 
   /**
    * Get an article by slug.
@@ -133,6 +148,23 @@ class ArticlesResource extends BaseResource {
       articles: entities
     };
     return this.response;
+  }
+
+  /**
+   * @return Promise<Drash.Http.Response>
+   */
+  protected async toggleFavorite(
+    slug: string,
+    action: string
+  ): Promise<Drash.Http.Response> {
+    switch (action) {
+      case: "set":
+        ArticleModel.setArticleFavorite(slug);
+        break;
+      case: "unset":
+        ArticleModel.unsetArticleFavorite(slug);
+        break;
+    }
   }
 }
 

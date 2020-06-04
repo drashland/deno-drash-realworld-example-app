@@ -49,7 +49,7 @@ export default {
       return this.article.favorited ? "Unfavorite Article" : "Favorite Article";
     },
     favoriteCounter() {
-      return `(${this.article.favoritesCount})`;
+      return `(${this.article.favorites_count ? this.article.favorites_count : 0})`;
     },
     followUserLabel() {
       if (this.article && this.article.author) {
@@ -81,10 +81,11 @@ export default {
         this.$router.push({ name: "login" });
         return;
       }
-      this.$store.dispatch("setFavorite", {
-        article_slug: this.article.slug,
-        value: !this.article.favorited
-      });
+
+      const action = this.article.favorited
+        ? "unset"
+        : "set";
+      this.$store.dispatch("toggleArticleFavorite", this.article.slug, action);
     },
     toggleFollow() {
       if (!this.is_authenticated) {
