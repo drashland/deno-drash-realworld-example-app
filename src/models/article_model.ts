@@ -1,8 +1,8 @@
 import BaseModel from "./base_model.ts";
-import UserModel from "./user_model.ts";
+import { UserModel, createUserModelObject } from "./user_model.ts";
 
 export type ArticleEntity = {
-  author?: UserModel;
+  author?: UserModel|null;
   author_id: number;
   body: string;
   created_at: number;
@@ -39,6 +39,7 @@ export class ArticleModel extends BaseModel {
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
+  public author: UserModel|null = null;
   public author_id: number;
   public body: string;
   public created_at: number;
@@ -80,7 +81,7 @@ export class ArticleModel extends BaseModel {
   //////////////////////////////////////////////////////////////////////////////
 
   static async getAllArticles(filters: Filters): Promise<ArticleModel[]|[]> {
-    let query = "SELECT * FROM articles";
+    let query = "SELECT * FROM articles ";
     if (filters.author) {
       query += ` WHERE author_id = '${filters.author.id}'`;
     }
@@ -88,21 +89,59 @@ export class ArticleModel extends BaseModel {
     const dbResult = await client.query(query);
     let articles = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
     if (articles && articles.length > 0) {
-      return articles.map((article) => {
+      return articles.map((article: any) => {
         return createArticleModelObject(article);
       });
     }
     return [];
   }
 
+  static async getAllArticlesWithAuthors(filters: Filters): Promise<ArticleModel[]|[]> {
+    let query = "SELECT * FROM articles ";
+    query += " INNER JOIN users ON articles.author_id=users.id ";
+    if (filters.author) {
+      query += ` WHERE author_id = '${filters.author.id}'`;
+    }
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    let articles = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    if (articles && articles.length > 0) {
+      return articles.map((article: any) => {
+        let model = createArticleModelObject(article);
+        let user = article;
+        user.id = model.author_id;
+        model.author = createUserModelObject(user);
+        return model;
+      });
+    }
+    return [];
+  }
+
   static async getArticleBySlug(slug: string) {
-    const query = "SELECT * FROM articles "
-      + ` WHERE slug = '${slug}';`;
+    let query = "SELECT * FROM articles "
+    query += ` WHERE slug = '${slug}';`;
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
     const article = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
     if (article && article.length > 0) {
       return createArticleModelObject(article[0]);
+    }
+    return null;
+  }
+
+  static async getArticleBySlugWithAuthor(slug: string) {
+    let query = "SELECT * FROM articles "
+    query += " INNER JOIN users ON articles.author_id=users.id ";
+    query += ` WHERE slug = '${slug}';`;
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    const article = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    if (article && article.length > 0) {
+      let model = createArticleModelObject(article[0]);
+      let user = article[0];
+      user.id = model.author_id;
+      model.author = createUserModelObject(user);
+      return model;
     }
     return null;
   }
@@ -175,13 +214,12 @@ export class ArticleModel extends BaseModel {
   }
 
   /**
-   * Convert this object to an entity.
-   *
    * @return ArticleEntity
    */
   public toEntity(): ArticleEntity {
     return {
       id: this.id,
+      author: this.author,
       author_id: this.author_id,
       title: this.title,
       description: this.description,
@@ -218,10 +256,6 @@ export class ArticleModel extends BaseModel {
     // (crookse) We ignore this because getUserByEmail() can return null if the
     // user is not found. However, in this case, it will never be null.
     return ArticleModel.getArticleById(this.id);
-  }
-
-  public async author() {
-    return await UserModel.getUserById(this.author_id);
   }
 
   protected createSlug(title: string): string {

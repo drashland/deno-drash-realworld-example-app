@@ -10,6 +10,10 @@ class ArticlesResource extends BaseResource {
     "/articles/:slug",
   ];
 
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - HTTP //////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
   public async GET(): Promise<Drash.Http.Response> {
     console.log("Handling ArticlesResource GET");
 
@@ -49,8 +53,17 @@ class ArticlesResource extends BaseResource {
     return this.response;
   }
 
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - PROTECTED /////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * Get an article by slug.
+   *
+   * @return Promise<Drash.Http.Response>
+   */
   protected async getArticle(slug: string): Promise<Drash.Http.Response> {
-    const article = await ArticleModel.getArticleBySlug(slug);
+    const article = await ArticleModel.getArticleBySlugWithAuthor(slug);
 
     if (!article) {
       this.response.status_code = 404;
@@ -63,11 +76,6 @@ class ArticlesResource extends BaseResource {
     }
 
     let entity: any = article.toEntity();
-    let author = await article.author();
-    if (!author) {
-      return this.errorResponse(500, "Could not retrieve article.");
-    }
-    entity.author = author.toEntity();
 
     this.response.body = {
       article: entity
@@ -76,6 +84,18 @@ class ArticlesResource extends BaseResource {
     return this.response;
   }
 
+  /**
+   * Get all articles--filtered or unfiltered.
+   *
+   * Filters include: {
+   *   author: string;       (author username)
+   *   favorited_by: string; (author username)
+   *   offset: number;       (used for filtering articles by OFFSET clause)
+   *   tag: string;          (used for filtering articles by tag)
+   * }
+   *
+   * @return Promise<Drash.Http.Response>
+   */
   protected async getArticles(): Promise<Drash.Http.Response> {
     const author = this.request.getUrlQueryParam("author");
     const favoritedBy = this.request.getUrlQueryParam("favorited_by");
@@ -103,7 +123,8 @@ class ArticlesResource extends BaseResource {
     filters.offset = offset ?? 0;
     filters.tag = tag ?? null;
 
-    const articles: ArticleModel[] = await ArticleModel.getAllArticles(filters);
+    const articles: ArticleModel[] = await ArticleModel
+      .getAllArticlesWithAuthors(filters);
     const entities: ArticleEntity[] = articles.map((article: ArticleModel) => {
       return article.toEntity();
     });

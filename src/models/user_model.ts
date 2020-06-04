@@ -10,7 +10,7 @@ export type UserEntity = {
   token?: null|string;
 };
 
-function createUserModelObject(user: any): UserModel {
+export function createUserModelObject(user: any): UserModel {
   return new UserModel(
     user.username,
     user.password,
