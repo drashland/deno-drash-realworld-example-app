@@ -64,24 +64,20 @@ export default {
       swal({
           text: "Logging you in... Please wait...",
           buttons: false,
-        })
-        .then(async () => {
-          return await this.$store.dispatch("logIn", {
-            email,
-            password,
-          });
-        })
-        .then((response) => {
-          if (response === true) {
-            swal.close();
-            return this.$router.push({ name: "home" });
-          }
-          swal({
-            title: "Login failed!",
-            text: response.errors.body.join(" "),
-            icon: "error"
-          });
         });
+
+      let response = await this.$store.dispatch("logIn", { email, password });
+
+      if (response === true) {
+        swal.close();
+        return this.$router.push({ name: "home" });
+      }
+
+      swal({
+        title: "Login failed!",
+        text: response.errors.body.join(" "),
+        icon: "error"
+      });
     }
   },
 };
