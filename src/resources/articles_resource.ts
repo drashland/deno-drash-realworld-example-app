@@ -1,6 +1,7 @@
 import { Drash } from "../deps.ts"
 import BaseResource from "./base_resource.ts"
-import { ArticleModel, ArticleEntity } from "../models/article_model.ts";
+import { ArticleModel, ArticleEntity, Filters as ArticleFilters } from "../models/article_model.ts";
+import UserModel from "../models/user_model.ts";
 
 class ArticlesResource extends BaseResource {
 
@@ -61,19 +62,51 @@ class ArticlesResource extends BaseResource {
       return this.response;
     }
 
+    let entity: any = article.toEntity();
+    let author = await article.author();
+    if (!author) {
+      return this.errorResponse(500, "Could not retrieve article.");
+    }
+    entity.author = author.toEntity();
+
     this.response.body = {
-      article: article.toEntity()
+      article: entity
     };
 
     return this.response;
   }
 
   protected async getArticles(): Promise<Drash.Http.Response> {
-    const articles: ArticleModel[] = await ArticleModel.getAllArticles();
+    const author = this.request.getUrlQueryParam("author");
+    const favoritedBy = this.request.getUrlQueryParam("favorited_by");
+    const offset = this.request.getUrlQueryParam("offset");
+    const tag = this.request.getUrlQueryParam("tag");
+
+    let filters: ArticleFilters = {};
+
+    if (author) {
+      const authorUser= await UserModel.getUserByUsername(author);
+      if (!authorUser) {
+        return this.errorResponse(404, `Articles by ${author} could not be found.`);
+      }
+      filters.author = authorUser;
+    }
+
+    if (favoritedBy) {
+      const favoritedByUser = await UserModel.getUserByUsername(favoritedBy);
+      if (!favoritedByUser) {
+        return this.errorResponse(404, `Articles by ${favoritedBy} could not be found.`);
+      }
+      filters.favorited_by = favoritedByUser;
+    }
+
+    filters.offset = offset ?? 0;
+    filters.tag = tag ?? null;
+
+    const articles: ArticleModel[] = await ArticleModel.getAllArticles(filters);
     const entities: ArticleEntity[] = articles.map((article: ArticleModel) => {
       return article.toEntity();
     });
-    console.log(entities);
 
     this.response.body = {
       articles: entities

@@ -22,7 +22,7 @@
       </div>
       <hr />
       <div class="article-actions">
-        <ArticleMeta :article="article" :actions="true"></ArticleMeta>
+        <!-- <ArticleMeta :article="article" :actions="true"></ArticleMeta> -->
       </div>
       <div class="row">
         <div class="col-xs-12 col-md-8 offset-md-2">
@@ -83,6 +83,24 @@ export default {
     ...mapGetters(["article", "user", "comments", "is_authenticated"])
   },
   methods: {
+    articleCreatedAt() {
+      if (this.article && this.article.created_at) {
+        return this.article.created_at;
+      }
+      return null;
+    },
+    authorUsername() {
+      if (this.article && this.article.author) {
+        return this.article.author.username;
+      }
+      return null;
+    },
+    authorImage() {
+      if (this.article && this.article.author && this.article.author.image) {
+        return article.author.image;
+      }
+      return null;
+    },
     parseMarkdown(content) {
       if (content) {
         return marked(content);

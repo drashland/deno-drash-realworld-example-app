@@ -12,6 +12,9 @@ export default {
   components: {
     ArticleList
   },
+  mounted() {
+    console.log("ProfileFavorited mounted!");
+  },
   computed: {
     favorited() {
       return this.$route.params.username;

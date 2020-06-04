@@ -1,6 +1,8 @@
 import BaseModel from "./base_model.ts";
+import UserModel from "./user_model.ts";
 
 export type ArticleEntity = {
+  author?: UserModel;
   author_id: number;
   body: string;
   created_at: number;
@@ -9,6 +11,13 @@ export type ArticleEntity = {
   slug?: string;
   title: string;
   updated_at: number;
+}
+
+export type Filters = {
+  author?: UserModel|null;
+  favorited_by?: UserModel|null;
+  offset?: number;
+  tag?: string;
 }
 
 function createArticleModelObject(article: ArticleEntity): ArticleModel {
@@ -70,8 +79,11 @@ export class ArticleModel extends BaseModel {
   // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  static async getAllArticles(): Promise<ArticleModel[]|[]> {
-    const query = "SELECT * FROM articles";
+  static async getAllArticles(filters: Filters): Promise<ArticleModel[]|[]> {
+    let query = "SELECT * FROM articles";
+    if (filters.author) {
+      query += ` WHERE author_id = '${filters.author.id}'`;
+    }
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
     let articles = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
@@ -146,8 +158,8 @@ export class ArticleModel extends BaseModel {
         this.description,
         this.body,
         this.createSlug(this.title),
-        String(Date.now()),
-        String(Date.now())
+        String(Date.now() / 1000.00),
+        String(Date.now() / 1000.00)
       ]
     );
 
@@ -206,6 +218,10 @@ export class ArticleModel extends BaseModel {
     // (crookse) We ignore this because getUserByEmail() can return null if the
     // user is not found. However, in this case, it will never be null.
     return ArticleModel.getArticleById(this.id);
+  }
+
+  public async author() {
+    return await UserModel.getUserById(this.author_id);
   }
 
   protected createSlug(title: string): string {

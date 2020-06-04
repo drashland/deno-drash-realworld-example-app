@@ -85,7 +85,8 @@ export default {
       axios
         .get("/articles", {
           params: {
-            favorited: params.favorited,
+            author: params.author,
+            favorited_by: params.favorited,
             offset: params.filters,
             tag: params.tag,
           }

@@ -52,9 +52,11 @@ export default {
       return `(${this.article.favoritesCount})`;
     },
     followUserLabel() {
-      return `${this.profile.following ? "Unfollow" : "Follow"} ${
-        this.article.author.username
-      }`;
+      if (this.article && this.article.author) {
+        return `${this.profile.following ? "Unfollow" : "Follow"} ${
+          this.article.author.username
+        }`;
+      }
     },
     toggleFavoriteButtonClasses() {
       return {

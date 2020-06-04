@@ -1,9 +1,9 @@
 <template>
-  <div class="article-meta" v-if="article && article.author">
+  <div class="article-meta">
     <router-link
       :to="{ name: 'profile', params: { username: authorUsername() } }"
     >
-      <img :src="article.author.image" />
+      <img :src="authorImage()" />
     </router-link>
     <div class="info">
       <router-link
@@ -12,7 +12,7 @@
       >
         {{ authorUsername() }}
       </router-link>
-      <span class="date">{{ article.createdAt | date }}</span>
+      <span class="date">{{ articleCreatedAt() | date }}</span>
     </div>
     <article-actions
       v-if="actions"
@@ -46,7 +46,7 @@ export default {
   props: {
     article: {
       type: Object,
-      required: true
+      required: false
     },
     actions: {
       type: Boolean,
@@ -60,11 +60,25 @@ export default {
       "user",
     ])
   },
+  mounted() {
+    console.log(this.article);
+  },
   methods: {
     authorUsername() {
       if (this.article && this.article.author) {
         return this.article.author.username;
       }
+    },
+    authorImage() {
+      if (this.article && this.article.author) {
+        return this.article.author.image;
+      }
+    },
+    articleCreatedAt() {
+      if (this.article && this.article.created_at) {
+        return this.article.created_at;
+      }
+      return Date();
     },
     isCurrentUser() {
       if (
