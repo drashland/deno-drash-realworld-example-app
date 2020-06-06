@@ -61,7 +61,7 @@ export default {
     ])
   },
   mounted() {
-    console.log(this.article);
+    console.log("ArticleMeta mounted!");
   },
   methods: {
     authorUsername() {
