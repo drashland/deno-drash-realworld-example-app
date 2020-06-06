@@ -112,6 +112,7 @@ export default {
         })
         .catch((response) => {
           console.log("Unsetting profile.");
+          console.log(error.response);
           context.dispatch("unsetProfile");
         });
     });
@@ -202,7 +203,6 @@ export default {
         })
         .then((response) => {
           console.log("toggleArticleFavorite successful.");
-          console.log(response);
           context.dispatch("fetchArticles");
           resolve(true);
         })
@@ -241,7 +241,6 @@ export default {
       if (user.password) {
         params.password = user.password;
       }
-      console.log(params);
       axios
         .post("/user", params)
         .then((response) => {

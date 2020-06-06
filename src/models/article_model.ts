@@ -21,7 +21,7 @@ export type Filters = {
   tag?: string;
 }
 
-function createArticleModelObject(article: ArticleEntity): ArticleModel {
+export function createArticleModelObject(article: ArticleEntity): ArticleModel {
   return new ArticleModel(
     article.author_id,
     article.title,
@@ -193,24 +193,13 @@ export class ArticleModel extends BaseModel {
   // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  static async getAllArticles(filters: Filters): Promise<ArticleModel[]|[]> {
-    let query = "SELECT * FROM articles ";
-    if (filters.author) {
-      query += ` WHERE author_id = '${filters.author.id}'`;
-    }
-    const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
-    client.release();
-
-    let articles = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
-    if (articles && articles.length > 0) {
-      return articles.map((article: any) => {
-        return createArticleModelObject(article);
-      });
-    }
-    return [];
-  }
-
+  /**
+   * Get all records--filtered or unfiltered.
+   *
+   * @param Filters filters
+   *
+   * @return Promise<ArticleMode[]|[]>
+   */
   static async all(filters: Filters): Promise<ArticleModel[]|[]> {
     let query = "SELECT * FROM articles ";
     if (filters.author) {
@@ -229,6 +218,11 @@ export class ArticleModel extends BaseModel {
     return [];
   }
 
+  /**
+   * Get a record by the slug column value.
+   *
+   * @param string slug
+   */
   static async whereSlug(slug: string) {
     let query = `SELECT * FROM articles WHERE slug = '${slug}';`;
 
@@ -244,17 +238,16 @@ export class ArticleModel extends BaseModel {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-
-  public async author(): Promise<UserModel|null> {
-    return await UserModel.whereId(this.author_id);
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - METHODS - PROTECTED /////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * Create a slug based on the given title.
+   *
+   * @param string title
+   *
+   * @return string
+   */
   protected createSlug(title: string): string {
     return title.toLowerCase()
       .replace(/[^a-zA-Z0-9 ]/g, "")
