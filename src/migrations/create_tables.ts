@@ -18,6 +18,6 @@ await execute(`DROP TABLE IF EXISTS public.articles_favorites;`);
 await execute(`CREATE TABLE public.articles_favorites (
   id serial PRIMARY KEY,
   article_id integer NOT NULL,
-  author_id integer NOT NULL,
+  user_id integer NOT NULL,
   value boolean NOT NULL
 );`);
