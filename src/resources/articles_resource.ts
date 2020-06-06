@@ -19,15 +19,15 @@ class ArticlesResource extends BaseResource {
   public async GET(): Promise<Drash.Http.Response> {
     console.log("Handling ArticlesResource GET");
 
-    const slug = this.request.getPathParam("slug");
-    if (slug) {
-      return await this.getArticle(slug);
+    if (this.request.getPathParam("slug")) {
+      return await this.getArticle();
     }
 
     return await this.getArticles();
   }
 
   public async POST(): Promise<Drash.Http.Response> {
+    console.log("Handling ArticlesResource POST");
     if (this.request.url_path.includes("/favorite")) {
       return await this.toggleFavorite();
     }
@@ -65,24 +65,28 @@ class ArticlesResource extends BaseResource {
   }
 
   /**
-   * Get an article by slug.
-   *
    * @return Promise<Drash.Http.Response>
    */
-  protected async getArticle(slug: string): Promise<Drash.Http.Response> {
-    const article = await ArticleModel.getArticleBySlugWithAuthor(slug);
+  protected async getArticle(): Promise<Drash.Http.Response> {
+    const slug = this.request.getPathParam("slug");
+    const article = await ArticleModel.whereSlug(slug);
 
     if (!article) {
-      this.response.status_code = 404;
-      this.response.body = {
-        errors: {
-          body: ["Article not found."]
-        }
-      };
-      return this.response;
+      return this.errorResponse(404, "Article not found.");
     }
 
     let entity: any = article.toEntity();
+    let user: any = await UserModel.whereId(article.author_id);
+    if (!user) {
+      entity.author = user = {
+        bio: "",
+        email: "",
+        image: "",
+        username: "Unknown",
+      };
+    } else {
+      entity.author = user.toEntity();
+    }
 
     this.response.body = {
       article: entity
@@ -112,7 +116,7 @@ class ArticlesResource extends BaseResource {
     let filters: ArticleFilters = {};
 
     if (author) {
-      const authorUser= await UserModel.getUserByUsername(author);
+      const authorUser= await UserModel.whereUsername(author);
       if (!authorUser) {
         return this.errorResponse(404, `Articles by ${author} could not be found.`);
       }
@@ -120,7 +124,7 @@ class ArticlesResource extends BaseResource {
     }
 
     if (favoritedBy) {
-      const favoritedByUser = await UserModel.getUserByUsername(favoritedBy);
+      const favoritedByUser = await UserModel.whereUsername(favoritedBy);
       if (!favoritedByUser) {
         return this.errorResponse(404, `Articles by ${favoritedBy} could not be found.`);
       }
@@ -130,10 +134,26 @@ class ArticlesResource extends BaseResource {
     filters.offset = offset ?? 0;
     filters.tag = tag ?? null;
 
-    const articles: ArticleModel[] = await ArticleModel
-      .getAllArticlesWithAuthors(filters);
-    const entities: ArticleEntity[] = articles.map((article: ArticleModel) => {
+    const articles: ArticleModel[] = await ArticleModel.all(filters);
+
+    let authorIds: number[] = [];
+
+    let entities: any = articles.map((article: ArticleModel) => {
+      if (authorIds.indexOf(article.author_id) === -1) {
+        authorIds.push(article.author_id);
+      }
       return article.toEntity();
+    });
+
+    let authors: any = await UserModel.whereInId(authorIds);
+
+    entities.map((entity: any) => {
+      authors.forEach((user: UserModel) => {
+        if (user.id == entity.author_id) {
+          entity.author = user.toEntity();
+        }
+      });
+      return entity;
     });
 
     this.response.body = {
@@ -147,7 +167,7 @@ class ArticlesResource extends BaseResource {
    */
   protected async toggleFavorite(): Promise<Drash.Http.Response> {
     const slug = this.request.getPathParam("slug");
-    const article = await ArticleModel.getArticleBySlug(slug);
+    const article = await ArticleModel.whereSlug(slug);
     if (!article) {
       return this.errorResponse(404, `Article with slug "${slug}" not found.`);
     }

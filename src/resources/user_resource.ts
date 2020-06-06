@@ -17,7 +17,7 @@ export default class UserResource extends BaseResource {
    *     Returns a User object matched to the username path param.
    */
   public async GET() {
-    this.response.body = await UserModel.getUserByUsername(
+    this.response.body = await UserModel.whereUsername(
       this.request.getPathParam("username"),
     );
     return this.response;
@@ -62,7 +62,7 @@ export default class UserResource extends BaseResource {
     );
     const token = this.request.getBodyParam("token");
 
-    let user = await UserModel.getUserById(id);
+    let user = await UserModel.whereId(id);
 
     if (!user) {
       console.log("User not found.");

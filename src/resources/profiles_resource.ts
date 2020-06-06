@@ -26,7 +26,7 @@ class ProfilesResource extends BaseResource {
       profile: null
     };
 
-    let user = await UserModel.getUserByUsername(username);
+    let user = await UserModel.whereUsername(username);
     if (user) {
       let entity = user.toEntity();
       this.response.body = {

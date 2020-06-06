@@ -66,7 +66,7 @@ class LoginResource extends BaseResource {
       if (sessionOne && sessionTwo) {
         const session = await SessionModel.getUserSession(sessionOne, sessionTwo);
         if (session) {
-          let user = await UserModel.getUserById(session.user_id);
+          let user = await UserModel.whereId(session.user_id);
           if (user) {
             let entity = user.toEntity();
             entity.token = `${session.session_one}|::|${session.session_two}`;
@@ -106,7 +106,7 @@ class LoginResource extends BaseResource {
     }
 
     // Convert the user to a real user model object
-    const user = await UserModel.getUserByEmail(
+    const user = await UserModel.whereEmail(
       inputUser.email
     );
 
