@@ -203,6 +203,7 @@ export default {
         .then((response) => {
           console.log("toggleArticleFavorite successful.");
           console.log(response);
+          context.dispatch("fetchArticles");
           resolve(true);
         })
         .catch((error) => {
