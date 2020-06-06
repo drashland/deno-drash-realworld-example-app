@@ -20,7 +20,7 @@ class ArticlesResource extends BaseResource {
   //////////////////////////////////////////////////////////////////////////////
 
   public async GET(): Promise<Drash.Http.Response> {
-    console.log("Handling ArticlesResource GET");
+    console.log("Handling ArticlesResource GET.");
 
     if (this.request.getPathParam("slug")) {
       return await this.getArticle();
@@ -30,7 +30,7 @@ class ArticlesResource extends BaseResource {
   }
 
   public async POST(): Promise<Drash.Http.Response> {
-    console.log("Handling ArticlesResource POST");
+    console.log("Handling ArticlesResource POST.");
     if (this.request.url_path.includes("/favorite")) {
       return await this.toggleFavorite();
     }
@@ -41,6 +41,56 @@ class ArticlesResource extends BaseResource {
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - METHODS - PROTECTED /////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @param number[] authorIds
+   * @param any[] entities
+   *
+   * @return any[]
+   *     Returns the entities with author entities attached.
+   */
+  protected async attachAuthorsToArticleEntities(
+    authorIds: number[],
+    entities: any[]
+  ): Promise<any[]> {
+    let authors: any = await UserModel.whereInId(authorIds);
+
+    entities.map((entity: any) => {
+      authors.forEach((user: UserModel) => {
+        if (user.id === entity.author_id) {
+          entity.author = user.toEntity();
+        }
+      });
+      return entity;
+    });
+
+    return entities;
+  }
+
+  /**
+   * @param number[] articleIds
+   * @param any[] entities
+   *
+   * @return any[]
+   *     Returns the entities with a favoritesCount field.
+   */
+  protected async attachFavoritesToArticleEntities(
+    articleIds: number[],
+    entities: any
+  ): Promise<any[]> {
+    let favorites: any = await ArticlesFavoritesModel.whereInId(articleIds);
+
+    entities.map((entity: any) => {
+      favorites.forEach((favorite: ArticlesFavoritesModel) => {
+        if (favorite.article_id === entity.id) {
+          entity.favoritesCount += 1;
+        }
+      });
+      return entity;
+    });
+
+    return entities;
+  }
 
   /**
    * @return Promise<Drash.Http.Response>
@@ -91,6 +141,9 @@ class ArticlesResource extends BaseResource {
       entity.author = user.toEntity();
     }
 
+    let favorites: any = await ArticlesFavoritesModel.whereId(article.id);
+    entity.favoritesCount = favorites.length;
+
     this.response.body = {
       article: entity,
     };
@@ -111,6 +164,37 @@ class ArticlesResource extends BaseResource {
    * @return Promise<Drash.Http.Response>
    */
   protected async getArticles(): Promise<Drash.Http.Response> {
+    const articles: ArticleModel[] = await ArticleModel
+      .all(await this.getFilters());
+
+    let articleIds: number[] = [];
+    let authorIds: number[] = [];
+
+    let entities: any = articles.map((article: ArticleModel) => {
+      if (authorIds.indexOf(article.author_id) === -1) {
+        authorIds.push(article.author_id);
+      }
+      if (articleIds.indexOf(article.id) === -1) {
+        articleIds.push(article.id);
+      }
+      return article.toEntity();
+    });
+
+    entities = await this.attachAuthorsToArticleEntities(authorIds, entities);
+    entities = await this.attachFavoritesToArticleEntities(authorIds, entities);
+
+    this.response.body = {
+      articles: entities,
+    };
+    return this.response;
+  }
+
+  /**
+   * Get the filters for filtering article records.
+   *
+   * @return ArticleFilters
+   */
+  protected async getFilters(): Promise<ArticleFilters> {
     const author = this.request.getUrlQueryParam("author");
     const favoritedBy = this.request.getUrlQueryParam("favorited_by");
     const offset = this.request.getUrlQueryParam("offset");
@@ -120,55 +204,22 @@ class ArticlesResource extends BaseResource {
 
     if (author) {
       const authorUser = await UserModel.whereUsername(author);
-      if (!authorUser) {
-        return this.errorResponse(
-          404,
-          `Articles by ${author} could not be found.`,
-        );
+      if (authorUser) {
+        filters.author = authorUser;
       }
-      filters.author = authorUser;
     }
 
     if (favoritedBy) {
       const favoritedByUser = await UserModel.whereUsername(favoritedBy);
-      if (!favoritedByUser) {
-        return this.errorResponse(
-          404,
-          `Articles by ${favoritedBy} could not be found.`,
-        );
+      if (favoritedByUser) {
+        filters.favorited_by = favoritedByUser;
       }
-      filters.favorited_by = favoritedByUser;
     }
 
     filters.offset = offset ?? 0;
     filters.tag = tag ?? null;
 
-    const articles: ArticleModel[] = await ArticleModel.all(filters);
-
-    let authorIds: number[] = [];
-
-    let entities: any = articles.map((article: ArticleModel) => {
-      if (authorIds.indexOf(article.author_id) === -1) {
-        authorIds.push(article.author_id);
-      }
-      return article.toEntity();
-    });
-
-    let authors: any = await UserModel.whereInId(authorIds);
-
-    entities.map((entity: any) => {
-      authors.forEach((user: UserModel) => {
-        if (user.id === entity.author_id) {
-          entity.author = user.toEntity();
-        }
-      });
-      return entity;
-    });
-
-    this.response.body = {
-      articles: entities,
-    };
-    return this.response;
+    return filters;
   }
 
   /**
@@ -192,7 +243,10 @@ class ArticlesResource extends BaseResource {
         await favorite.save();
         break;
       case "unset":
-        favorite = await ArticlesFavoritesModel.getByArticleId(article.id);
+        favorite = await ArticlesFavoritesModel.whereId(article.id);
+        if (!favorite) {
+          return this.errorResponse(404, "Article doesn't have any favorites.");
+        }
         favorite.value = false;
         await favorite.save();
         break;

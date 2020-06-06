@@ -50,7 +50,14 @@ export class ArticlesFavoritesModel extends BaseModel {
   // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  static async getByArticleId(
+  /**
+   * Get a record by the given id column value.
+   *
+   * @param number articleId
+   *
+   * @return Promise<ArticlesFavoritesModel[]|[]>
+   */
+  static async whereId(
     articleId: number,
   ): Promise<ArticlesFavoritesModel[] | []> {
     let query = "SELECT * FROM articles_favorites ";
@@ -69,8 +76,38 @@ export class ArticlesFavoritesModel extends BaseModel {
     return [];
   }
 
+  /**
+   * Get records by the given id column values.
+   *
+   * @param number[] ids
+   */
+  static async whereInId(ids: number[]) {
+    if (ids.length <= 0) {
+      return [];
+    }
+
+    let idsCommaSeparated = ids.join(",");
+    let query = `SELECT * FROM articles_favorites WHERE id IN (${idsCommaSeparated});`;
+
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    client.release();
+
+    let favorites: any = BaseModel.formatResults(
+      dbResult.rows,
+      dbResult.rowDescription.columns,
+    );
+    if (favorites && favorites.length > 0) {
+      return favorites.map((favorite: any) => {
+        return createArticlesFavoritesModelObject(favorite);
+      });
+    }
+
+    return [];
+  }
+
   //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
+  // FILE MARKER - METHODS - CRUD //////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -126,19 +163,7 @@ export class ArticlesFavoritesModel extends BaseModel {
     client.release();
 
     // @ts-ignore
-    return ArticlesFavoritesModel.getByArticleId(this.article_id);
-  }
-
-  /**
-   * @return ArticlesFavoritesEntity
-   */
-  public toEntity(): ArticlesFavoritesEntity {
-    return {
-      id: this.id,
-      article_id: this.article_id,
-      user_id: this.user_id,
-      value: this.value,
-    };
+    return ArticlesFavoritesModel.whereId(this.article_id);
   }
 
   /**
@@ -161,8 +186,24 @@ export class ArticlesFavoritesModel extends BaseModel {
     client.release();
 
     // @ts-ignore
-    // (crookse) We ignore this because getArticleById() can return null if the
+    // (crookse) We ignore this because whereId() can return null if the
     // user is not found. However, in this case, it will never be null.
-    return ArticlesFavoritesModel.getByArticleId(this.id);
+    return ArticlesFavoritesModel.whereId(this.id);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @return ArticlesFavoritesEntity
+   */
+  public toEntity(): ArticlesFavoritesEntity {
+    return {
+      id: this.id,
+      article_id: this.article_id,
+      user_id: this.user_id,
+      value: this.value,
+    };
   }
 }

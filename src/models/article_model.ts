@@ -10,7 +10,7 @@ export type ArticleEntity = {
   body: string;
   created_at: number;
   description: string;
-  favorites_count?: number;
+  favoritesCount: number;
   id?: number;
   slug?: string;
   title: string;
@@ -46,7 +46,7 @@ export class ArticleModel extends BaseModel {
   public body: string;
   public created_at: number;
   public description: string;
-  public favorites_count: number = 0;
+  public favoritesCount: number = 0;
   public id: number;
   public slug: string;
   public title: string;
@@ -153,7 +153,7 @@ export class ArticleModel extends BaseModel {
       author_id: this.author_id,
       title: this.title,
       description: this.description,
-      favorites_count: 0,
+      favoritesCount: this.favoritesCount,
       body: this.body,
       slug: this.slug,
       created_at: this.created_at,
@@ -184,9 +184,9 @@ export class ArticleModel extends BaseModel {
     client.release();
 
     // @ts-ignore
-    // (crookse) We ignore this because getArticleById() can return null if the
+    // (crookse) We ignore this because whereId() can return null if the
     // user is not found. However, in this case, it will never be null.
-    return ArticleModel.getArticleById(this.id);
+    return ArticleModel.whereId(this.id);
   }
 
   //////////////////////////////////////////////////////////////////////////////

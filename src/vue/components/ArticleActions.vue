@@ -49,7 +49,7 @@ export default {
       return this.article.favorited ? "Unfavorite Article" : "Favorite Article";
     },
     favoriteCounter() {
-      return `(${this.article.favorites_count ? this.article.favorites_count : 0})`;
+      return `(${this.article.favoritesCount ? this.article.favoritesCount : 0})`;
     },
     followUserLabel() {
       if (this.article && this.article.author) {

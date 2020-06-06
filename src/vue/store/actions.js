@@ -180,6 +180,11 @@ export default {
     context.commit("setArticle", article);
   },
 
+  async setArticleFavorite(context, options) {
+    const article = await context.dispatch("fetchArticle", options.slug);
+    console.log(article);
+  },
+
   setArticles(context, articles) {
     context.commit("setArticles", articles);
   },
@@ -201,14 +206,19 @@ export default {
         .post(`/articles/${params.slug}/favorite`, {
           action: params.action,
         })
-        .then((response) => {
+        .then(async (response) => {
           console.log("toggleArticleFavorite successful.");
-          context.dispatch("fetchArticles");
-          resolve(true);
+          let articlesResponse = await context.dispatch("fetchArticles", {});
+          articlesResponse.data.articles.forEach((article) => {
+            if (article.slug == params.slug) {
+              context.dispatch("setArticle", article);
+            }
+          });
         })
         .catch((error) => {
+          console.log(error);
           console.log("toggleArticleFavorite unsuccessful.");
-          resolve(error.response.data);
+          resolve(error.response);
         });
     });
   },
