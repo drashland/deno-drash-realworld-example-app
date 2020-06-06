@@ -149,7 +149,7 @@ class ArticlesResource extends BaseResource {
 
     entities.map((entity: any) => {
       authors.forEach((user: UserModel) => {
-        if (user.id == entity.author_id) {
+        if (user.id === entity.author_id) {
           entity.author = user.toEntity();
         }
       });

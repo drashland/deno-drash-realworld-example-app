@@ -106,9 +106,6 @@ export class UserModel extends BaseModel {
     }
 
     let idsCommaSeparated = ids.join(",");
-    if (idsCommaSeparated.length > 1) {
-      idsCommaSeparated = idsCommaSeparated.substring(0, idsCommaSeparated.length - 1);
-    }
     let query = `SELECT * FROM users WHERE id IN (${idsCommaSeparated});`;
 
     const client = await BaseModel.connect();
