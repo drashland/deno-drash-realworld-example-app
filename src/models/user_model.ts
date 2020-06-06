@@ -101,6 +101,10 @@ export class UserModel extends BaseModel {
    * @param number[] ids
    */
   static async whereInId(ids: number[]) {
+    if (ids.length <= 0) {
+      return [];
+    }
+
     let idsCommaSeparated = ids.join(",");
     if (idsCommaSeparated.length > 1) {
       idsCommaSeparated = idsCommaSeparated.substring(0, idsCommaSeparated.length - 1);
