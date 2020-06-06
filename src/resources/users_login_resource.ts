@@ -110,8 +110,6 @@ class LoginResource extends BaseResource {
       inputUser.email
     );
 
-    console.log(user);
-
     if (!user) {
       console.log("User not found.");
       return this.errorResponse(422, "Invalid user credentials.");
