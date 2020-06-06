@@ -251,8 +251,7 @@ class ArticlesResource extends BaseResource {
         await favorite.save();
         break;
     }
-    this.response.body = true;
-    return this.response;
+    return this.getArticle();
   }
 }
 

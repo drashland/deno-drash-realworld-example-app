@@ -208,12 +208,8 @@ export default {
         })
         .then(async (response) => {
           console.log("toggleArticleFavorite successful.");
-          let articlesResponse = await context.dispatch("fetchArticles", {});
-          articlesResponse.data.articles.forEach((article) => {
-            if (article.slug == params.slug) {
-              context.dispatch("setArticle", article);
-            }
-          });
+          context.dispatch("fetchArticles", {});
+          context.dispatch("setArticle", response.data.article);
         })
         .catch((error) => {
           console.log(error);
