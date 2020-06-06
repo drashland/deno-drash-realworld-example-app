@@ -1,12 +1,13 @@
 import BaseModel from "./base_model.ts";
 import { UserModel, createUserModelObject } from "./user_model.ts";
+import { ArticlesFavoritesModel, createArticlesFavoritesModelObject } from "./articles_favorites_model.ts";
 
 export type ArticleEntity = {
-  author?: UserModel|null;
   author_id: number;
   body: string;
   created_at: number;
   description: string;
+  favorites_count?: number;
   id?: number;
   slug?: string;
   title: string;
@@ -39,11 +40,11 @@ export class ArticleModel extends BaseModel {
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  public author: UserModel|null = null;
   public author_id: number;
   public body: string;
   public created_at: number;
   public description: string;
+  public favorites_count: number = 0;
   public id: number;
   public slug: string;
   public title: string;
@@ -77,79 +78,7 @@ export class ArticleModel extends BaseModel {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-
-  static async getAllArticles(filters: Filters): Promise<ArticleModel[]|[]> {
-    let query = "SELECT * FROM articles ";
-    if (filters.author) {
-      query += ` WHERE author_id = '${filters.author.id}'`;
-    }
-    const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
-    let articles = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
-    if (articles && articles.length > 0) {
-      return articles.map((article: any) => {
-        return createArticleModelObject(article);
-      });
-    }
-    return [];
-  }
-
-  static async getAllArticlesWithAuthors(filters: Filters): Promise<ArticleModel[]|[]> {
-    console.log(filters);
-    let query = "SELECT * FROM articles ";
-    query += " INNER JOIN users ON articles.author_id=users.id ";
-    if (filters.author) {
-      query += ` WHERE author_id = '${filters.author.id}'`;
-    }
-    const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
-    let articles = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
-    console.log(articles);
-    if (articles && articles.length > 0) {
-      return articles.map((article: any) => {
-        let model = createArticleModelObject(article);
-        let user = article;
-        user.id = model.author_id;
-        model.author = createUserModelObject(user);
-        return model;
-      });
-    }
-    return [];
-  }
-
-  static async getArticleBySlug(slug: string) {
-    let query = "SELECT * FROM articles "
-    query += ` WHERE slug = '${slug}';`;
-    const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
-    const article = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
-    if (article && article.length > 0) {
-      return createArticleModelObject(article[0]);
-    }
-    return null;
-  }
-
-  static async getArticleBySlugWithAuthor(slug: string) {
-    let query = "SELECT * FROM articles "
-    query += " INNER JOIN users ON articles.author_id=users.id ";
-    query += ` WHERE slug = '${slug}';`;
-    const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
-    const article = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
-    if (article && article.length > 0) {
-      let model = createArticleModelObject(article[0]);
-      let user = article[0];
-      user.id = model.author_id;
-      model.author = createUserModelObject(user);
-      return model;
-    }
-    return null;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
+  // FILE MARKER - METHODS - CRUD //////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -210,9 +139,9 @@ export class ArticleModel extends BaseModel {
 
     // @ts-ignore
     //
-    // (crookse) We ignore this because getArticleBySlug() can return null if
-    // the article is not found. However, in this case, it will never be null.
-    return ArticleModel.getArticleBySlug(this.slug);
+    // (crookse) We ignore this because whereSlug() can return null if the
+    // article is not found. However, in this case, it will never be null.
+    return ArticleModel.whereSlug(this.slug);
   }
 
   /**
@@ -221,10 +150,10 @@ export class ArticleModel extends BaseModel {
   public toEntity(): ArticleEntity {
     return {
       id: this.id,
-      author: this.author,
       author_id: this.author_id,
       title: this.title,
       description: this.description,
+      favorites_count: 0,
       body: this.body,
       slug: this.slug,
       created_at: this.created_at,
@@ -255,10 +184,76 @@ export class ArticleModel extends BaseModel {
     client.release();
 
     // @ts-ignore
-    // (crookse) We ignore this because getUserByEmail() can return null if the
+    // (crookse) We ignore this because getArticleById() can return null if the
     // user is not found. However, in this case, it will never be null.
     return ArticleModel.getArticleById(this.id);
   }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  static async getAllArticles(filters: Filters): Promise<ArticleModel[]|[]> {
+    let query = "SELECT * FROM articles ";
+    if (filters.author) {
+      query += ` WHERE author_id = '${filters.author.id}'`;
+    }
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    client.release();
+
+    let articles = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    if (articles && articles.length > 0) {
+      return articles.map((article: any) => {
+        return createArticleModelObject(article);
+      });
+    }
+    return [];
+  }
+
+  static async all(filters: Filters): Promise<ArticleModel[]|[]> {
+    let query = "SELECT * FROM articles ";
+    if (filters.author) {
+      query += ` WHERE author_id = '${filters.author.id}'`;
+    }
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    client.release();
+
+    let articles = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    if (articles && articles.length > 0) {
+      return articles.map((article: any) => {
+        return createArticleModelObject(article);
+      });
+    }
+    return [];
+  }
+
+  static async whereSlug(slug: string) {
+    let query = `SELECT * FROM articles WHERE slug = '${slug}';`;
+
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    client.release();
+
+    const article = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    if (article && article.length > 0) {
+      return createArticleModelObject(article[0]);
+    }
+    return null;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  public async author(): Promise<UserModel|null> {
+    return await UserModel.whereId(this.author_id);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - PROTECTED /////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
 
   protected createSlug(title: string): string {
     return title.toLowerCase()

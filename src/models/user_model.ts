@@ -59,7 +59,12 @@ export class UserModel extends BaseModel {
   // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  static async getUserByEmail(email: string) {
+  /**
+   * Get a record by the email column value.
+   *
+   * @param string email
+   */
+  static async whereEmail(email: string) {
     const query = `SELECT * FROM users WHERE email = '${email}';`;
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
@@ -70,27 +75,69 @@ export class UserModel extends BaseModel {
     return null;
   }
 
-  static async getUserById(id: number) {
+  /**
+   * Get a record by the id column value.
+   *
+   * @param number id
+   */
+  static async whereId(id: number) {
     const query = `SELECT * FROM users WHERE id = '${id}';`;
+
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
     client.release();
-    const user = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+
+    const user = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns);
     if (user && user.length > 0) {
       return createUserModelObject(user[0]);
     }
+
     return null;
   }
 
-  static async getUserByUsername(username: string) {
-    const query = `SELECT * FROM users WHERE username = '${username}';`;
+  /**
+   * Get records by the given id column values.
+   *
+   * @param number[] ids
+   */
+  static async whereInId(ids: number[]) {
+    let idsCommaSeparated = ids.join(",");
+    if (idsCommaSeparated.length > 1) {
+      idsCommaSeparated = idsCommaSeparated.substring(0, idsCommaSeparated.length - 1);
+    }
+    let query = `SELECT * FROM users WHERE id IN (${idsCommaSeparated});`;
+
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
     client.release();
-    const user = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+
+    let users: any = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns);
+    if (users && users.length > 0) {
+      return users.map((user: any) => {
+        return createUserModelObject(user);
+      });
+    }
+
+    return [];
+  }
+
+  /**
+   * Get a record by the username column value.
+   *
+   * @param string username
+   */
+  static async whereUsername(username: string) {
+    const query = `SELECT * FROM users WHERE username = '${username}';`;
+
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    client.release();
+
+    const user = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns);
     if (user && user.length > 0) {
       return createUserModelObject(user[0]);
     }
+
     return null;
   }
 
@@ -154,9 +201,9 @@ export class UserModel extends BaseModel {
 
     // @ts-ignore
     //
-    // (crookse) We ignore this because getUserByEmail() can return null if the
+    // (crookse) We ignore this because whereEmail() can return null if the
     // user is not found. However, in this case, it will never be null.
-    return UserModel.getUserByEmail(this.email);
+    return UserModel.whereEmail(this.email);
   }
 
   /**
@@ -183,9 +230,9 @@ export class UserModel extends BaseModel {
     client.release();
 
     // @ts-ignore
-    // (crookse) We ignore this because getUserByEmail() can return null if the
+    // (crookse) We ignore this because whereEmail() can return null if the
     // user is not found. However, in this case, it will never be null.
-    return UserModel.getUserByEmail(this.email);
+    return UserModel.whereEmail(this.email);
   }
 
   /**
