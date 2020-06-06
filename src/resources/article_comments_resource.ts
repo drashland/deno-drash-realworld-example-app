@@ -1,8 +1,7 @@
-import { Drash } from "../deps.ts"
+import { Drash } from "../deps.ts";
 // import ArticleService from "../services/article_service.ts";
 
 class ArticleCommentsResource extends Drash.Http.Resource {
-
   static paths = [
     "/articles/:slug/comments",
   ];
@@ -19,10 +18,10 @@ class ArticleCommentsResource extends Drash.Http.Resource {
             "username": "jake",
             "bio": "I work at statefarm",
             "image": "https://i.stack.imgur.com/xHWG8.jpg",
-            "following": false
-          }
-        }
-      }
+            "following": false,
+          },
+        },
+      },
     ];
     return this.response;
   }

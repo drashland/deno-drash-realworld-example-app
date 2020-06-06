@@ -1,6 +1,9 @@
 import BaseModel from "./base_model.ts";
 import { UserModel, createUserModelObject } from "./user_model.ts";
-import { ArticlesFavoritesModel, createArticlesFavoritesModelObject } from "./articles_favorites_model.ts";
+import {
+  ArticlesFavoritesModel,
+  createArticlesFavoritesModelObject,
+} from "./articles_favorites_model.ts";
 
 export type ArticleEntity = {
   author_id: number;
@@ -12,14 +15,14 @@ export type ArticleEntity = {
   slug?: string;
   title: string;
   updated_at: number;
-}
+};
 
 export type Filters = {
-  author?: UserModel|null;
-  favorited_by?: UserModel|null;
+  author?: UserModel | null;
+  favorited_by?: UserModel | null;
   offset?: number;
   tag?: string;
-}
+};
 
 export function createArticleModelObject(article: ArticleEntity): ArticleModel {
   return new ArticleModel(
@@ -30,12 +33,11 @@ export function createArticleModelObject(article: ArticleEntity): ArticleModel {
     article.slug,
     article.created_at,
     article.updated_at,
-    article.id
+    article.id,
   );
 }
 
 export class ArticleModel extends BaseModel {
-
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -62,7 +64,7 @@ export class ArticleModel extends BaseModel {
     slug: string = "",
     createdAt = Date.now(),
     updatedAt = Date.now(),
-    id: number = -1
+    id: number = -1,
   ) {
     super();
     this.id = id;
@@ -70,9 +72,7 @@ export class ArticleModel extends BaseModel {
     this.title = title;
     this.description = description;
     this.body = body;
-    this.slug = this.id == -1
-      ? this.createSlug(title)
-      : slug;
+    this.slug = this.id == -1 ? this.createSlug(title) : slug;
     this.created_at = createdAt;
     this.updated_at = updatedAt;
   }
@@ -92,7 +92,7 @@ export class ArticleModel extends BaseModel {
       query,
       [
         String(this.id),
-      ]
+      ],
     );
 
     try {
@@ -117,9 +117,9 @@ export class ArticleModel extends BaseModel {
       return this.update();
     }
 
-    let query = "INSERT INTO articles "
-      + " (author_id, title, description, body, slug, created_at, updated_at)"
-      + " VALUES (?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?));"
+    let query = "INSERT INTO articles " +
+      " (author_id, title, description, body, slug, created_at, updated_at)" +
+      " VALUES (?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?));";
     query = this.prepareQuery(
       query,
       [
@@ -129,8 +129,8 @@ export class ArticleModel extends BaseModel {
         this.body,
         this.createSlug(this.title),
         String(Date.now() / 1000.00),
-        String(Date.now() / 1000.00)
-      ]
+        String(Date.now() / 1000.00),
+      ],
     );
 
     const client = await BaseModel.connect();
@@ -157,7 +157,7 @@ export class ArticleModel extends BaseModel {
       body: this.body,
       slug: this.slug,
       created_at: this.created_at,
-      updated_at: this.updated_at
+      updated_at: this.updated_at,
     };
   }
 
@@ -167,17 +167,17 @@ export class ArticleModel extends BaseModel {
    * @return Promise<ArticleModel>
    */
   public async update(): Promise<ArticleModel> {
-    let query = "UPDATE articles SET "
-      + "title = ?, description = ?, body = ?, updatedAt = to_timestamp(?) "
-      + `WHERE id = '${this.id}';`;
+    let query = "UPDATE articles SET " +
+      "title = ?, description = ?, body = ?, updatedAt = to_timestamp(?) " +
+      `WHERE id = '${this.id}';`;
     query = this.prepareQuery(
       query,
       [
         this.title,
         this.description,
         this.body,
-        String(Date.now())
-      ]
+        String(Date.now()),
+      ],
     );
     const client = await BaseModel.connect();
     await client.query(query);
@@ -200,7 +200,7 @@ export class ArticleModel extends BaseModel {
    *
    * @return Promise<ArticleMode[]|[]>
    */
-  static async all(filters: Filters): Promise<ArticleModel[]|[]> {
+  static async all(filters: Filters): Promise<ArticleModel[] | []> {
     let query = "SELECT * FROM articles ";
     if (filters.author) {
       query += ` WHERE author_id = '${filters.author.id}'`;
@@ -209,7 +209,10 @@ export class ArticleModel extends BaseModel {
     const dbResult = await client.query(query);
     client.release();
 
-    let articles = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    let articles = BaseModel.formatResults(
+      dbResult.rows,
+      dbResult.rowDescription.columns,
+    );
     if (articles && articles.length > 0) {
       return articles.map((article: any) => {
         return createArticleModelObject(article);
@@ -230,7 +233,10 @@ export class ArticleModel extends BaseModel {
     const dbResult = await client.query(query);
     client.release();
 
-    const article = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    const article = BaseModel.formatResults(
+      dbResult.rows,
+      dbResult.rowDescription.columns,
+    );
     if (article && article.length > 0) {
       return createArticleModelObject(article[0]);
     }

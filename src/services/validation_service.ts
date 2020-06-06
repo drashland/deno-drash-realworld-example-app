@@ -63,7 +63,7 @@ export default class ValidationService {
    */
   static async isPasswordCorrect(
     passwordOne: string,
-    passwordTwo: string
+    passwordTwo: string,
   ): Promise<boolean> {
     return await bcrypt.compare(passwordOne, passwordTwo);
   }

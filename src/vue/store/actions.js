@@ -4,12 +4,12 @@ import { router } from "../../public/js/_app.js";
 import JwtService from "@/common/jwt_service.js";
 
 const userDefault = {
-   created_on: null,
-   email: null,
-   id: null,
-   last_login: null,
-   password: null,
-   username: null,
+  created_on: null,
+  email: null,
+  id: null,
+  last_login: null,
+  password: null,
+  username: null,
 };
 
 export default {
@@ -41,10 +41,10 @@ export default {
     return new Promise((resolve) => {
       axios
         .post("/articles", {
-          article
+          article,
         })
         .then((response) => {
-          resolve(response)
+          resolve(response);
         })
         .catch((error) => {
           resolve(error.response);
@@ -89,11 +89,11 @@ export default {
             favorited_by: params.favorited,
             offset: params.filters,
             tag: params.tag,
-          }
+          },
         })
         .then((response) => {
           context.dispatch("setArticles", response.data.articles);
-          resolve(response)
+          resolve(response);
         })
         .catch((error) => {
           resolve(error.response);
@@ -123,9 +123,9 @@ export default {
       axios
         .get("/tags")
         .then(({ data }) => {
-          resolve(data)
+          resolve(data);
         })
-        .catch(error => {
+        .catch((error) => {
           resolve(undefined);
         });
     });
@@ -136,7 +136,7 @@ export default {
     return new Promise((resolve) => {
       axios
         .post("/users/login", {
-          user: credentials
+          user: credentials,
         })
         .then((response) => {
           console.log("Log in successful.");
@@ -199,7 +199,7 @@ export default {
     return new Promise((resolve) => {
       axios
         .post(`/articles/${params.slug}/favorite`, {
-          action: params.action
+          action: params.action,
         })
         .then((response) => {
           console.log("toggleArticleFavorite successful.");
@@ -220,7 +220,7 @@ export default {
   unsetUser(context) {
     context.commit("setIsAuthenticated", false);
     context.commit("setUser", userDefault);
-    setCookie("drash_sess", null)
+    setCookie("drash_sess", null);
   },
 
   unsetProfile(context) {
@@ -236,7 +236,7 @@ export default {
         email: user.email,
         bio: user.bio,
         image: user.image,
-        token: user.token
+        token: user.token,
       };
       if (user.password) {
         params.password = user.password;
@@ -259,10 +259,10 @@ export default {
 function getCookie(cname) {
   var name = cname + "=";
   var decodedCookie = decodeURIComponent(document.cookie);
-  var ca = decodedCookie.split(';');
-  for(var i = 0; i <ca.length; i++) {
+  var ca = decodedCookie.split(";");
+  for (var i = 0; i < ca.length; i++) {
     var c = ca[i];
-    while (c.charAt(0) == ' ') {
+    while (c.charAt(0) == " ") {
       c = c.substring(1);
     }
     if (c.indexOf(name) == 0) {
@@ -274,7 +274,7 @@ function getCookie(cname) {
 
 function setCookie(cname, cvalue, exdays) {
   var d = new Date();
-  d.setTime(d.getTime() + (exdays*24*60*60*1000));
-  var expires = "expires="+ d.toUTCString();
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  var expires = "expires=" + d.toUTCString();
   document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }

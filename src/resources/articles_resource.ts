@@ -1,11 +1,14 @@
-import { Drash } from "../deps.ts"
-import BaseResource from "./base_resource.ts"
-import { ArticleModel, ArticleEntity, Filters as ArticleFilters } from "../models/article_model.ts";
+import { Drash } from "../deps.ts";
+import BaseResource from "./base_resource.ts";
+import {
+  ArticleModel,
+  ArticleEntity,
+  Filters as ArticleFilters,
+} from "../models/article_model.ts";
 import { ArticlesFavoritesModel } from "../models/articles_favorites_model.ts";
 import UserModel from "../models/user_model.ts";
 
 class ArticlesResource extends BaseResource {
-
   static paths = [
     "/articles",
     "/articles/:slug",
@@ -49,7 +52,7 @@ class ArticlesResource extends BaseResource {
       inputArticle.author_id,
       inputArticle.title,
       inputArticle.description,
-      inputArticle.body
+      inputArticle.body,
     );
     article = await article.save();
 
@@ -58,7 +61,7 @@ class ArticlesResource extends BaseResource {
     }
 
     this.response.body = {
-      article: article.toEntity()
+      article: article.toEntity(),
     };
 
     return this.response;
@@ -89,7 +92,7 @@ class ArticlesResource extends BaseResource {
     }
 
     this.response.body = {
-      article: entity
+      article: entity,
     };
 
     return this.response;
@@ -116,9 +119,12 @@ class ArticlesResource extends BaseResource {
     let filters: ArticleFilters = {};
 
     if (author) {
-      const authorUser= await UserModel.whereUsername(author);
+      const authorUser = await UserModel.whereUsername(author);
       if (!authorUser) {
-        return this.errorResponse(404, `Articles by ${author} could not be found.`);
+        return this.errorResponse(
+          404,
+          `Articles by ${author} could not be found.`,
+        );
       }
       filters.author = authorUser;
     }
@@ -126,7 +132,10 @@ class ArticlesResource extends BaseResource {
     if (favoritedBy) {
       const favoritedByUser = await UserModel.whereUsername(favoritedBy);
       if (!favoritedByUser) {
-        return this.errorResponse(404, `Articles by ${favoritedBy} could not be found.`);
+        return this.errorResponse(
+          404,
+          `Articles by ${favoritedBy} could not be found.`,
+        );
       }
       filters.favorited_by = favoritedByUser;
     }
@@ -157,7 +166,7 @@ class ArticlesResource extends BaseResource {
     });
 
     this.response.body = {
-      articles: entities
+      articles: entities,
     };
     return this.response;
   }
@@ -178,7 +187,7 @@ class ArticlesResource extends BaseResource {
         favorite = new ArticlesFavoritesModel(
           article.id,
           article.author_id,
-          true
+          true,
         );
         await favorite.save();
         break;
@@ -194,4 +203,3 @@ class ArticlesResource extends BaseResource {
 }
 
 export default ArticlesResource;
-

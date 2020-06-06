@@ -7,7 +7,7 @@ export type UserEntity = {
   image?: string;
   password?: string;
   username: string;
-  token?: null|string;
+  token?: null | string;
 };
 
 export function createUserModelObject(user: any): UserModel {
@@ -17,12 +17,11 @@ export function createUserModelObject(user: any): UserModel {
     user.email,
     user.bio,
     user.image,
-    user.id
+    user.id,
   );
 }
 
 export class UserModel extends BaseModel {
-
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -44,7 +43,7 @@ export class UserModel extends BaseModel {
     email: string,
     bio: string = "",
     image: string = "https://static.productionready.io/images/smiley-cyrus.jpg",
-    id: number = -1
+    id: number = -1,
   ) {
     super();
     this.id = id;
@@ -68,7 +67,10 @@ export class UserModel extends BaseModel {
     const query = `SELECT * FROM users WHERE email = '${email}';`;
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
-    const user = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    const user = BaseModel.formatResults(
+      dbResult.rows,
+      dbResult.rowDescription.columns,
+    );
     if (user && user.length > 0) {
       return createUserModelObject(user[0]);
     }
@@ -87,7 +89,10 @@ export class UserModel extends BaseModel {
     const dbResult = await client.query(query);
     client.release();
 
-    const user = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns);
+    const user = BaseModel.formatResults(
+      dbResult.rows,
+      dbResult.rowDescription.columns,
+    );
     if (user && user.length > 0) {
       return createUserModelObject(user[0]);
     }
@@ -112,7 +117,10 @@ export class UserModel extends BaseModel {
     const dbResult = await client.query(query);
     client.release();
 
-    let users: any = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns);
+    let users: any = BaseModel.formatResults(
+      dbResult.rows,
+      dbResult.rowDescription.columns,
+    );
     if (users && users.length > 0) {
       return users.map((user: any) => {
         return createUserModelObject(user);
@@ -134,7 +142,10 @@ export class UserModel extends BaseModel {
     const dbResult = await client.query(query);
     client.release();
 
-    const user = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns);
+    const user = BaseModel.formatResults(
+      dbResult.rows,
+      dbResult.rowDescription.columns,
+    );
     if (user && user.length > 0) {
       return createUserModelObject(user[0]);
     }
@@ -157,7 +168,7 @@ export class UserModel extends BaseModel {
       query,
       [
         String(this.id),
-      ]
+      ],
     );
 
     try {
@@ -182,9 +193,9 @@ export class UserModel extends BaseModel {
       return this.update();
     }
 
-    let query = "INSERT INTO users "
-      + " (username, email, password, bio, image)"
-      + " VALUES (?, ?, ?, ?, ?);"
+    let query = "INSERT INTO users " +
+      " (username, email, password, bio, image)" +
+      " VALUES (?, ?, ?, ?, ?);";
     query = this.prepareQuery(
       query,
       [
@@ -192,8 +203,8 @@ export class UserModel extends BaseModel {
         this.email,
         this.password,
         this.bio,
-        this.image
-      ]
+        this.image,
+      ],
     );
 
     const client = await BaseModel.connect();
@@ -213,9 +224,9 @@ export class UserModel extends BaseModel {
    * @return Promise<UserModel>
    */
   public async update(): Promise<UserModel> {
-    let query = "UPDATE users SET "
-      + "username = ?, password = ?, email = ?, bio = ?, image = ? "
-      + `WHERE id = '${this.id}';`;
+    let query = "UPDATE users SET " +
+      "username = ?, password = ?, email = ?, bio = ?, image = ? " +
+      `WHERE id = '${this.id}';`;
     query = this.prepareQuery(
       query,
       [
@@ -223,8 +234,8 @@ export class UserModel extends BaseModel {
         this.password,
         this.email,
         this.bio,
-        this.image
-      ]
+        this.image,
+      ],
     );
     const client = await BaseModel.connect();
     await client.query(query);

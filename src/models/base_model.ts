@@ -1,15 +1,14 @@
 import { Pool, PoolClient } from "../deps.ts";
 
 export const dbPool = new Pool({
-    user: "user",
-    password: "userpassword",
-    database: "realworld",
-    hostname: "realworld_postgres",
-    port: 5432
+  user: "user",
+  password: "userpassword",
+  database: "realworld",
+  hostname: "realworld_postgres",
+  port: 5432,
 }, 50);
 
 export default abstract class BaseModel {
-
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -36,22 +35,23 @@ export default abstract class BaseModel {
    * @return {any[]} Empty array of no db rows, else array of rows as key value pairs
    */
   // TODO :: Figure out return type (its format of: [{key: string}]
-  static formatResults (rows: Array<string[]>, columns: any[]): any[] {
-      if (!rows.length)
-          return []
-      const columnNames: string[] = columns.map(column => {
-          return column.name
-      })
-      let newResult: any = []
-      rows.forEach((row, rowIndex) => {
-          let rowData: any = {}
-          row.forEach((rVal, rIndex) => {
-              const columnName: string = columnNames[rIndex]
-              rowData[columnName] = row[rIndex]
-          })
-          newResult.push(rowData)
-      })
-      return newResult
+  static formatResults(rows: Array<string[]>, columns: any[]): any[] {
+    if (!rows.length) {
+      return [];
+    }
+    const columnNames: string[] = columns.map((column) => {
+      return column.name;
+    });
+    let newResult: any = [];
+    rows.forEach((row, rowIndex) => {
+      let rowData: any = {};
+      row.forEach((rVal, rIndex) => {
+        const columnName: string = columnNames[rIndex];
+        rowData[columnName] = row[rIndex];
+      });
+      newResult.push(rowData);
+    });
+    return newResult;
   }
 
   /**
@@ -69,21 +69,23 @@ export default abstract class BaseModel {
    * @return {string} The query with the placeholders replaced with the data
    */
   protected prepareQuery(query: string, data?: string[]): string {
-      if (!data || !data.length)
-          return query
-      // First create an array item for each placeholder
-      let occurrences = query.split('?')
-      if (occurrences[occurrences.length - 1] === '') // for when last item is ""
-          occurrences.splice(occurrences.length -1)
-      // Replace each item with itself but passed in data instead of the placeholder
-      data.forEach((val, i) => {
-          occurrences[i] = occurrences[i] + "'" + data[i] + "'"
-      })
-      // re construct the string
-      let prepared = ''
-      occurrences.forEach((val, i) => {
-          prepared += occurrences[i]
-      })
-      return prepared
+    if (!data || !data.length) {
+      return query;
+    }
+    // First create an array item for each placeholder
+    let occurrences = query.split("?");
+    if (occurrences[occurrences.length - 1] === "") { // for when last item is ""
+      occurrences.splice(occurrences.length - 1);
+    }
+    // Replace each item with itself but passed in data instead of the placeholder
+    data.forEach((val, i) => {
+      occurrences[i] = occurrences[i] + "'" + data[i] + "'";
+    });
+    // re construct the string
+    let prepared = "";
+    occurrences.forEach((val, i) => {
+      prepared += occurrences[i];
+    });
+    return prepared;
   }
 }

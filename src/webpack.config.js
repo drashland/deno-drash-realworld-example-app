@@ -10,17 +10,17 @@ module.exports = (envVars) => {
     mode: envVars.environment,
     output: {
       path: path.resolve(__dirname, "public/js/"),
-      filename: `[name].js`
+      filename: `[name].js`,
     },
     module: {
       rules: [
         {
           test: /\.pug$/,
-          loader: "pug-plain-loader"
+          loader: "pug-plain-loader",
         },
         {
           test: /\.vue$/,
-          loader: "vue-loader"
+          loader: "vue-loader",
         },
         // this will apply to both plain `.js` files
         // AND `<script>` blocks in `.vue` files
@@ -35,10 +35,10 @@ module.exports = (envVars) => {
           use: [
             "style-loader", // creates style nodes from JS strings
             "css-loader", // translates CSS into CommonJS
-            "sass-loader" // compiles Sass to CSS, using Node Sass by default
-          ]
-        }
-      ]
+            "sass-loader", // compiles Sass to CSS, using Node Sass by default
+          ],
+        },
+      ],
     },
     plugins: [
       // make sure to include the plugin!
@@ -48,7 +48,7 @@ module.exports = (envVars) => {
       alias: {
         vue: "vue/dist/vue.js",
         "@": path.resolve(__dirname, "vue"),
-      }
-    }
+      },
+    },
   };
 };

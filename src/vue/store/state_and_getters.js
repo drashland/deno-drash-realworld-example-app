@@ -67,9 +67,9 @@ const getters = {
   user() {
     return state.user;
   },
-}
+};
 
 export {
   state,
   getters,
-}
+};

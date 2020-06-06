@@ -1,5 +1,5 @@
 import { Drash, bcrypt } from "../deps.ts";
-import BaseResource from "./base_resource.ts"
+import BaseResource from "./base_resource.ts";
 import UserModel from "../models/user_model.ts";
 import ValidationService from "../services/validation_service.ts";
 
@@ -46,19 +46,19 @@ export default class UserResource extends BaseResource {
     // Gather data
     const id = this.request.getBodyParam("id");
     const username = ValidationService.decodeInput(
-      this.request.getBodyParam('username')
+      this.request.getBodyParam("username"),
     );
     const email = ValidationService.decodeInput(
-      this.request.getBodyParam('email')
+      this.request.getBodyParam("email"),
     );
     const rawPassword = ValidationService.decodeInput(
-      this.request.getBodyParam('password')
+      this.request.getBodyParam("password"),
     );
     const bio = ValidationService.decodeInput(
-      this.request.getBodyParam("bio")
+      this.request.getBodyParam("bio"),
     );
     const image = ValidationService.decodeInput(
-      this.request.getBodyParam("image")
+      this.request.getBodyParam("image"),
     );
     const token = this.request.getBodyParam("token");
 
@@ -92,8 +92,8 @@ export default class UserResource extends BaseResource {
       if (!ValidationService.isPasswordStrong(rawPassword)) {
         return this.errorResponse(
           422,
-          "Password must be 8 characters long and include 1 number, 1 "
-          + "uppercase letter, and 1 lowercase letter."
+          "Password must be 8 characters long and include 1 number, 1 " +
+            "uppercase letter, and 1 lowercase letter.",
         );
       }
     }
@@ -111,7 +111,7 @@ export default class UserResource extends BaseResource {
     entity.token = token;
 
     this.response.body = {
-      user: entity
+      user: entity,
     };
 
     return this.response;

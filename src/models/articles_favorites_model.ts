@@ -5,10 +5,10 @@ export type ArticlesFavoritesEntity = {
   user_id: number;
   id?: number;
   value: boolean;
-}
+};
 
 export function createArticlesFavoritesModelObject(
-  inputObj: ArticlesFavoritesEntity
+  inputObj: ArticlesFavoritesEntity,
 ): ArticlesFavoritesModel {
   return new ArticlesFavoritesModel(
     inputObj.article_id,
@@ -19,7 +19,6 @@ export function createArticlesFavoritesModelObject(
 }
 
 export class ArticlesFavoritesModel extends BaseModel {
-
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -38,7 +37,7 @@ export class ArticlesFavoritesModel extends BaseModel {
     articleId: number,
     authorId: number,
     value: boolean,
-    id: number = -1
+    id: number = -1,
   ) {
     super();
     this.article_id = articleId;
@@ -51,12 +50,17 @@ export class ArticlesFavoritesModel extends BaseModel {
   // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  static async getByArticleId(articleId: number): Promise<ArticlesFavoritesModel[]|[]> {
+  static async getByArticleId(
+    articleId: number,
+  ): Promise<ArticlesFavoritesModel[] | []> {
     let query = "SELECT * FROM articles_favorites ";
     query += ` WHERE article_id = '${articleId}'`;
     const client = await BaseModel.connect();
     let result: any = await client.query(query);
-    result = BaseModel.formatResults(result.rows, result.rowDescription.columns)
+    result = BaseModel.formatResults(
+      result.rows,
+      result.rowDescription.columns,
+    );
     if (result && result.length > 0) {
       return result.map((row: any) => {
         return createArticlesFavoritesModelObject(row);
@@ -80,7 +84,7 @@ export class ArticlesFavoritesModel extends BaseModel {
       query,
       [
         String(this.id),
-      ]
+      ],
     );
 
     try {
@@ -105,16 +109,16 @@ export class ArticlesFavoritesModel extends BaseModel {
       return this.update();
     }
 
-    let query = "INSERT INTO articles_favorites "
-      + " (article_id, user_id, value)"
-      + " VALUES (?, ?, ?);"
+    let query = "INSERT INTO articles_favorites " +
+      " (article_id, user_id, value)" +
+      " VALUES (?, ?, ?);";
     query = this.prepareQuery(
       query,
       [
         String(this.article_id),
         String(this.user_id),
         String(this.value),
-      ]
+      ],
     );
 
     const client = await BaseModel.connect();
@@ -143,14 +147,14 @@ export class ArticlesFavoritesModel extends BaseModel {
    * @return Promise<ArticlesFavoritesModel>
    */
   public async update(): Promise<ArticlesFavoritesModel> {
-    let query = "UPDATE articles_favorites SET "
-      + "value = ? "
-      + `WHERE id = '${this.id}';`;
+    let query = "UPDATE articles_favorites SET " +
+      "value = ? " +
+      `WHERE id = '${this.id}';`;
     query = this.prepareQuery(
       query,
       [
         String(this.value),
-      ]
+      ],
     );
     const client = await BaseModel.connect();
     await client.query(query);
