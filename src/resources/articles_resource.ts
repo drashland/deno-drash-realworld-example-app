@@ -143,7 +143,7 @@ class ArticlesResource extends BaseResource {
       inputArticle.description,
       inputArticle.body,
     );
-    article = await article.save();
+    await article.save();
 
     if (!article) {
       return this.errorResponse(500, "Article could not be saved.");
