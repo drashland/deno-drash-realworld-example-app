@@ -57,11 +57,11 @@ export default {
     });
   },
 
-  fetchArticle(context, params) {
+  fetchArticle(context, slug) {
     console.log("Handling action: fetchArticle");
     return new Promise((resolve) => {
       axios
-        .get(`/articles/${params.slug}`, {
+        .get(`/articles/${slug}`, {
           params: {
             user_id: context.getters.user.id
           }
