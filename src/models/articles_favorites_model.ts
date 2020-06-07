@@ -81,13 +81,13 @@ export class ArticlesFavoritesModel extends BaseModel {
    *
    * @param number[] ids
    */
-  static async whereInId(ids: number[]) {
+  static async whereInArticleId(ids: number[]) {
     if (ids.length <= 0) {
       return [];
     }
 
     let idsCommaSeparated = ids.join(",");
-    let query = `SELECT * FROM articles_favorites WHERE id IN (${idsCommaSeparated});`;
+    let query = `SELECT * FROM articles_favorites WHERE article_id IN (${idsCommaSeparated});`;
 
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
