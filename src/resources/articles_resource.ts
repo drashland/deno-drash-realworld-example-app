@@ -178,7 +178,9 @@ class ArticlesResource extends BaseResource {
       );
     }
 
-    let user: UserModel | null = await UserModel.where({id: article.author_id });
+    let user: UserModel | null = await UserModel.where(
+      { id: article.author_id },
+    );
     if (!user) {
       return this.errorResponse(
         400,
@@ -190,7 +192,7 @@ class ArticlesResource extends BaseResource {
     entity.author = user.toEntity();
 
     let favs = await ArticlesFavoritesModel
-      .where({article_id: article.id});
+      .where({ article_id: article.id });
     if (favs) {
       favs.forEach((favorite: ArticlesFavoritesModel) => {
         if (favorite.value === true) {

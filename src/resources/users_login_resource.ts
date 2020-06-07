@@ -68,7 +68,7 @@ class LoginResource extends BaseResource {
           sessionTwo,
         );
         if (session) {
-          let user = await UserModel.where({"id": session.user_id});
+          let user = await UserModel.where({ "id": session.user_id });
           if (user) {
             let entity = user.toEntity();
             entity.token = `${session.session_one}|::|${session.session_two}`;
