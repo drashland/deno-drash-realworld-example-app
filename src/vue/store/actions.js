@@ -14,21 +14,26 @@ const userDefault = {
 
 export default {
   checkIfUserIsAuthenticated(context) {
+    console.log("Checking if the user is authenticated.");
     if (getCookie("drash_sess") && getCookie("drash_sess") != "null") {
-      axios
-        .post("/users/login", {
-          action: "check_if_user_is_authenticated",
-          token: getCookie("drash_sess"),
-        })
-        .then((response) => {
-          context.dispatch("setUser", response.data.user);
-        })
-        .catch((error) => {
-          console.log("User has a session, but it's invalid.");
-          console.log(error.response);
-          context.dispatch("unsetUser");
-        });
-      return;
+      return new Promise((resolve) => {
+        axios
+          .post("/users/login", {
+            action: "check_if_user_is_authenticated",
+            token: getCookie("drash_sess"),
+          })
+          .then(async (response) => {
+            console.log("User is authenticated.");
+            await context.dispatch("setUser", response.data.user);
+            resolve();
+          })
+          .catch((error) => {
+            console.log("User has a session, but it's invalid.");
+            console.log(error.response);
+            context.dispatch("unsetUser");
+            resolve();
+          });
+      });
     }
 
     console.log("User is not authenticated.");
@@ -52,11 +57,15 @@ export default {
     });
   },
 
-  fetchArticle(context, slug) {
+  fetchArticle(context, params) {
     console.log("Handling action: fetchArticle");
     return new Promise((resolve) => {
       axios
-        .get(`/articles/${slug}`)
+        .get(`/articles/${params.slug}`, {
+          params: {
+            user_id: context.getters.user.id
+          }
+        })
         .then((response) => {
           context.dispatch("setArticle", response.data.article);
           resolve(response);
@@ -181,7 +190,10 @@ export default {
   },
 
   async setArticleFavorite(context, options) {
-    const article = await context.dispatch("fetchArticle", options.slug);
+    const article = await context.dispatch("fetchArticle", {
+      slug: options.slug,
+      user_id: context.getters.user.id
+    });
     console.log(article);
   },
 
@@ -205,6 +217,7 @@ export default {
       axios
         .post(`/articles/${params.slug}/favorite`, {
           action: params.action,
+          user_id: params.user_id,
         })
         .then(async (response) => {
           console.log("toggleArticleFavorite successful.");
