@@ -1,4 +1,7 @@
 import { Drash } from "../deps.ts";
+import UserModel from "../models/user_model.ts";
+import SessionModel from "../models/session_model.ts";
+import ValidationService from "../services/validation_service.ts";
 
 class BaseResource extends Drash.Http.Resource {
   /**
@@ -18,6 +21,16 @@ class BaseResource extends Drash.Http.Resource {
       },
     };
     return this.response;
+  }
+
+  protected async getCurrentUser() {
+    let userId = this.request.getUrlQueryParam("user_id");
+    console.log(userId);
+    let user = await UserModel.whereId(userId);
+    if (user) {
+      return user;
+    }
+    return null;
   }
 }
 
