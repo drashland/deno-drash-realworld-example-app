@@ -98,7 +98,6 @@ class ArticlesResource extends BaseResource {
       return entity;
     });
 
-    console.log(entities);
     return entities;
   }
 
