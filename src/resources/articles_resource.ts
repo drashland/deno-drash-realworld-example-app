@@ -9,6 +9,7 @@ import { ArticlesFavoritesModel } from "../models/articles_favorites_model.ts";
 import UserModel from "../models/user_model.ts";
 
 class ArticlesResource extends BaseResource {
+
   static paths = [
     "/articles",
     "/articles/:slug",
@@ -49,7 +50,7 @@ class ArticlesResource extends BaseResource {
    * @return any[]
    *     Returns the entities with author entities added.
    */
-  protected async addAuthorsToArticleEntities(
+  protected async addAuthorsToEntities(
     authorIds: number[],
     entities: any[]
   ): Promise<any[]> {
@@ -74,7 +75,41 @@ class ArticlesResource extends BaseResource {
    * @return any[]
    *     Returns the entities with a favoritesCount field.
    */
-  protected async addFavoritesToArticleEntities(
+  protected async addFavoritedToEntities(
+    articleIds: number[],
+    entities: any
+  ): Promise<any[]> {
+    const currentUser = await this.getCurrentUser();
+    if (!currentUser) {
+      return entities;
+    }
+
+    const favorites: any = await ArticlesFavoritesModel
+      .whereInArticleId(articleIds);
+
+    entities = entities.map((entity: any) => {
+      favorites.forEach((favorite: ArticlesFavoritesModel) => {
+        if (entity.id === favorite.article_id) {
+          if (currentUser.id === favorite.user_id) {
+            entity.favorited = favorite.value;
+          }
+        }
+      });
+      return entity;
+    });
+
+    console.log(entities);
+    return entities;
+  }
+
+  /**
+   * @param number[] articleIds
+   * @param any[] entities
+   *
+   * @return any[]
+   *     Returns the entities with a favoritesCount field.
+   */
+  protected async addFavoritesCountToEntities(
     articleIds: number[],
     entities: any
   ): Promise<any[]> {
@@ -127,8 +162,8 @@ class ArticlesResource extends BaseResource {
     const currentUser = await this.getCurrentUser();
     if (!currentUser) {
       return this.errorResponse(
-        500,
-        "Can't determine the current user."
+        400,
+        "`user_id` field is required."
       );
     }
 
@@ -204,9 +239,10 @@ class ArticlesResource extends BaseResource {
       return article.toEntity();
     });
 
-    entities = await this.addAuthorsToArticleEntities(authorIds, entities);
-    entities = await this.addFavoritesToArticleEntities(articleIds, entities);
-    entities = await this.filterEntities(articleIds, entities);
+    entities = await this.addAuthorsToEntities(authorIds, entities);
+    entities = await this.addFavoritesCountToEntities(articleIds, entities);
+    entities = await this.addFavoritedToEntities(articleIds, entities);
+    entities = await this.filterEntitiesByFavoritedBy(articleIds, entities);
 
     this.response.body = {
       articles: entities,
@@ -215,25 +251,17 @@ class ArticlesResource extends BaseResource {
   }
 
   /**
-   * Filter the entities further.
+   * Filter the entities by the favorited_by param.
    *
-   * @param any entities
+   * @param number[] articleIds
+   * @param any[] entities
    *
-   * @return any
-   *     Returns the filtered entities.
+   * @return Promise<any[]>
    */
-  protected async filterEntities(
-    articleIds: number[],
-    entities: any
-  ): Promise<any> {
-    entities = await this.filterEntitiesByFavoritedBy(articleIds, entities);
-    return entities;
-  }
-
   protected async filterEntitiesByFavoritedBy(
     articleIds: number[],
     entities: any
-  ): Promise<any> {
+  ): Promise<any[]> {
     const favorites: any = await ArticlesFavoritesModel
       .whereInArticleId(articleIds);
 
@@ -255,6 +283,7 @@ class ArticlesResource extends BaseResource {
         if (entity.id === favorite.article_id) {
           if (user.id === favorite.user_id) {
             if (favorite.value === true) {
+              entity.favorited = true;
               filtered.push(entity);
             }
           }
@@ -273,7 +302,6 @@ class ArticlesResource extends BaseResource {
   protected async getQueryFilters(): Promise<ArticleFilters> {
     const author = this.request.getUrlQueryParam("author");
     const offset = this.request.getUrlQueryParam("offset");
-    const tag = this.request.getUrlQueryParam("tag");
 
     let filters: ArticleFilters = {};
 
@@ -294,7 +322,10 @@ class ArticlesResource extends BaseResource {
   protected async toggleFavorite(): Promise<Drash.Http.Response> {
     const currentUser = await this.getCurrentUser();
     if (!currentUser) {
-      return this.errorResponse(500, "Can't determine the current user.");
+      return this.errorResponse(
+        400,
+        "`user_id` field is required."
+      );
     }
 
     const slug = this.request.getPathParam("slug");
