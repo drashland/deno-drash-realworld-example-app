@@ -158,35 +158,30 @@ export class ArticlesFavoritesModel extends BaseModel {
   }
 
   /**
-   * Get records by the given id column values.
+   * @description
+   *     See BaseModel.whereIn()
    *
    * @param string column
-   * @param number[] val
+   * @param any values
+   *
+   * @return Promise<ArticlesFavoritesModel[]|[]>
    */
-  static async whereIn(column: string, values: number[]) {
-    if (values.length <= 0) {
+  static async whereIn(
+    column: string,
+    values: any
+  ): Promise<ArticlesFavoritesModel[] | []> {
+    let results = await BaseModel.whereIn("articles_favorites", {
+      column,
+      values
+    });
+
+    if (results.length <= 0) {
       return [];
     }
 
-    let valuesCommaSeparated = values.join(",");
-    let query =
-      `SELECT * FROM articles_favorites WHERE ${column} IN (${values.join(",")})`;
-
-    const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
-    client.release();
-
-    let results: any = BaseModel.formatResults(
-      dbResult.rows,
-      dbResult.rowDescription.columns,
-    );
-    if (results && results.length > 0) {
-      return results.map((result: any) => {
-        return createArticlesFavoritesModelObject(result);
-      });
-    }
-
-    return [];
+    return results.map((result: any) => {
+      return createArticlesFavoritesModelObject(result);
+    });
   }
 
   //////////////////////////////////////////////////////////////////////////////

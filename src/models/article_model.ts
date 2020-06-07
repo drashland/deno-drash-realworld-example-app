@@ -1,9 +1,5 @@
 import BaseModel from "./base_model.ts";
 import { UserEntity, UserModel } from "./user_model.ts";
-import {
-  ArticlesFavoritesModel,
-  createArticlesFavoritesModelObject,
-} from "./articles_favorites_model.ts";
 
 export type ArticleEntity = {
   author?: UserEntity | null;
@@ -204,6 +200,7 @@ export class ArticleModel extends BaseModel {
     }
     return [];
   }
+
   /**
    * @description
    *     See BaseModel.where()
@@ -216,6 +213,33 @@ export class ArticleModel extends BaseModel {
     fields: any
   ): Promise<ArticleModel[] | []> {
     let results = await BaseModel.where("articles", fields);
+
+    if (results.length <= 0) {
+      return [];
+    }
+
+    return results.map((result: any) => {
+      return createArticleModelObject(result);
+    });
+  }
+
+  /**
+   * @description
+   *     See BaseModel.whereIn()
+   *
+   * @param string column
+   * @param any values
+   *
+   * @return Promise<ArticleModel[]|[]>
+   */
+  static async whereIn(
+    column: string,
+    values: any
+  ): Promise<ArticleModel[] | []> {
+    let results = await BaseModel.whereIn("articles", {
+      column,
+      values
+    });
 
     if (results.length <= 0) {
       return [];

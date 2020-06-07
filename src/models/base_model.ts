@@ -81,6 +81,35 @@ export default abstract class BaseModel {
 
   /**
    * @description
+   *     Get records using the WHERE IN clause.
+   *
+   * @param any data
+   *     {
+   *       column: string
+   *       values: any
+   *     }
+   */
+  static async whereIn(table: string, data: any) {
+    if (data.values.length <= 0) {
+      return [];
+    }
+
+    let query =`SELECT * FROM ${table} `
+      + ` WHERE ${data.column} `
+      + ` IN (${data.values.join(",")})`;
+
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    client.release();
+
+    return BaseModel.formatResults(
+      dbResult.rows,
+      dbResult.rowDescription.columns,
+    );
+  }
+
+  /**
+   * @description
    * Prepares a query to insert dynamic data into, similar to what PHP would do.
    * The query doesn't have to have "?", if it doesn't, method will return the original query string
    *

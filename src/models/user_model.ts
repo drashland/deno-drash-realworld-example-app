@@ -172,32 +172,28 @@ export class UserModel extends BaseModel {
   }
 
   /**
-   * Get records by the given id column values.
+   * @description
+   *     See BaseModel.whereIn()
    *
-   * @param number[] ids
+   * @param string column
+   * @param any values
    */
-  static async whereIn(column: string, values: number[]) {
-    if (values.length <= 0) {
+  static async whereIn(
+    column: string,
+    values: any
+  ): Promise<UserModel[] | []> {
+    let results = await BaseModel.whereIn("users", {
+      column,
+      values
+    });
+
+    if (results.length <= 0) {
       return [];
     }
 
-    let query = `SELECT * FROM users WHERE ${column} IN (${values.join(",")})`;
-
-    const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
-    client.release();
-
-    let results: any = BaseModel.formatResults(
-      dbResult.rows,
-      dbResult.rowDescription.columns,
-    );
-    if (results && results.length > 0) {
-      return results.map((result: any) => {
-        return createUserModelObject(result);
-      });
-    }
-
-    return [];
+    return results.map((result: any) => {
+      return createUserModelObject(result);
+    });
   }
 
   //////////////////////////////////////////////////////////////////////////////
