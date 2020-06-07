@@ -10,6 +10,7 @@ export type ArticleEntity = {
   body: string;
   created_at: number;
   description: string;
+  favorited: boolean;
   favoritesCount: number;
   id?: number;
   slug?: string;
@@ -46,6 +47,7 @@ export class ArticleModel extends BaseModel {
   public body: string;
   public created_at: number;
   public description: string;
+  public favorited: boolean = false;
   public favoritesCount: number = 0;
   public id: number;
   public slug: string;
@@ -153,6 +155,7 @@ export class ArticleModel extends BaseModel {
       author_id: this.author_id,
       title: this.title,
       description: this.description,
+      favorited: this.favorited,
       favoritesCount: this.favoritesCount,
       body: this.body,
       slug: this.slug,
