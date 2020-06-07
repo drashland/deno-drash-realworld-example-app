@@ -44,19 +44,20 @@ class ArticlesResource extends BaseResource {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @param number[] authorIds
-   * @param any[] entities
+   * Add the author object to the entities.
    *
-   * @return any[]
-   *     Returns the entities with author entities added.
+   * @param number[] authorIds
+   * @param ArticleEntity[] entities
+   *
+   * @return ArticleEntity[]
    */
   protected async addAuthorsToEntities(
     authorIds: number[],
-    entities: any[]
-  ): Promise<any[]> {
-    let authors: any = await UserModel.whereInId(authorIds);
+    entities: ArticleEntity[]
+  ): Promise<ArticleEntity[]> {
+    let authors: UserModel[] = await UserModel.whereInId(authorIds);
 
-    entities.map((entity: any) => {
+    entities.map((entity: ArticleEntity) => {
       authors.forEach((user: UserModel) => {
         if (user.id === entity.author_id) {
           entity.author = user.toEntity();
@@ -69,25 +70,26 @@ class ArticlesResource extends BaseResource {
   }
 
   /**
-   * @param number[] articleIds
-   * @param any[] entities
+   * Add the favorited field to the entities.
    *
-   * @return any[]
-   *     Returns the entities with a favoritesCount field.
+   * @param number[] articleIds
+   * @param ArticleEntity[] entities
+   *
+   * @return ArticleEntity[]
    */
   protected async addFavoritedToEntities(
     articleIds: number[],
-    entities: any
-  ): Promise<any[]> {
+    entities: ArticleEntity[]
+  ): Promise<ArticleEntity[]> {
     const currentUser = await this.getCurrentUser();
     if (!currentUser) {
       return entities;
     }
 
-    const favorites: any = await ArticlesFavoritesModel
+    const favorites: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
       .whereInArticleId(articleIds);
 
-    entities = entities.map((entity: any) => {
+    entities = entities.map((entity: ArticleEntity) => {
       favorites.forEach((favorite: ArticlesFavoritesModel) => {
         if (entity.id === favorite.article_id) {
           if (currentUser.id === favorite.user_id) {
@@ -102,20 +104,21 @@ class ArticlesResource extends BaseResource {
   }
 
   /**
-   * @param number[] articleIds
-   * @param any[] entities
+   * Add the favoritesCount field to the entities.
    *
-   * @return any[]
-   *     Returns the entities with a favoritesCount field.
+   * @param number[] articleIds
+   * @param ArticleEntity[] entities
+   *
+   * @return ArticleEntity[]
    */
   protected async addFavoritesCountToEntities(
     articleIds: number[],
-    entities: any
-  ): Promise<any[]> {
-    let favorites: any = await ArticlesFavoritesModel
+    entities: ArticleEntity[]
+  ): Promise<ArticleEntity[]> {
+    let favorites: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
       .whereInArticleId(articleIds);
 
-    entities.map((entity: any) => {
+    entities.map((entity: ArticleEntity) => {
       favorites.forEach((favorite: ArticlesFavoritesModel) => {
         if (favorite.article_id == entity.id) {
           if (favorite.value === true) {
@@ -176,7 +179,7 @@ class ArticlesResource extends BaseResource {
       );
     }
 
-    let user: any = await UserModel.whereId(article.author_id);
+    let user: UserModel|null = await UserModel.whereId(article.author_id);
     if (!user) {
       return this.errorResponse(
         400,
@@ -184,10 +187,11 @@ class ArticlesResource extends BaseResource {
       );
     }
 
-    let entity: any = article.toEntity();
+    let entity: ArticleEntity = article.toEntity();
     entity.author = user.toEntity();
 
-    let favorites: any = await ArticlesFavoritesModel.whereArticleId(article.id);
+    let favorites: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
+      .whereArticleId(article.id);
     favorites.forEach((favorite: ArticlesFavoritesModel) => {
       if (favorite.value === true) {
         entity.favoritesCount += 1;
@@ -228,7 +232,7 @@ class ArticlesResource extends BaseResource {
     let articleIds: number[] = [];
     let authorIds: number[] = [];
 
-    let entities: any = articles.map((article: ArticleModel) => {
+    let entities: ArticleEntity[] = articles.map((article: ArticleModel) => {
       if (authorIds.indexOf(article.author_id) === -1) {
         authorIds.push(article.author_id);
       }
@@ -253,15 +257,15 @@ class ArticlesResource extends BaseResource {
    * Filter the entities by the favorited_by param.
    *
    * @param number[] articleIds
-   * @param any[] entities
+   * @param ArticleEntity[] entities
    *
-   * @return Promise<any[]>
+   * @return Promise<ArticleEntity[]>
    */
   protected async filterEntitiesByFavoritedBy(
     articleIds: number[],
-    entities: any
-  ): Promise<any[]> {
-    const favorites: any = await ArticlesFavoritesModel
+    entities: ArticleEntity[]
+  ): Promise<ArticleEntity[]> {
+    const favorites: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
       .whereInArticleId(articleIds);
 
     const username = this.request.getUrlQueryParam("favorited_by");
@@ -275,9 +279,9 @@ class ArticlesResource extends BaseResource {
       return entities;
     }
 
-    let filtered: any[] = [];
+    let filtered: ArticleEntity[] = [];
 
-    entities.forEach((entity: any) => {
+    entities.forEach((entity: ArticleEntity) => {
       favorites.forEach((favorite: ArticlesFavoritesModel) => {
         if (entity.id === favorite.article_id) {
           if (user.id === favorite.user_id) {
