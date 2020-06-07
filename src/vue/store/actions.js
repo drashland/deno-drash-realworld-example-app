@@ -98,6 +98,7 @@ export default {
             favorited_by: params.favorited,
             offset: params.filters,
             tag: params.tag,
+            user_id: context.getters.user.id
           },
         })
         .then((response) => {
@@ -187,14 +188,15 @@ export default {
 
   setArticle(context, article) {
     context.commit("setArticle", article);
-  },
-
-  async setArticleFavorite(context, options) {
-    const article = await context.dispatch("fetchArticle", {
-      slug: options.slug,
-      user_id: context.getters.user.id
+    let articles = [];
+    context.getters.articles.forEach((a, i) => {
+      if (a.id === article.id) {
+        articles.push(article);
+        return;
+      }
+      articles.push(a);
     });
-    console.log(article);
+    context.commit("setArticles", articles);
   },
 
   setArticles(context, articles) {
@@ -221,7 +223,6 @@ export default {
         })
         .then(async (response) => {
           console.log("toggleArticleFavorite successful.");
-          context.dispatch("fetchArticles", {});
           context.dispatch("setArticle", response.data.article);
         })
         .catch((error) => {
