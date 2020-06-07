@@ -217,7 +217,7 @@ export default {
       axios
         .post(`/articles/${params.slug}/favorite`, {
           action: params.action,
-          user_id: params.user_id,
+          user_id: context.getters.user.id,
         })
         .then(async (response) => {
           console.log("toggleArticleFavorite successful.");

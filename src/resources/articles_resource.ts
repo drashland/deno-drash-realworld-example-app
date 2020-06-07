@@ -277,6 +277,10 @@ class ArticlesResource extends BaseResource {
    *     Returns the updated article.
    */
   protected async toggleFavorite(): Promise<Drash.Http.Response> {
+    const currentUser = await this.getCurrentUser();
+    if (!currentUser) {
+      return this.errorResponse(500, "Can't determine the current user.");
+    }
     const slug = this.request.getPathParam("slug");
     const article = await ArticleModel.whereSlug(slug);
     if (!article) {
@@ -288,7 +292,7 @@ class ArticlesResource extends BaseResource {
       case "set":
         favorite = new ArticlesFavoritesModel(
           article.id,
-          article.author_id,
+          currentUser.id,
           true,
         );
         await favorite.save();
