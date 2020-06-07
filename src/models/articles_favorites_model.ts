@@ -19,6 +19,7 @@ export function createArticlesFavoritesModelObject(
 }
 
 export class ArticlesFavoritesModel extends BaseModel {
+
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -50,6 +51,31 @@ export class ArticlesFavoritesModel extends BaseModel {
   // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
+  static async where(fields: any): Promise<ArticlesFavoritesModel | null> {
+    let query = "SELECT * FROM articles_favorites WHERE ";
+    let clauses: string[] = [];
+    for (let field in fields) {
+      let value = fields[field];
+      clauses.push(`${field} = '${value}'`);
+    }
+    query += clauses.join(" AND ");
+
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    client.release();
+
+    let favorite: any = BaseModel.formatResults(
+      dbResult.rows,
+      dbResult.rowDescription.columns,
+    );
+
+    if (favorite && favorite.length > 0) {
+      return createArticlesFavoritesModelObject(favorite[0]);
+    }
+
+    return null;
+  }
+
   /**
    * Get a record by the given id column value.
    *
@@ -57,7 +83,7 @@ export class ArticlesFavoritesModel extends BaseModel {
    *
    * @return Promise<ArticlesFavoritesModel[]|[]>
    */
-  static async whereId(
+  static async whereArticleId(
     articleId: number,
   ): Promise<ArticlesFavoritesModel[] | []> {
     let query = "SELECT * FROM articles_favorites ";
@@ -163,7 +189,7 @@ export class ArticlesFavoritesModel extends BaseModel {
     client.release();
 
     // @ts-ignore
-    return ArticlesFavoritesModel.whereId(this.article_id);
+    return ArticlesFavoritesModel.whereArticleId(this.article_id);
   }
 
   /**
@@ -188,7 +214,7 @@ export class ArticlesFavoritesModel extends BaseModel {
     // @ts-ignore
     // (crookse) We ignore this because whereId() can return null if the
     // user is not found. However, in this case, it will never be null.
-    return ArticlesFavoritesModel.whereId(this.id);
+    return ArticlesFavoritesModel.whereArticleId(this.id);
   }
 
   //////////////////////////////////////////////////////////////////////////////

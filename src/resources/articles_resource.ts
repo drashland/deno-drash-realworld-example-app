@@ -124,30 +124,40 @@ class ArticlesResource extends BaseResource {
   protected async getArticle(): Promise<Drash.Http.Response> {
     const currentUser = await this.getCurrentUser();
     if (!currentUser) {
-      return this.errorResponse(500, "Can't determine the current user.");
+      return this.errorResponse(
+        500,
+        "Can't determine the current user."
+      );
     }
+
     const slug = this.request.getPathParam("slug");
     const article = await ArticleModel.whereSlug(slug);
 
     if (!article) {
-      return this.errorResponse(404, "Article not found.");
+      return this.errorResponse(
+        404,
+        "Article not found."
+      );
+    }
+
+    let user: any = await UserModel.whereId(article.author_id);
+    if (!user) {
+      return this.errorResponse(
+        400,
+        "Unable to determine the article's author."
+      );
     }
 
     let entity: any = article.toEntity();
-    let user: any = await UserModel.whereId(article.author_id);
-    if (!user) {
-      entity.author = user = {
-        bio: "",
-        email: "",
-        image: "",
-        username: "Unknown",
-      };
-    } else {
-      entity.author = user.toEntity();
-    }
+    entity.author = user.toEntity();
 
-    let favorites: any = await ArticlesFavoritesModel.whereId(article.id);
-    entity.favoritesCount = favorites.length;
+    let favorites: any = await ArticlesFavoritesModel.whereArticleId(article.id);
+    favorites.forEach((favorite: ArticlesFavoritesModel) => {
+      if (favorite.value === true) {
+        entity.favoritesCount += 1;
+      }
+    });
+
     console.log(favorites);
     favorites.forEach((favorite: ArticlesFavoritesModel) => {
       if (entity.id === favorite.article_id) {
@@ -156,7 +166,7 @@ class ArticlesResource extends BaseResource {
         console.log(favorite.user_id);
         if (currentUser.id === favorite.user_id) {
           console.log("favorited 2");
-          entity.favorited = true;
+          entity.favorited = favorite.value;
         }
       }
     });
@@ -281,26 +291,46 @@ class ArticlesResource extends BaseResource {
     if (!currentUser) {
       return this.errorResponse(500, "Can't determine the current user.");
     }
+
     const slug = this.request.getPathParam("slug");
+
     const article = await ArticleModel.whereSlug(slug);
     if (!article) {
       return this.errorResponse(404, `Article with slug "${slug}" not found.`);
     }
-    const action = this.request.getBodyParam("action");
+
     let favorite: any;
+
+    const action = this.request.getBodyParam("action");
     switch (action) {
       case "set":
-        favorite = new ArticlesFavoritesModel(
-          article.id,
-          currentUser.id,
-          true,
-        );
+        // Check if the user already has a record in the db before creating a
+        // new one. If the user has a record, then we just update the record.
+        favorite = await ArticlesFavoritesModel.where({
+          article_id: article.id,
+          user_id: currentUser.id,
+        });
+        if (favorite) {
+          favorite.value = true;
+        } else {
+          favorite = new ArticlesFavoritesModel(
+            article.id,
+            currentUser.id,
+            true,
+          );
+        }
         await favorite.save();
         break;
       case "unset":
-        favorite = await ArticlesFavoritesModel.whereId(article.id);
+        favorite = await ArticlesFavoritesModel.where({
+          article_id: article.id,
+          user_id: currentUser.id,
+        });
         if (!favorite) {
-          return this.errorResponse(404, "Article doesn't have any favorites.");
+          return this.errorResponse(
+            404,
+            "Can't unset favorite on article that doesn't have any favorites."
+          );
         }
         favorite.value = false;
         await favorite.save();
