@@ -22,7 +22,7 @@
       </div>
       <hr />
       <div class="article-actions">
-        <!-- <ArticleMeta :article="article" :actions="true"></ArticleMeta> -->
+        <ArticleMeta :article="article" :actions="true"></ArticleMeta>
       </div>
       <div class="row">
         <div class="col-xs-12 col-md-8 offset-md-2">
