@@ -76,36 +76,10 @@ export class ArticlesFavoritesModel extends BaseModel {
   }
 
   /**
-   * Get a record by the given id column value.
-   *
-   * @param number articleId
-   *
-   * @return Promise<ArticlesFavoritesModel[]|[]>
-   */
-  static async whereArticleId(
-    articleId: number,
-  ): Promise<ArticlesFavoritesModel[] | []> {
-    let query = "SELECT * FROM articles_favorites ";
-    query += ` WHERE article_id = '${articleId}'`;
-    const client = await BaseModel.connect();
-    let result: any = await client.query(query);
-    result = BaseModel.formatResults(
-      result.rows,
-      result.rowDescription.columns,
-    );
-    if (result && result.length > 0) {
-      return result.map((row: any) => {
-        return createArticlesFavoritesModelObject(row);
-      });
-    }
-    return [];
-  }
-
-  /**
    * Get records by the given id column values.
    *
    * @param string column
-   * @param number[] ids
+   * @param number[] val
    */
   static async whereIn(column: string, values: number[]) {
     if (values.length <= 0) {
@@ -190,7 +164,8 @@ export class ArticlesFavoritesModel extends BaseModel {
     client.release();
 
     // @ts-ignore
-    return ArticlesFavoritesModel.whereArticleId(this.article_id);
+    // (crookse) We ignore this because this will never return null.
+    return ArticlesFavoritesModel.where({article_id: this.article_id});
   }
 
   /**
@@ -213,9 +188,8 @@ export class ArticlesFavoritesModel extends BaseModel {
     client.release();
 
     // @ts-ignore
-    // (crookse) We ignore this because whereId() can return null if the
-    // user is not found. However, in this case, it will never be null.
-    return ArticlesFavoritesModel.whereArticleId(this.id);
+    // (crookse) We ignore this because this will never return null.
+    return ArticlesFavoritesModel.where({article_id: this.article_id});
   }
 
   //////////////////////////////////////////////////////////////////////////////

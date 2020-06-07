@@ -190,7 +190,7 @@ class ArticlesResource extends BaseResource {
     entity.author = user.toEntity();
 
     let favorites: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
-      .whereArticleId(article.id);
+      .where({article_id: article.id});
     favorites.forEach((favorite: ArticlesFavoritesModel) => {
       if (favorite.value === true) {
         entity.favoritesCount += 1;
