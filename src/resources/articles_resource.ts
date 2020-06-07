@@ -181,7 +181,7 @@ class ArticlesResource extends BaseResource {
     });
 
     entities = await this.attachAuthorsToArticleEntities(authorIds, entities);
-    entities = await this.attachFavoritesToArticleEntities(authorIds, entities);
+    entities = await this.attachFavoritesToArticleEntities(articleIds, entities);
 
     this.response.body = {
       articles: entities,
