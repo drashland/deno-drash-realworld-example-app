@@ -57,13 +57,15 @@ class BaseResource extends Drash.Http.Resource {
     }
 
     let user = await UserModel.where({ id: userId });
-    if (user) {
-      this.current_user = user;
-      console.log(`Setting User #${this.current_user.id} as current user.`);
-      return this.current_user;
+
+    if (user.length <= 0) {
+      this.current_user = null;
     }
 
-    return null;
+    this.current_user = user[0];
+
+    console.log(`Setting User #${this.current_user.id} as current user.`);
+    return this.current_user;
   }
 }
 

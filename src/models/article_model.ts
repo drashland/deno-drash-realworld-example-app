@@ -1,5 +1,5 @@
 import BaseModel from "./base_model.ts";
-import { UserEntity, UserModel, createUserModelObject } from "./user_model.ts";
+import { UserEntity, UserModel } from "./user_model.ts";
 import {
   ArticlesFavoritesModel,
   createArticlesFavoritesModelObject,
@@ -139,28 +139,8 @@ export class ArticleModel extends BaseModel {
     client.release();
 
     // @ts-ignore
-    //
-    // (crookse) We ignore this because whereSlug() can return null if the
-    // article is not found. However, in this case, it will never be null.
-    return ArticleModel.whereSlug(this.slug);
-  }
-
-  /**
-   * @return ArticleEntity
-   */
-  public toEntity(): ArticleEntity {
-    return {
-      id: this.id,
-      author_id: this.author_id,
-      title: this.title,
-      description: this.description,
-      favorited: this.favorited,
-      favoritesCount: this.favoritesCount,
-      body: this.body,
-      slug: this.slug,
-      created_at: this.created_at,
-      updated_at: this.updated_at,
-    };
+    // (crookse) We ignore this because this will never return null.
+    return ArticleModel.where({ slug: this.slug });
   }
 
   /**
@@ -186,7 +166,7 @@ export class ArticleModel extends BaseModel {
     client.release();
 
     // @ts-ignore
-    // (crookse) This will never return null.
+    // (crookse) We ignore this because this will never return null.
     return ArticleModel.where({id: this.id});
   }
 
@@ -204,44 +184,81 @@ export class ArticleModel extends BaseModel {
   static async all(filters: Filters): Promise<ArticleModel[] | []> {
     let query = "SELECT * FROM articles ";
     if (filters.author) {
-      query += ` WHERE author_id = '${filters.author.id}'`;
+      query += ` WHERE author_id = '${filters.author.id}' `;
+    }
+    if (filters.offset) {
+      query += ` OFFSET ${filters.offset} `;
     }
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
     client.release();
 
-    let articles = BaseModel.formatResults(
+    let results = BaseModel.formatResults(
       dbResult.rows,
       dbResult.rowDescription.columns,
     );
-    if (articles && articles.length > 0) {
-      return articles.map((article: any) => {
+    if (results && results.length > 0) {
+      return results.map((article: any) => {
         return createArticleModelObject(article);
       });
     }
     return [];
   }
-
   /**
-   * Get a record by the slug column value.
+   * Get records using the WHERE clause.
    *
-   * @param string slug
+   * @param any fields
    */
-  static async whereSlug(slug: string) {
-    let query = `SELECT * FROM articles WHERE slug = '${slug}';`;
+  static async where(
+    fields: any
+  ): Promise<ArticleModel[] | []> {
+    let query = "SELECT * FROM articles WHERE ";
+    let clauses: string[] = [];
+    for (let field in fields) {
+      let value = fields[field];
+      clauses.push(`${field} = '${value}'`);
+    }
+    query += clauses.join(" AND ");
 
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
     client.release();
 
-    const article = BaseModel.formatResults(
+
+    let results: any = BaseModel.formatResults(
       dbResult.rows,
       dbResult.rowDescription.columns,
     );
-    if (article && article.length > 0) {
-      return createArticleModelObject(article[0]);
+
+    if (results.length <= 0) {
+      return [];
     }
-    return null;
+
+    return results.map((result: any) => {
+      return createArticleModelObject(result);
+    });
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @return ArticleEntity
+   */
+  public toEntity(): ArticleEntity {
+    return {
+      id: this.id,
+      author_id: this.author_id,
+      title: this.title,
+      description: this.description,
+      favorited: this.favorited,
+      favoritesCount: this.favoritesCount,
+      body: this.body,
+      slug: this.slug,
+      created_at: this.created_at,
+      updated_at: this.updated_at,
+    };
   }
 
   //////////////////////////////////////////////////////////////////////////////

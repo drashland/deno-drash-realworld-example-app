@@ -69,8 +69,8 @@ class LoginResource extends BaseResource {
         );
         if (session) {
           let user = await UserModel.where({ "id": session.user_id });
-          if (user) {
-            let entity = user.toEntity();
+          if (user.length > 0) {
+            let entity = user[0].toEntity();
             entity.token = `${session.session_one}|::|${session.session_two}`;
             this.response.body = {
               user: entity,
@@ -108,12 +108,14 @@ class LoginResource extends BaseResource {
     }
 
     // Convert the user to a real user model object
-    const user = await UserModel.where({ email: inputUser.email });
+    const result = await UserModel.where({ email: inputUser.email });
 
-    if (!user) {
+    if (result.length <= 0) {
       console.log("User not found.");
       return this.errorResponse(422, "Invalid user credentials.");
     }
+
+    let user = result[0];
 
     const password = this.request.getBodyParam("user").password;
     if (!password) {

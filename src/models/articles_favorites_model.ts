@@ -47,71 +47,6 @@ export class ArticlesFavoritesModel extends BaseModel {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-
-  static async where(
-    fields: any
-  ): Promise<ArticlesFavoritesModel[] | []> {
-    let query = "SELECT * FROM articles_favorites WHERE ";
-    let clauses: string[] = [];
-    for (let field in fields) {
-      let value = fields[field];
-      clauses.push(`${field} = '${value}'`);
-    }
-    query += clauses.join(" AND ");
-
-    const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
-    client.release();
-
-    let results: any = BaseModel.formatResults(
-      dbResult.rows,
-      dbResult.rowDescription.columns,
-    );
-
-    if (results.length <= 0) {
-      return [];
-    }
-
-    return results.map((result: any) => {
-      return createArticlesFavoritesModelObject(result);
-    });
-  }
-
-  /**
-   * Get records by the given id column values.
-   *
-   * @param string column
-   * @param number[] val
-   */
-  static async whereIn(column: string, values: number[]) {
-    if (values.length <= 0) {
-      return [];
-    }
-
-    let valuesCommaSeparated = values.join(",");
-    let query =
-      `SELECT * FROM articles_favorites WHERE ${column} IN (${values.join(",")});`;
-
-    const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
-    client.release();
-
-    let favorites: any = BaseModel.formatResults(
-      dbResult.rows,
-      dbResult.rowDescription.columns,
-    );
-    if (favorites && favorites.length > 0) {
-      return favorites.map((favorite: any) => {
-        return createArticlesFavoritesModelObject(favorite);
-      });
-    }
-
-    return [];
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - METHODS - CRUD //////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
@@ -194,6 +129,71 @@ export class ArticlesFavoritesModel extends BaseModel {
     // @ts-ignore
     // (crookse) We ignore this because this will never return null.
     return ArticlesFavoritesModel.where({article_id: this.article_id});
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  static async where(
+    fields: any
+  ): Promise<ArticlesFavoritesModel[] | []> {
+    let query = "SELECT * FROM articles_favorites WHERE ";
+    let clauses: string[] = [];
+    for (let field in fields) {
+      let value = fields[field];
+      clauses.push(`${field} = '${value}'`);
+    }
+    query += clauses.join(" AND ");
+
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    client.release();
+
+    let results: any = BaseModel.formatResults(
+      dbResult.rows,
+      dbResult.rowDescription.columns,
+    );
+
+    if (results.length <= 0) {
+      return [];
+    }
+
+    return results.map((result: any) => {
+      return createArticlesFavoritesModelObject(result);
+    });
+  }
+
+  /**
+   * Get records by the given id column values.
+   *
+   * @param string column
+   * @param number[] val
+   */
+  static async whereIn(column: string, values: number[]) {
+    if (values.length <= 0) {
+      return [];
+    }
+
+    let valuesCommaSeparated = values.join(",");
+    let query =
+      `SELECT * FROM articles_favorites WHERE ${column} IN (${values.join(",")})`;
+
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    client.release();
+
+    let results: any = BaseModel.formatResults(
+      dbResult.rows,
+      dbResult.rowDescription.columns,
+    );
+    if (results && results.length > 0) {
+      return results.map((result: any) => {
+        return createArticlesFavoritesModelObject(result);
+      });
+    }
+
+    return [];
   }
 
   //////////////////////////////////////////////////////////////////////////////

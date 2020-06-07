@@ -168,25 +168,29 @@ class ArticlesResource extends BaseResource {
       );
     }
 
-    const slug = this.request.getPathParam("slug");
-    const article = await ArticleModel.whereSlug(slug);
+    let result: any;
 
-    if (!article) {
+    const slug = this.request.getPathParam("slug");
+    result = await ArticleModel.where({ slug: slug });
+
+    if (result.length <= 0) {
       return this.errorResponse(
         404,
         "Article not found.",
       );
     }
 
-    let user: UserModel | null = await UserModel.where(
-      { id: article.author_id },
-    );
-    if (!user) {
+    let article = result[0];
+
+    result = await UserModel.where({ id: article.author_id });
+    if (result.length <= 0) {
       return this.errorResponse(
         400,
         "Unable to determine the article's author.",
       );
     }
+
+    let user = result[0];
 
     let entity: ArticleEntity = article.toEntity();
     entity.author = user.toEntity();
@@ -275,11 +279,13 @@ class ArticlesResource extends BaseResource {
       return entities;
     }
 
-    const user = await UserModel.whereUsername(username);
+    let results = await UserModel.where({username: username});
 
-    if (!user) {
+    if (results.length <= 0) {
       return entities;
     }
+
+    let user = results[0];
 
     let filtered: ArticleEntity[] = [];
 
@@ -311,9 +317,9 @@ class ArticlesResource extends BaseResource {
     let filters: ArticleFilters = {};
 
     if (author) {
-      const authorUser = await UserModel.whereUsername(author);
-      if (authorUser) {
-        filters.author = authorUser;
+      const authorUser = await UserModel.where({username: author});
+      if (authorUser.length > 0) {
+        filters.author = authorUser[0];
       }
     }
 
@@ -325,6 +331,7 @@ class ArticlesResource extends BaseResource {
    *     Returns the updated article.
    */
   protected async toggleFavorite(): Promise<Drash.Http.Response> {
+    console.log("Handling action: toggleFavorite.");
     const currentUser = await this.getCurrentUser();
     if (!currentUser) {
       return this.errorResponse(
@@ -335,7 +342,7 @@ class ArticlesResource extends BaseResource {
 
     const slug = this.request.getPathParam("slug");
 
-    const article = await ArticleModel.whereSlug(slug);
+    const article = await ArticleModel.where({ slug: slug });
     if (!article) {
       return this.errorResponse(404, `Article with slug "${slug}" not found.`);
     }
@@ -348,7 +355,7 @@ class ArticlesResource extends BaseResource {
         // Check if the user already has a record in the db before creating a
         // new one. If the user has a record, then we just update the record.
         favorite = await ArticlesFavoritesModel.where({
-          article_id: article.id,
+          article_id: article[0].id,
           user_id: currentUser.id,
         });
         if (favorite) {
@@ -356,7 +363,7 @@ class ArticlesResource extends BaseResource {
           await favorite[0].save();
         } else {
           favorite = new ArticlesFavoritesModel(
-            article.id,
+            article[0].id,
             currentUser.id,
             true,
           );
@@ -365,7 +372,7 @@ class ArticlesResource extends BaseResource {
         break;
       case "unset":
         favorite = await ArticlesFavoritesModel.where({
-          article_id: article.id,
+          article_id: article[0].id,
           user_id: currentUser.id,
         });
         if (!favorite) {
