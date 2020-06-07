@@ -86,7 +86,7 @@ class ArticlesResource extends BaseResource {
     }
 
     const favorites: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
-      .whereInArticleId(articleIds);
+      .whereIn("article_id", articleIds);
 
     entities = entities.map((entity: ArticleEntity) => {
       favorites.forEach((favorite: ArticlesFavoritesModel) => {
@@ -115,7 +115,7 @@ class ArticlesResource extends BaseResource {
     entities: ArticleEntity[],
   ): Promise<ArticleEntity[]> {
     let favorites: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
-      .whereInArticleId(articleIds);
+      .whereIn("article_id", articleIds);
 
     entities.map((entity: ArticleEntity) => {
       favorites.forEach((favorite: ArticlesFavoritesModel) => {
@@ -265,7 +265,7 @@ class ArticlesResource extends BaseResource {
     entities: ArticleEntity[],
   ): Promise<ArticleEntity[]> {
     const favorites: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
-      .whereInArticleId(articleIds);
+      .whereIn("article_id", articleIds);
 
     const username = this.request.getUrlQueryParam("favorited_by");
     if (!username) {

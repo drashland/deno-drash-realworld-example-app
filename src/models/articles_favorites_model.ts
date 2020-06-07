@@ -104,16 +104,17 @@ export class ArticlesFavoritesModel extends BaseModel {
   /**
    * Get records by the given id column values.
    *
+   * @param string column
    * @param number[] ids
    */
-  static async whereInArticleId(ids: number[]) {
-    if (ids.length <= 0) {
+  static async whereIn(column: string, values: number[]) {
+    if (values.length <= 0) {
       return [];
     }
 
-    let idsCommaSeparated = ids.join(",");
+    let valuesCommaSeparated = values.join(",");
     let query =
-      `SELECT * FROM articles_favorites WHERE article_id IN (${idsCommaSeparated});`;
+      `SELECT * FROM articles_favorites WHERE ${column} IN (${values.join(","});`;
 
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
