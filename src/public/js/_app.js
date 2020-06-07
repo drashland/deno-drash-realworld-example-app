@@ -139,8 +139,14 @@ const router = new VueRouter({
 });
 
 // Ensure we checked auth before each page load.
-router.beforeEach((to, from, next) => {
-  Promise.all([store.dispatch("checkIfUserIsAuthenticated")]).then(next);
+router.beforeEach(async (to, from, next) => {
+  store.dispatch("checkIfUserIsAuthenticated")
+    .then(() => {
+      next();
+    })
+    .catch(() => {
+      next();
+    });
 });
 
 //
