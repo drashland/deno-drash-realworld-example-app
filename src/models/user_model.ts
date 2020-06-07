@@ -150,30 +150,17 @@ export class UserModel extends BaseModel {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * Get records using the WHERE clause.
+   * @description
+   *     See BaseModel.where()
    *
    * @param any fields
+   *
+   * @return Promise<UserModel[]|[]>
    */
   static async where(
     fields: any
   ): Promise<UserModel[] | []> {
-    let query = "SELECT * FROM users WHERE ";
-    let clauses: string[] = [];
-    for (let field in fields) {
-      let value = fields[field];
-      clauses.push(`${field} = '${value}'`);
-    }
-    query += clauses.join(" AND ");
-
-    const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
-    client.release();
-
-
-    let results: any = BaseModel.formatResults(
-      dbResult.rows,
-      dbResult.rowDescription.columns,
-    );
+    let results = await BaseModel.where("users", fields);
 
     if (results.length <= 0) {
       return [];

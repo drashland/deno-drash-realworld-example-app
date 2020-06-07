@@ -205,30 +205,17 @@ export class ArticleModel extends BaseModel {
     return [];
   }
   /**
-   * Get records using the WHERE clause.
+   * @description
+   *     See BaseModel.where()
    *
    * @param any fields
+   *
+   * @return Promise<ArticleModel[]|[]>
    */
   static async where(
     fields: any
   ): Promise<ArticleModel[] | []> {
-    let query = "SELECT * FROM articles WHERE ";
-    let clauses: string[] = [];
-    for (let field in fields) {
-      let value = fields[field];
-      clauses.push(`${field} = '${value}'`);
-    }
-    query += clauses.join(" AND ");
-
-    const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
-    client.release();
-
-
-    let results: any = BaseModel.formatResults(
-      dbResult.rows,
-      dbResult.rowDescription.columns,
-    );
+    let results = await BaseModel.where("articles", fields);
 
     if (results.length <= 0) {
       return [];

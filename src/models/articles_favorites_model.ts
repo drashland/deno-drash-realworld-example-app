@@ -135,25 +135,18 @@ export class ArticlesFavoritesModel extends BaseModel {
   // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * @description
+   *     See BaseModel.where()
+   *
+   * @param any fields
+   *
+   * @return Promise<ArticlesFavoritesModel[]|[]>
+   */
   static async where(
     fields: any
   ): Promise<ArticlesFavoritesModel[] | []> {
-    let query = "SELECT * FROM articles_favorites WHERE ";
-    let clauses: string[] = [];
-    for (let field in fields) {
-      let value = fields[field];
-      clauses.push(`${field} = '${value}'`);
-    }
-    query += clauses.join(" AND ");
-
-    const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
-    client.release();
-
-    let results: any = BaseModel.formatResults(
-      dbResult.rows,
-      dbResult.rowDescription.columns,
-    );
+    let results = await BaseModel.where("articles_favorites", fields);
 
     if (results.length <= 0) {
       return [];

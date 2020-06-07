@@ -55,6 +55,31 @@ export default abstract class BaseModel {
   }
 
   /**
+   * Get records using the WHERE clause.
+   *
+   * @param string table
+   * @param any fields
+   */
+  static async where(table: string, fields: any) {
+    let query = `SELECT * FROM ${table} WHERE `;
+    let clauses: string[] = [];
+    for (let field in fields) {
+      let value = fields[field];
+      clauses.push(`${field} = '${value}'`);
+    }
+    query += clauses.join(" AND ");
+
+    const client = await BaseModel.connect();
+    const dbResult = await client.query(query);
+    client.release();
+
+    return BaseModel.formatResults(
+      dbResult.rows,
+      dbResult.rowDescription.columns,
+    );
+  }
+
+  /**
    * @description
    * Prepares a query to insert dynamic data into, similar to what PHP would do.
    * The query doesn't have to have "?", if it doesn't, method will return the original query string
