@@ -20,9 +20,7 @@ export type ArticleEntity = {
 
 export type Filters = {
   author?: UserModel | null;
-  favorited_by?: UserModel | null;
   offset?: number;
-  tag?: string;
 };
 
 export function createArticleModelObject(article: ArticleEntity): ArticleModel {

@@ -47,9 +47,9 @@ class ArticlesResource extends BaseResource {
    * @param any[] entities
    *
    * @return any[]
-   *     Returns the entities with author entities attached.
+   *     Returns the entities with author entities added.
    */
-  protected async attachAuthorsToArticleEntities(
+  protected async addAuthorsToArticleEntities(
     authorIds: number[],
     entities: any[]
   ): Promise<any[]> {
@@ -74,15 +74,16 @@ class ArticlesResource extends BaseResource {
    * @return any[]
    *     Returns the entities with a favoritesCount field.
    */
-  protected async attachFavoritesToArticleEntities(
+  protected async addFavoritesToArticleEntities(
     articleIds: number[],
     entities: any
   ): Promise<any[]> {
-    let favorites: any = await ArticlesFavoritesModel.whereInId(articleIds);
+    let favorites: any = await ArticlesFavoritesModel
+      .whereInArticleId(articleIds);
 
     entities.map((entity: any) => {
       favorites.forEach((favorite: ArticlesFavoritesModel) => {
-        if (favorite.article_id === entity.id) {
+        if (favorite.article_id == entity.id) {
           entity.favoritesCount += 1;
         }
       });
@@ -121,6 +122,10 @@ class ArticlesResource extends BaseResource {
    * @return Promise<Drash.Http.Response>
    */
   protected async getArticle(): Promise<Drash.Http.Response> {
+    const currentUser = await this.getCurrentUser();
+    if (!currentUser) {
+      return this.errorResponse(500, "Can't determine the current user.");
+    }
     const slug = this.request.getPathParam("slug");
     const article = await ArticleModel.whereSlug(slug);
 
@@ -143,6 +148,18 @@ class ArticlesResource extends BaseResource {
 
     let favorites: any = await ArticlesFavoritesModel.whereId(article.id);
     entity.favoritesCount = favorites.length;
+    console.log(favorites);
+    favorites.forEach((favorite: ArticlesFavoritesModel) => {
+      if (entity.id === favorite.article_id) {
+        console.log("favorited 1");
+        console.log(currentUser.id);
+        console.log(favorite.user_id);
+        if (currentUser.id === favorite.user_id) {
+          console.log("favorited 2");
+          entity.favorited = true;
+        }
+      }
+    });
 
     this.response.body = {
       article: entity,
@@ -165,7 +182,7 @@ class ArticlesResource extends BaseResource {
    */
   protected async getArticles(): Promise<Drash.Http.Response> {
     const articles: ArticleModel[] = await ArticleModel
-      .all(await this.getFilters());
+      .all(await this.getQueryFilters());
 
     let articleIds: number[] = [];
     let authorIds: number[] = [];
@@ -180,8 +197,9 @@ class ArticlesResource extends BaseResource {
       return article.toEntity();
     });
 
-    entities = await this.attachAuthorsToArticleEntities(authorIds, entities);
-    entities = await this.attachFavoritesToArticleEntities(articleIds, entities);
+    entities = await this.addAuthorsToArticleEntities(authorIds, entities);
+    entities = await this.addFavoritesToArticleEntities(articleIds, entities);
+    entities = await this.filterEntities(articleIds, entities);
 
     this.response.body = {
       articles: entities,
@@ -190,13 +208,55 @@ class ArticlesResource extends BaseResource {
   }
 
   /**
+   * Filter the entities further.
+   *
+   * @param any entities
+   *
+   * @return any
+   *     Returns the filtered entities.
+   */
+  protected async filterEntities(
+    articleIds: number[],
+    entities: any
+  ): Promise<any> {
+    const favorites: any = await ArticlesFavoritesModel
+      .whereInArticleId(articleIds);
+
+    const username = this.request.getUrlQueryParam("favorited_by");
+    if (!username) {
+      return entities;
+    }
+
+    const user = await UserModel.whereUsername(username);
+
+    if (!user) {
+      return entities;
+    }
+
+    let filteredIds: number[] = [];
+
+    entities.forEach((entity: any) => {
+      favorites.forEach((favorite: ArticlesFavoritesModel) => {
+        if (entity.id === favorite.article_id) {
+          if (user.id === favorite.user_id) {
+            filteredIds.push(entity.id);
+          }
+        }
+      });
+    });
+
+    return entities.filter((entity: any) => {
+      return filteredIds.indexOf(entity.id) !== -1;
+    });
+  }
+
+  /**
    * Get the filters for filtering article records.
    *
    * @return ArticleFilters
    */
-  protected async getFilters(): Promise<ArticleFilters> {
+  protected async getQueryFilters(): Promise<ArticleFilters> {
     const author = this.request.getUrlQueryParam("author");
-    const favoritedBy = this.request.getUrlQueryParam("favorited_by");
     const offset = this.request.getUrlQueryParam("offset");
     const tag = this.request.getUrlQueryParam("tag");
 
@@ -209,21 +269,12 @@ class ArticlesResource extends BaseResource {
       }
     }
 
-    if (favoritedBy) {
-      const favoritedByUser = await UserModel.whereUsername(favoritedBy);
-      if (favoritedByUser) {
-        filters.favorited_by = favoritedByUser;
-      }
-    }
-
-    filters.offset = offset ?? 0;
-    filters.tag = tag ?? null;
-
     return filters;
   }
 
   /**
    * @return Promise<Drash.Http.Response>
+   *     Returns the updated article.
    */
   protected async toggleFavorite(): Promise<Drash.Http.Response> {
     const slug = this.request.getPathParam("slug");
