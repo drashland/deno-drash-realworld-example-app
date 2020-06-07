@@ -80,7 +80,12 @@ export default {
     });
   },
   computed: {
-    ...mapGetters(["article", "user", "comments", "is_authenticated"])
+    ...mapGetters([
+      "article",
+      "comments",
+      "is_authenticated",
+      "user",
+    ])
   },
   methods: {
     articleCreatedAt() {
