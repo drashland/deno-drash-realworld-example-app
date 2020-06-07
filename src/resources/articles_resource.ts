@@ -84,7 +84,9 @@ class ArticlesResource extends BaseResource {
     entities.map((entity: any) => {
       favorites.forEach((favorite: ArticlesFavoritesModel) => {
         if (favorite.article_id == entity.id) {
-          entity.favoritesCount += 1;
+          if (favorite.value === true) {
+            entity.favoritesCount += 1;
+          }
         }
       });
       return entity;
@@ -158,14 +160,9 @@ class ArticlesResource extends BaseResource {
       }
     });
 
-    console.log(favorites);
     favorites.forEach((favorite: ArticlesFavoritesModel) => {
       if (entity.id === favorite.article_id) {
-        console.log("favorited 1");
-        console.log(currentUser.id);
-        console.log(favorite.user_id);
         if (currentUser.id === favorite.user_id) {
-          console.log("favorited 2");
           entity.favorited = favorite.value;
         }
       }
@@ -229,6 +226,14 @@ class ArticlesResource extends BaseResource {
     articleIds: number[],
     entities: any
   ): Promise<any> {
+    entities = await this.filterEntitiesByFavoritedBy(articleIds, entities);
+    return entities;
+  }
+
+  protected async filterEntitiesByFavoritedBy(
+    articleIds: number[],
+    entities: any
+  ): Promise<any> {
     const favorites: any = await ArticlesFavoritesModel
       .whereInArticleId(articleIds);
 
@@ -243,21 +248,21 @@ class ArticlesResource extends BaseResource {
       return entities;
     }
 
-    let filteredIds: number[] = [];
+    let filtered: any[] = [];
 
     entities.forEach((entity: any) => {
       favorites.forEach((favorite: ArticlesFavoritesModel) => {
         if (entity.id === favorite.article_id) {
           if (user.id === favorite.user_id) {
-            filteredIds.push(entity.id);
+            if (favorite.value === true) {
+              filtered.push(entity);
+            }
           }
         }
       });
     });
 
-    return entities.filter((entity: any) => {
-      return filteredIds.indexOf(entity.id) !== -1;
-    });
+    return filtered;
   }
 
   /**
@@ -299,7 +304,7 @@ class ArticlesResource extends BaseResource {
       return this.errorResponse(404, `Article with slug "${slug}" not found.`);
     }
 
-    let favorite: any;
+    let favorite: ArticlesFavoritesModel|null;
 
     const action = this.request.getBodyParam("action");
     switch (action) {
