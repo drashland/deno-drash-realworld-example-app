@@ -19,7 +19,6 @@ export function createArticlesFavoritesModelObject(
 }
 
 export class ArticlesFavoritesModel extends BaseModel {
-
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -113,7 +112,8 @@ export class ArticlesFavoritesModel extends BaseModel {
     }
 
     let idsCommaSeparated = ids.join(",");
-    let query = `SELECT * FROM articles_favorites WHERE article_id IN (${idsCommaSeparated});`;
+    let query =
+      `SELECT * FROM articles_favorites WHERE article_id IN (${idsCommaSeparated});`;
 
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);

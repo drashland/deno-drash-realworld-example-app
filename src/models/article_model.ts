@@ -6,7 +6,7 @@ import {
 } from "./articles_favorites_model.ts";
 
 export type ArticleEntity = {
-  author?: UserEntity|null;
+  author?: UserEntity | null;
   author_id: number;
   body: string;
   created_at: number;

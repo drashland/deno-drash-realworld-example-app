@@ -9,7 +9,6 @@ import { ArticlesFavoritesModel } from "../models/articles_favorites_model.ts";
 import UserModel from "../models/user_model.ts";
 
 class ArticlesResource extends BaseResource {
-
   static paths = [
     "/articles",
     "/articles/:slug",
@@ -53,7 +52,7 @@ class ArticlesResource extends BaseResource {
    */
   protected async addAuthorsToEntities(
     authorIds: number[],
-    entities: ArticleEntity[]
+    entities: ArticleEntity[],
   ): Promise<ArticleEntity[]> {
     let authors: UserModel[] = await UserModel.whereInId(authorIds);
 
@@ -79,7 +78,7 @@ class ArticlesResource extends BaseResource {
    */
   protected async addFavoritedToEntities(
     articleIds: number[],
-    entities: ArticleEntity[]
+    entities: ArticleEntity[],
   ): Promise<ArticleEntity[]> {
     const currentUser = await this.getCurrentUser();
     if (!currentUser) {
@@ -113,7 +112,7 @@ class ArticlesResource extends BaseResource {
    */
   protected async addFavoritesCountToEntities(
     articleIds: number[],
-    entities: ArticleEntity[]
+    entities: ArticleEntity[],
   ): Promise<ArticleEntity[]> {
     let favorites: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
       .whereInArticleId(articleIds);
@@ -165,7 +164,7 @@ class ArticlesResource extends BaseResource {
     if (!currentUser) {
       return this.errorResponse(
         400,
-        "`user_id` field is required."
+        "`user_id` field is required.",
       );
     }
 
@@ -175,15 +174,15 @@ class ArticlesResource extends BaseResource {
     if (!article) {
       return this.errorResponse(
         404,
-        "Article not found."
+        "Article not found.",
       );
     }
 
-    let user: UserModel|null = await UserModel.whereId(article.author_id);
+    let user: UserModel | null = await UserModel.whereId(article.author_id);
     if (!user) {
       return this.errorResponse(
         400,
-        "Unable to determine the article's author."
+        "Unable to determine the article's author.",
       );
     }
 
@@ -263,7 +262,7 @@ class ArticlesResource extends BaseResource {
    */
   protected async filterEntitiesByFavoritedBy(
     articleIds: number[],
-    entities: ArticleEntity[]
+    entities: ArticleEntity[],
   ): Promise<ArticleEntity[]> {
     const favorites: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
       .whereInArticleId(articleIds);
@@ -327,7 +326,7 @@ class ArticlesResource extends BaseResource {
     if (!currentUser) {
       return this.errorResponse(
         400,
-        "`user_id` field is required."
+        "`user_id` field is required.",
       );
     }
 
@@ -338,7 +337,7 @@ class ArticlesResource extends BaseResource {
       return this.errorResponse(404, `Article with slug "${slug}" not found.`);
     }
 
-    let favorite: ArticlesFavoritesModel|null;
+    let favorite: ArticlesFavoritesModel | null;
 
     const action = this.request.getBodyParam("action");
     switch (action) {
@@ -368,7 +367,7 @@ class ArticlesResource extends BaseResource {
         if (!favorite) {
           return this.errorResponse(
             404,
-            "Can't unset favorite on article that doesn't have any favorites."
+            "Can't unset favorite on article that doesn't have any favorites.",
           );
         }
         favorite.value = false;

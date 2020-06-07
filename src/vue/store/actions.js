@@ -63,8 +63,8 @@ export default {
       axios
         .get(`/articles/${slug}`, {
           params: {
-            user_id: context.getters.user.id
-          }
+            user_id: context.getters.user.id,
+          },
         })
         .then((response) => {
           context.dispatch("setArticle", response.data.article);
@@ -98,7 +98,7 @@ export default {
             favorited_by: params.favorited,
             offset: params.filters,
             tag: params.tag,
-            user_id: context.getters.user.id
+            user_id: context.getters.user.id,
           },
         })
         .then((response) => {

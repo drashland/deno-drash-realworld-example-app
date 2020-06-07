@@ -4,8 +4,7 @@ import SessionModel from "../models/session_model.ts";
 import ValidationService from "../services/validation_service.ts";
 
 class BaseResource extends Drash.Http.Resource {
-
-  public current_user: UserModel|null = null;
+  public current_user: UserModel | null = null;
 
   /**
    * @param number statusCode
@@ -36,7 +35,7 @@ class BaseResource extends Drash.Http.Resource {
   protected errorResponseCurrentUser(): Drash.Http.Response {
     return this.errorResponse(
       400,
-      "`user_id` field is required."
+      "`user_id` field is required.",
     );
   }
 
