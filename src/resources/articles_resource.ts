@@ -342,10 +342,12 @@ class ArticlesResource extends BaseResource {
 
     const slug = this.request.getPathParam("slug");
 
-    const article = await ArticleModel.where({ slug: slug });
-    if (!article) {
+    const result = await ArticleModel.where({ slug: slug });
+    if (result.length <= 0) {
       return this.errorResponse(404, `Article with slug "${slug}" not found.`);
     }
+
+    let article = result[0];
 
     let favorite;
 
@@ -355,15 +357,15 @@ class ArticlesResource extends BaseResource {
         // Check if the user already has a record in the db before creating a
         // new one. If the user has a record, then we just update the record.
         favorite = await ArticlesFavoritesModel.where({
-          article_id: article[0].id,
+          article_id: article.id,
           user_id: currentUser.id,
         });
-        if (favorite) {
+        if (favorite.length > 0) {
           favorite[0].value = true;
           await favorite[0].save();
         } else {
           favorite = new ArticlesFavoritesModel(
-            article[0].id,
+            article.id,
             currentUser.id,
             true,
           );
@@ -372,7 +374,7 @@ class ArticlesResource extends BaseResource {
         break;
       case "unset":
         favorite = await ArticlesFavoritesModel.where({
-          article_id: article[0].id,
+          article_id: article.id,
           user_id: currentUser.id,
         });
         if (!favorite) {
