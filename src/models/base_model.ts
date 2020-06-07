@@ -13,6 +13,9 @@ export default abstract class BaseModel {
   // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * @return Promise<PoolClient>
+   */
   static async connect(): Promise<PoolClient> {
     return await dbPool.connect();
   }
@@ -23,18 +26,23 @@ export default abstract class BaseModel {
 
   /**
    * @description
-   * Uses the data received from the database table and the column names to format
-   * the result into key value pairs
+   *     Uses the data received from the database table and the column names to
+   *     format the result into key value pairs.
    *
-   * @param {Array<string[]>} rows An array of the rows from the table, each containing column values
-   * @param {any[]} columns Array of objects, each object holding column data. Used the get the column name
+   * @param Array<string[]> rows
+   *     An array of the rows from the table, each containing column values.
+   * @param any[] columns
+   *     Array of objects, each object holding column data. Used the get the
+   *     column name.
+   *
+   * @return any[]
+   *     Empty array of no db rows, else array of rows as key value pairs.
    *
    * @example
    * BaseModel.formatResults([[1, 'ed'], [2, 'john']], [{name: 'id', ...}, {name: 'name', ...}]);
    *
-   * @return {any[]} Empty array of no db rows, else array of rows as key value pairs
+   * TODO: Figure out return type (its format of: [{key: string}]
    */
-  // TODO :: Figure out return type (its format of: [{key: string}]
   static formatResults(rows: Array<string[]>, columns: any[]): any[] {
     if (!rows.length) {
       return [];
@@ -55,12 +63,18 @@ export default abstract class BaseModel {
   }
 
   /**
-   * Get records using the WHERE clause.
+   * @description
+   *     Get records using the WHERE clause.
    *
    * @param string table
    * @param any fields
+   *
+   * @return Promise<any>
    */
-  static async where(table: string, fields: any) {
+  static async where(
+    table: string,
+    fields: any,
+  ): Promise<any> {
     let query = `SELECT * FROM ${table} WHERE `;
     let clauses: string[] = [];
     for (let field in fields) {
@@ -85,18 +99,23 @@ export default abstract class BaseModel {
    *
    * @param any data
    *     {
-   *       column: string
-   *       values: any
+   *       column: string            (the column to target)
+   *       values: number[]|string[] (the values to put in the IN array)
    *     }
+   *
+   * @return Promise<any>
    */
-  static async whereIn(table: string, data: any) {
+  static async whereIn(
+    table: string,
+    data: any,
+  ): Promise<any> {
     if (data.values.length <= 0) {
       return [];
     }
 
-    let query =`SELECT * FROM ${table} `
-      + ` WHERE ${data.column} `
-      + ` IN (${data.values.join(",")})`;
+    let query = `SELECT * FROM ${table} ` +
+      ` WHERE ${data.column} ` +
+      ` IN (${data.values.join(",")})`;
 
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
@@ -114,17 +133,21 @@ export default abstract class BaseModel {
 
   /**
    * @description
-   * Prepares a query to insert dynamic data into, similar to what PHP would do.
-   * The query doesn't have to have "?", if it doesn't, method will return the original query string
+   *     Prepares a query to insert dynamic data into, similar to what PHP would
+   *     do.  The query doesn't have to have "?", if it doesn't, method will
+   *     return the original query string
    *
-   * @param {string}      query The db query string. Required.
-   * @param {string[]}    data Array of strings to update each placeholder
+   * @param string query
+   *     The db query string. Required.
+   * @param string[] data
+   *     Array of strings to update each placeholder
    *
    * @example
    * const query = "SELECT * FROM users WHERE name = ? AND username = ?"
    * const data = ["Edward", "Ed2020"]; // note first index is for 1st placeholder, 2nd index is for 2nd placeholder and so on
    *
-   * @return {string} The query with the placeholders replaced with the data
+   * @return string
+   *     The query with the placeholders replaced with the data
    */
   protected prepareQuery(query: string, data?: string[]): string {
     if (!data || !data.length) {

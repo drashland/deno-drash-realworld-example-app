@@ -104,7 +104,7 @@ export class ArticlesFavoritesModel extends BaseModel {
 
     // @ts-ignore
     // (crookse) We ignore this because this will never return null.
-    return ArticlesFavoritesModel.where({article_id: this.article_id});
+    return ArticlesFavoritesModel.where({ article_id: this.article_id });
   }
 
   /**
@@ -128,7 +128,7 @@ export class ArticlesFavoritesModel extends BaseModel {
 
     // @ts-ignore
     // (crookse) We ignore this because this will never return null.
-    return ArticlesFavoritesModel.where({article_id: this.article_id});
+    return ArticlesFavoritesModel.where({ article_id: this.article_id });
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -144,7 +144,7 @@ export class ArticlesFavoritesModel extends BaseModel {
    * @return Promise<ArticlesFavoritesModel[]|[]>
    */
   static async where(
-    fields: any
+    fields: any,
   ): Promise<ArticlesFavoritesModel[] | []> {
     let results = await BaseModel.where("articles_favorites", fields);
 
@@ -168,11 +168,11 @@ export class ArticlesFavoritesModel extends BaseModel {
    */
   static async whereIn(
     column: string,
-    values: any
+    values: any,
   ): Promise<ArticlesFavoritesModel[] | []> {
     let results = await BaseModel.whereIn("articles_favorites", {
       column,
-      values
+      values,
     });
 
     if (results.length <= 0) {

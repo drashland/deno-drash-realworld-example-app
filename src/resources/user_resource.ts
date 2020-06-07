@@ -18,7 +18,7 @@ export default class UserResource extends BaseResource {
    */
   public async GET() {
     this.response.body = await UserModel.where({
-      username: this.request.getPathParam("username")
+      username: this.request.getPathParam("username"),
     });
     return this.response;
   }

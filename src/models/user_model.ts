@@ -114,7 +114,7 @@ export class UserModel extends BaseModel {
 
     // @ts-ignore
     // (crookse) We ignore this because this will never return null.
-    return UserModel.where({email: this.email});
+    return UserModel.where({ email: this.email });
   }
 
   /**
@@ -142,7 +142,7 @@ export class UserModel extends BaseModel {
 
     // @ts-ignore
     // (crookse) We ignore this because this will never return null.
-    return UserModel.where({email: this.email});
+    return UserModel.where({ email: this.email });
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -158,7 +158,7 @@ export class UserModel extends BaseModel {
    * @return Promise<UserModel[]|[]>
    */
   static async where(
-    fields: any
+    fields: any,
   ): Promise<UserModel[] | []> {
     let results = await BaseModel.where("users", fields);
 
@@ -180,11 +180,11 @@ export class UserModel extends BaseModel {
    */
   static async whereIn(
     column: string,
-    values: any
+    values: any,
   ): Promise<UserModel[] | []> {
     let results = await BaseModel.whereIn("users", {
       column,
-      values
+      values,
     });
 
     if (results.length <= 0) {

@@ -163,7 +163,7 @@ export class ArticleModel extends BaseModel {
 
     // @ts-ignore
     // (crookse) We ignore this because this will never return null.
-    return ArticleModel.where({id: this.id});
+    return ArticleModel.where({ id: this.id });
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -210,7 +210,7 @@ export class ArticleModel extends BaseModel {
    * @return Promise<ArticleModel[]|[]>
    */
   static async where(
-    fields: any
+    fields: any,
   ): Promise<ArticleModel[] | []> {
     let results = await BaseModel.where("articles", fields);
 
@@ -234,11 +234,11 @@ export class ArticleModel extends BaseModel {
    */
   static async whereIn(
     column: string,
-    values: any
+    values: any,
   ): Promise<ArticleModel[] | []> {
     let results = await BaseModel.whereIn("articles", {
       column,
-      values
+      values,
     });
 
     if (results.length <= 0) {

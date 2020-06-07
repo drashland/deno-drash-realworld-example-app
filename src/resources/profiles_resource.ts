@@ -25,7 +25,7 @@ class ProfilesResource extends BaseResource {
       profile: null,
     };
 
-    let result = await UserModel.where({username: username});
+    let result = await UserModel.where({ username: username });
     if (result.length <= 0) {
       return this.errorResponse(404, "Profile not found.");
     }

@@ -31,6 +31,7 @@ class ArticlesResource extends BaseResource {
 
   public async POST(): Promise<Drash.Http.Response> {
     console.log("Handling ArticlesResource POST.");
+
     if (this.request.url_path.includes("/favorite")) {
       return await this.toggleFavorite();
     }
@@ -43,7 +44,8 @@ class ArticlesResource extends BaseResource {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * Add the author object to the entities.
+   * @description
+   *     Add the author object to the entities.
    *
    * @param number[] authorIds
    * @param ArticleEntity[] entities
@@ -69,7 +71,8 @@ class ArticlesResource extends BaseResource {
   }
 
   /**
-   * Add the favorited field to the entities.
+   * @description
+   *     Add the favorited field to the entities.
    *
    * @param number[] articleIds
    * @param ArticleEntity[] entities
@@ -103,7 +106,8 @@ class ArticlesResource extends BaseResource {
   }
 
   /**
-   * Add the favoritesCount field to the entities.
+   * @description
+   *     Add the favoritesCount field to the entities.
    *
    * @param number[] articleIds
    * @param ArticleEntity[] entities
@@ -220,14 +224,16 @@ class ArticlesResource extends BaseResource {
   }
 
   /**
-   * Get all articles--filtered or unfiltered.
+   * @description
+   *     Get all articles--filtered or unfiltered.
    *
-   * Filters include: {
-   *   author: string;       (author username)
-   *   favorited_by: string; (author username)
-   *   offset: number;       (used for filtering articles by OFFSET clause)
-   *   tag: string;          (used for filtering articles by tag)
-   * }
+   *     Filters include:
+   *         {
+   *           author: string;       (author username)
+   *           favorited_by: string; (author username)
+   *           offset: number;       (used for filtering articles by OFFSET)
+   *           tag: string;          (used for filtering articles by tag)
+   *         }
    *
    * @return Promise<Drash.Http.Response>
    */
@@ -260,7 +266,8 @@ class ArticlesResource extends BaseResource {
   }
 
   /**
-   * Filter the entities by the favorited_by param.
+   * @description
+   *     Filter the entities by the favorited_by param.
    *
    * @param number[] articleIds
    * @param ArticleEntity[] entities
@@ -279,7 +286,7 @@ class ArticlesResource extends BaseResource {
       return entities;
     }
 
-    let results = await UserModel.where({username: username});
+    let results = await UserModel.where({ username: username });
 
     if (results.length <= 0) {
       return entities;
@@ -306,7 +313,8 @@ class ArticlesResource extends BaseResource {
   }
 
   /**
-   * Get the filters for filtering article records.
+   * @description
+   *     Get the filters for filtering article records.
    *
    * @return ArticleFilters
    */
@@ -317,7 +325,7 @@ class ArticlesResource extends BaseResource {
     let filters: ArticleFilters = {};
 
     if (author) {
-      const authorUser = await UserModel.where({username: author});
+      const authorUser = await UserModel.where({ username: author });
       if (authorUser.length > 0) {
         filters.author = authorUser[0];
       }
@@ -328,7 +336,7 @@ class ArticlesResource extends BaseResource {
 
   /**
    * @return Promise<Drash.Http.Response>
-   *     Returns the updated article.
+   *     Returns the updated article in the response.
    */
   protected async toggleFavorite(): Promise<Drash.Http.Response> {
     console.log("Handling action: toggleFavorite.");
@@ -387,6 +395,7 @@ class ArticlesResource extends BaseResource {
         await favorite[0].save();
         break;
     }
+
     return this.getArticle();
   }
 }
