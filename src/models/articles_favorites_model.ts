@@ -50,7 +50,9 @@ export class ArticlesFavoritesModel extends BaseModel {
   // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  static async where(fields: any): Promise<ArticlesFavoritesModel | null> {
+  static async where(
+    fields: any
+  ): Promise<ArticlesFavoritesModel[] | []> {
     let query = "SELECT * FROM articles_favorites WHERE ";
     let clauses: string[] = [];
     for (let field in fields) {
@@ -63,16 +65,18 @@ export class ArticlesFavoritesModel extends BaseModel {
     const dbResult = await client.query(query);
     client.release();
 
-    let favorite: any = BaseModel.formatResults(
+    let results: any = BaseModel.formatResults(
       dbResult.rows,
       dbResult.rowDescription.columns,
     );
 
-    if (favorite && favorite.length > 0) {
-      return createArticlesFavoritesModelObject(favorite[0]);
+    if (results.length <= 0) {
+      return [];
     }
 
-    return null;
+    return results.map((result: any) => {
+      return createArticlesFavoritesModelObject(result);
+    });
   }
 
   /**
@@ -88,7 +92,7 @@ export class ArticlesFavoritesModel extends BaseModel {
 
     let valuesCommaSeparated = values.join(",");
     let query =
-      `SELECT * FROM articles_favorites WHERE ${column} IN (${values.join(","});`;
+      `SELECT * FROM articles_favorites WHERE ${column} IN (${values.join(",")});`;
 
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);

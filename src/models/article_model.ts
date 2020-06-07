@@ -186,9 +186,8 @@ export class ArticleModel extends BaseModel {
     client.release();
 
     // @ts-ignore
-    // (crookse) We ignore this because whereId() can return null if the
-    // user is not found. However, in this case, it will never be null.
-    return ArticleModel.whereId(this.id);
+    // (crookse) This will never return null.
+    return ArticleModel.where({id: this.id});
   }
 
   //////////////////////////////////////////////////////////////////////////////

@@ -62,7 +62,7 @@ export default class UserResource extends BaseResource {
     );
     const token = this.request.getBodyParam("token");
 
-    let user = await UserModel.whereId(id);
+    let user = await UserModel.where({id: id});
 
     if (!user) {
       console.log("User not found.");

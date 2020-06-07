@@ -54,7 +54,7 @@ class ArticlesResource extends BaseResource {
     authorIds: number[],
     entities: ArticleEntity[],
   ): Promise<ArticleEntity[]> {
-    let authors: UserModel[] = await UserModel.whereInId(authorIds);
+    let authors: UserModel[] = await UserModel.whereIn("id", authorIds);
 
     entities.map((entity: ArticleEntity) => {
       authors.forEach((user: UserModel) => {
@@ -85,11 +85,11 @@ class ArticlesResource extends BaseResource {
       return entities;
     }
 
-    const favorites: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
+    const favs: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
       .whereIn("article_id", articleIds);
 
     entities = entities.map((entity: ArticleEntity) => {
-      favorites.forEach((favorite: ArticlesFavoritesModel) => {
+      favs.forEach((favorite: ArticlesFavoritesModel) => {
         if (entity.id === favorite.article_id) {
           if (currentUser.id === favorite.user_id) {
             entity.favorited = favorite.value;
@@ -114,11 +114,11 @@ class ArticlesResource extends BaseResource {
     articleIds: number[],
     entities: ArticleEntity[],
   ): Promise<ArticleEntity[]> {
-    let favorites: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
+    let favs: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
       .whereIn("article_id", articleIds);
 
     entities.map((entity: ArticleEntity) => {
-      favorites.forEach((favorite: ArticlesFavoritesModel) => {
+      favs.forEach((favorite: ArticlesFavoritesModel) => {
         if (favorite.article_id == entity.id) {
           if (favorite.value === true) {
             entity.favoritesCount += 1;
@@ -178,7 +178,7 @@ class ArticlesResource extends BaseResource {
       );
     }
 
-    let user: UserModel | null = await UserModel.whereId(article.author_id);
+    let user: UserModel | null = await UserModel.where({id: article.author_id });
     if (!user) {
       return this.errorResponse(
         400,
@@ -189,21 +189,22 @@ class ArticlesResource extends BaseResource {
     let entity: ArticleEntity = article.toEntity();
     entity.author = user.toEntity();
 
-    let favorites: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
+    let favs = await ArticlesFavoritesModel
       .where({article_id: article.id});
-    favorites.forEach((favorite: ArticlesFavoritesModel) => {
-      if (favorite.value === true) {
-        entity.favoritesCount += 1;
-      }
-    });
-
-    favorites.forEach((favorite: ArticlesFavoritesModel) => {
-      if (entity.id === favorite.article_id) {
-        if (currentUser.id === favorite.user_id) {
-          entity.favorited = favorite.value;
+    if (favs) {
+      favs.forEach((favorite: ArticlesFavoritesModel) => {
+        if (favorite.value === true) {
+          entity.favoritesCount += 1;
         }
-      }
-    });
+      });
+      favs.forEach((favorite: ArticlesFavoritesModel) => {
+        if (entity.id === favorite.article_id) {
+          if (currentUser.id === favorite.user_id) {
+            entity.favorited = favorite.value;
+          }
+        }
+      });
+    }
 
     this.response.body = {
       article: entity,
@@ -264,7 +265,7 @@ class ArticlesResource extends BaseResource {
     articleIds: number[],
     entities: ArticleEntity[],
   ): Promise<ArticleEntity[]> {
-    const favorites: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
+    const favs: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
       .whereIn("article_id", articleIds);
 
     const username = this.request.getUrlQueryParam("favorited_by");
@@ -281,7 +282,7 @@ class ArticlesResource extends BaseResource {
     let filtered: ArticleEntity[] = [];
 
     entities.forEach((entity: ArticleEntity) => {
-      favorites.forEach((favorite: ArticlesFavoritesModel) => {
+      favs.forEach((favorite: ArticlesFavoritesModel) => {
         if (entity.id === favorite.article_id) {
           if (user.id === favorite.user_id) {
             if (favorite.value === true) {
@@ -337,7 +338,7 @@ class ArticlesResource extends BaseResource {
       return this.errorResponse(404, `Article with slug "${slug}" not found.`);
     }
 
-    let favorite: ArticlesFavoritesModel | null;
+    let favorite;
 
     const action = this.request.getBodyParam("action");
     switch (action) {
@@ -349,15 +350,16 @@ class ArticlesResource extends BaseResource {
           user_id: currentUser.id,
         });
         if (favorite) {
-          favorite.value = true;
+          favorite[0].value = true;
+          await favorite[0].save();
         } else {
           favorite = new ArticlesFavoritesModel(
             article.id,
             currentUser.id,
             true,
           );
+          await favorite.save();
         }
-        await favorite.save();
         break;
       case "unset":
         favorite = await ArticlesFavoritesModel.where({
@@ -370,8 +372,8 @@ class ArticlesResource extends BaseResource {
             "Can't unset favorite on article that doesn't have any favorites.",
           );
         }
-        favorite.value = false;
-        await favorite.save();
+        favorite[0].value = false;
+        await favorite[0].save();
         break;
     }
     return this.getArticle();
