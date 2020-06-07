@@ -25,11 +25,20 @@ class BaseResource extends Drash.Http.Resource {
 
   protected async getCurrentUser() {
     let userId = this.request.getUrlQueryParam("user_id");
-    console.log(userId);
+
+    if (!userId) {
+      userId = this.request.getBodyParam("user_id");
+    }
+
+    if (!userId) {
+      return null;
+    }
+
     let user = await UserModel.whereId(userId);
     if (user) {
       return user;
     }
+
     return null;
   }
 }
