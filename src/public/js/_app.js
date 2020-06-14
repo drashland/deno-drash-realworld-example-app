@@ -56,6 +56,7 @@ import ProfileArticles from "@/routes/ProfileArticles.vue";
 import ProfileFavorited from "@/routes/ProfileFavorited.vue";
 import Article from "@/routes/Article.vue";
 import ArticleEdit from "@/routes/ArticleEdit.vue";
+import NotFound from "@/routes/404.vue"
 
 const router = new VueRouter({
   routes: [
@@ -125,6 +126,10 @@ const router = new VueRouter({
       path: "/editor/:slug?",
       props: true,
       component: ArticleEdit,
+    },
+    {
+      path: "*",
+      component: NotFound
     }
   ],
   scrollBehavior(to, from, savedPosition) {
