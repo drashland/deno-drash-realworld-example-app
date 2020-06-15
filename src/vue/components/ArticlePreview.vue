@@ -1,6 +1,6 @@
 <template>
   <div class="article-preview">
-    <ArticleMeta isPreview :article="article" />
+    <ArticleMeta :article="article" />
     <router-link :to="articleLink" class="preview-link">
       <h1 v-text="article.title" />
       <p v-text="article.description" />
@@ -21,7 +21,10 @@ export default {
     TagList
   },
   props: {
-    article: { type: Object, required: true }
+    article: {
+      type: Object,
+      required: true
+    }
   },
   computed: {
     articleLink() {

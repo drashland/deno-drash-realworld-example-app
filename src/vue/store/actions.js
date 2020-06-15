@@ -4,50 +4,109 @@ import { router } from "../../public/js/_app.js";
 import JwtService from "@/common/jwt_service.js";
 
 const userDefault = {
-   created_on: null,
-   email: null,
-   id: null,
-   last_login: null,
-   password: null,
-   username: null,
+  created_on: null,
+  email: null,
+  id: null,
+  last_login: null,
+  password: null,
+  username: null,
 };
 
 export default {
   checkIfUserIsAuthenticated(context) {
+    console.log("Checking if the user is authenticated.");
     if (getCookie("drash_sess") && getCookie("drash_sess") != "null") {
-      console.log("Handling action: checkIfUserIsAuthenticated");
-      axios
-        .post("/users/login", {
-          action: "check_if_user_is_authenticated",
-          token: getCookie("drash_sess"),
-        })
-        .then((response) => {
-          console.log("User is authenticated.");
-          context.dispatch("setUser", response.data.user);
-        })
-        .catch((error) => {
-          console.log("User is not authenticated.");
-          console.log(error.response);
-          context.dispatch("unsetUser");
-        });
-      return;
+      return new Promise((resolve) => {
+        axios
+          .post("/users/login", {
+            action: "check_if_user_is_authenticated",
+            token: getCookie("drash_sess"),
+          })
+          .then(async (response) => {
+            console.log("User is authenticated.");
+            await context.dispatch("setUser", response.data.user);
+            resolve();
+          })
+          .catch((error) => {
+            console.log("User has a session, but it's invalid.");
+            console.log(error.response);
+            context.dispatch("unsetUser");
+            resolve();
+          });
+      });
     }
 
     console.log("User is not authenticated.");
     context.dispatch("unsetUser");
   },
 
-  fetchArticles({ commit }, offset) {
+  createArticle(context, article) {
+    console.log("Handling action: createArticle");
+    article.author_id = context.getters.user.id;
+    return new Promise((resolve) => {
+      axios
+        .post("/articles", {
+          article,
+        })
+        .then((response) => {
+          resolve(response);
+        })
+        .catch((error) => {
+          resolve(error.response);
+        });
+    });
+  },
+
+  fetchArticle(context, slug) {
+    console.log("Handling action: fetchArticle");
+    return new Promise((resolve) => {
+      axios
+        .get(`/articles/${slug}`, {
+          params: {
+            user_id: context.getters.user.id,
+          },
+        })
+        .then((response) => {
+          context.dispatch("setArticle", response.data.article);
+          resolve(response);
+        })
+        .catch((error) => {
+          resolve(error.response);
+        });
+    });
+  },
+
+  fetchArticleComments({ commit }, slug) {
+    return new Promise((resolve) => {
+      axios
+        .get(`/articles/${slug}/comments`)
+        .then((response) => {
+          resolve(response);
+        })
+        .catch((error) => {
+          resolve(error.response);
+        });
+    });
+  },
+
+  fetchArticles(context, params) {
     return new Promise((resolve) => {
       axios
         .get("/articles", {
-          offset: offset
+          params: {
+            author: params.author,
+            favorited_by: params.favorited,
+            offset: params.filters,
+            tag: params.tag,
+            user_id: context.getters.user.id,
+          },
         })
-        .then(({ data }) => {
-          resolve(data)
+        .then((response) => {
+          context.dispatch("setArticles", response.data.articles);
+          resolve(response);
         })
-        .catch(error => {
-          resolve(undefined);
+        .catch((error) => {
+          resolve(error.response);
         });
     });
   },
@@ -63,6 +122,7 @@ export default {
         })
         .catch((response) => {
           console.log("Unsetting profile.");
+          console.log(error.response);
           context.dispatch("unsetProfile");
         });
     });
@@ -73,9 +133,9 @@ export default {
       axios
         .get("/tags")
         .then(({ data }) => {
-          resolve(data)
+          resolve(data);
         })
-        .catch(error => {
+        .catch((error) => {
           resolve(undefined);
         });
     });
@@ -86,7 +146,7 @@ export default {
     return new Promise((resolve) => {
       axios
         .post("/users/login", {
-          user: credentials
+          user: credentials,
         })
         .then((response) => {
           console.log("Log in successful.");
@@ -126,6 +186,23 @@ export default {
     });
   },
 
+  setArticle(context, article) {
+    context.commit("setArticle", article);
+    let articles = [];
+    context.getters.articles.forEach((a, i) => {
+      if (a.id === article.id) {
+        articles.push(article);
+        return;
+      }
+      articles.push(a);
+    });
+    context.commit("setArticles", articles);
+  },
+
+  setArticles(context, articles) {
+    context.commit("setArticles", articles);
+  },
+
   setProfile(context, profile) {
     context.commit("setProfile", profile);
   },
@@ -136,10 +213,34 @@ export default {
     setCookie("drash_sess", user.token, 1);
   },
 
+  toggleArticleFavorite(context, params) {
+    console.log(`Handling action: toggleArtileFavorite (${params.action})`);
+    return new Promise((resolve) => {
+      axios
+        .post(`/articles/${params.slug}/favorite`, {
+          action: params.action,
+          user_id: context.getters.user.id,
+        })
+        .then(async (response) => {
+          console.log("toggleArticleFavorite successful.");
+          context.dispatch("setArticle", response.data.article);
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("toggleArticleFavorite unsuccessful.");
+          resolve(error.response);
+        });
+    });
+  },
+
+  unsetArticle(context) {
+    context.commit("setArticle", {});
+  },
+
   unsetUser(context) {
     context.commit("setIsAuthenticated", false);
     context.commit("setUser", userDefault);
-    setCookie("drash_sess", null)
+    setCookie("drash_sess", null);
   },
 
   unsetProfile(context) {
@@ -155,12 +256,11 @@ export default {
         email: user.email,
         bio: user.bio,
         image: user.image,
-        token: user.token
+        token: user.token,
       };
       if (user.password) {
         params.password = user.password;
       }
-      console.log(params);
       axios
         .post("/user", params)
         .then((response) => {
@@ -179,10 +279,10 @@ export default {
 function getCookie(cname) {
   var name = cname + "=";
   var decodedCookie = decodeURIComponent(document.cookie);
-  var ca = decodedCookie.split(';');
-  for(var i = 0; i <ca.length; i++) {
+  var ca = decodedCookie.split(";");
+  for (var i = 0; i < ca.length; i++) {
     var c = ca[i];
-    while (c.charAt(0) == ' ') {
+    while (c.charAt(0) == " ") {
       c = c.substring(1);
     }
     if (c.indexOf(name) == 0) {
@@ -194,7 +294,7 @@ function getCookie(cname) {
 
 function setCookie(cname, cvalue, exdays) {
   var d = new Date();
-  d.setTime(d.getTime() + (exdays*24*60*60*1000));
-  var expires = "expires="+ d.toUTCString();
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  var expires = "expires=" + d.toUTCString();
   document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }

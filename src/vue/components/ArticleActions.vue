@@ -49,12 +49,14 @@ export default {
       return this.article.favorited ? "Unfavorite Article" : "Favorite Article";
     },
     favoriteCounter() {
-      return `(${this.article.favoritesCount})`;
+      return `(${this.article.favoritesCount ? this.article.favoritesCount : 0})`;
     },
     followUserLabel() {
-      return `${this.profile.following ? "Unfollow" : "Follow"} ${
-        this.article.author.username
-      }`;
+      if (this.article && this.article.author) {
+        return `${this.profile.following ? "Unfollow" : "Follow"} ${
+          this.article.author.username
+        }`;
+      }
     },
     toggleFavoriteButtonClasses() {
       return {
@@ -79,9 +81,13 @@ export default {
         this.$router.push({ name: "login" });
         return;
       }
-      this.$store.dispatch("setFavorite", {
-        article_slug: this.article.slug,
-        value: !this.article.favorited
+
+      const action = this.article.favorited
+        ? "unset"
+        : "set";
+      this.$store.dispatch("toggleArticleFavorite", {
+        slug: this.article.slug,
+        action: action
       });
     },
     toggleFollow() {

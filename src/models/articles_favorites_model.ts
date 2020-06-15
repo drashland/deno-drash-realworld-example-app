@@ -1,57 +1,49 @@
 import BaseModel from "./base_model.ts";
 
-export type UserEntity = {
-  bio?: string;
-  email: string;
+export type ArticlesFavoritesEntity = {
+  article_id: number;
+  user_id: number;
   id?: number;
-  image?: string;
-  password?: string;
-  username: string;
-  token?: null | string;
+  value: boolean;
 };
 
-export function createUserModelObject(user: any): UserModel {
-  return new UserModel(
-    user.username,
-    user.password,
-    user.email,
-    user.bio,
-    user.image,
-    user.id,
+export function createArticlesFavoritesModelObject(
+  inputObj: ArticlesFavoritesEntity,
+): ArticlesFavoritesModel {
+  return new ArticlesFavoritesModel(
+    inputObj.article_id,
+    inputObj.user_id,
+    inputObj.value,
+    inputObj.id,
   );
 }
 
-export class UserModel extends BaseModel {
+export class ArticlesFavoritesModel extends BaseModel {
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  public bio: string;
-  public email: string;
+  public article_id: number;
+  public user_id: number;
   public id: number;
-  public image: string;
-  public password: string;
-  public username: string;
+  public value: boolean;
+  public query: string = "";
 
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - CONSTRCUTOR /////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
   constructor(
-    username: string,
-    password: string,
-    email: string,
-    bio: string = "",
-    image: string = "https://static.productionready.io/images/smiley-cyrus.jpg",
+    articleId: number,
+    authorId: number,
+    value: boolean,
     id: number = -1,
   ) {
     super();
+    this.article_id = articleId;
+    this.user_id = authorId;
+    this.value = value;
     this.id = id;
-    this.username = username;
-    this.password = password;
-    this.email = email;
-    this.bio = bio;
-    this.image = image;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -64,7 +56,7 @@ export class UserModel extends BaseModel {
    * @return Promise<boolean>
    */
   public async delete(): Promise<boolean> {
-    let query = `DELETE FROM users WHERE id = ?`;
+    let query = `DELETE FROM articles WHERE id = ?`;
     query = this.prepareQuery(
       query,
       [
@@ -86,25 +78,23 @@ export class UserModel extends BaseModel {
   /**
    * Save this model.
    *
-   * @return Promise<UserModel>
+   * @return Promise<ArticlesFavoritesModel>
    */
-  public async save(): Promise<UserModel> {
+  public async save(): Promise<ArticlesFavoritesModel> {
     // If this model already has an ID, then that means we're updating the model
     if (this.id != -1) {
       return this.update();
     }
 
-    let query = "INSERT INTO users " +
-      " (username, email, password, bio, image)" +
-      " VALUES (?, ?, ?, ?, ?);";
+    let query = "INSERT INTO articles_favorites " +
+      " (article_id, user_id, value)" +
+      " VALUES (?, ?, ?);";
     query = this.prepareQuery(
       query,
       [
-        this.username,
-        this.email,
-        this.password,
-        this.bio,
-        this.image,
+        String(this.article_id),
+        String(this.user_id),
+        String(this.value),
       ],
     );
 
@@ -114,26 +104,22 @@ export class UserModel extends BaseModel {
 
     // @ts-ignore
     // (crookse) We ignore this because this will never return null.
-    return UserModel.where({ email: this.email });
+    return ArticlesFavoritesModel.where({ article_id: this.article_id });
   }
 
   /**
    * Update this model.
    *
-   * @return Promise<UserModel>
+   * @return Promise<ArticlesFavoritesModel>
    */
-  public async update(): Promise<UserModel> {
-    let query = "UPDATE users SET " +
-      "username = ?, password = ?, email = ?, bio = ?, image = ? " +
+  public async update(): Promise<ArticlesFavoritesModel> {
+    let query = "UPDATE articles_favorites SET " +
+      "value = ? " +
       `WHERE id = '${this.id}';`;
     query = this.prepareQuery(
       query,
       [
-        this.username,
-        this.password,
-        this.email,
-        this.bio,
-        this.image,
+        String(this.value),
       ],
     );
     const client = await BaseModel.connect();
@@ -142,7 +128,7 @@ export class UserModel extends BaseModel {
 
     // @ts-ignore
     // (crookse) We ignore this because this will never return null.
-    return UserModel.where({ email: this.email });
+    return ArticlesFavoritesModel.where({ article_id: this.article_id });
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -155,19 +141,19 @@ export class UserModel extends BaseModel {
    *
    * @param any fields
    *
-   * @return Promise<UserModel[]|[]>
+   * @return Promise<ArticlesFavoritesModel[]|[]>
    */
   static async where(
     fields: any,
-  ): Promise<UserModel[] | []> {
-    let results = await BaseModel.where("users", fields);
+  ): Promise<ArticlesFavoritesModel[] | []> {
+    let results = await BaseModel.where("articles_favorites", fields);
 
     if (results.length <= 0) {
       return [];
     }
 
     return results.map((result: any) => {
-      return createUserModelObject(result);
+      return createArticlesFavoritesModelObject(result);
     });
   }
 
@@ -177,12 +163,14 @@ export class UserModel extends BaseModel {
    *
    * @param string column
    * @param any values
+   *
+   * @return Promise<ArticlesFavoritesModel[]|[]>
    */
   static async whereIn(
     column: string,
     values: any,
-  ): Promise<UserModel[] | []> {
-    let results = await BaseModel.whereIn("users", {
+  ): Promise<ArticlesFavoritesModel[] | []> {
+    let results = await BaseModel.whereIn("articles_favorites", {
       column,
       values,
     });
@@ -192,7 +180,7 @@ export class UserModel extends BaseModel {
     }
 
     return results.map((result: any) => {
-      return createUserModelObject(result);
+      return createArticlesFavoritesModelObject(result);
     });
   }
 
@@ -201,18 +189,14 @@ export class UserModel extends BaseModel {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @return UserEntity
+   * @return ArticlesFavoritesEntity
    */
-  public toEntity(): UserEntity {
+  public toEntity(): ArticlesFavoritesEntity {
     return {
       id: this.id,
-      username: this.username,
-      email: this.email,
-      bio: this.bio,
-      image: this.image,
-      token: null,
+      article_id: this.article_id,
+      user_id: this.user_id,
+      value: this.value,
     };
   }
 }
-
-export default UserModel;

@@ -212,6 +212,82 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: articles; Type: TABLE; Schema: public; Owner: user
+--
+
+CREATE TABLE public.articles (
+    id integer NOT NULL,
+    author_id integer NOT NULL,
+    title character varying(255) NOT NULL,
+    description character varying(255) NOT NULL,
+    body character varying(255) NOT NULL,
+    slug character varying(255) NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.articles OWNER TO "user";
+
+--
+-- Name: articles_favorites; Type: TABLE; Schema: public; Owner: user
+--
+
+CREATE TABLE public.articles_favorites (
+    id integer NOT NULL,
+    article_id integer NOT NULL,
+    user_id integer NOT NULL,
+    value boolean NOT NULL
+);
+
+
+ALTER TABLE public.articles_favorites OWNER TO "user";
+
+--
+-- Name: articles_favorites_id_seq; Type: SEQUENCE; Schema: public; Owner: user
+--
+
+CREATE SEQUENCE public.articles_favorites_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.articles_favorites_id_seq OWNER TO "user";
+
+--
+-- Name: articles_favorites_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
+--
+
+ALTER SEQUENCE public.articles_favorites_id_seq OWNED BY public.articles_favorites.id;
+
+
+--
+-- Name: articles_id_seq; Type: SEQUENCE; Schema: public; Owner: user
+--
+
+CREATE SEQUENCE public.articles_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.articles_id_seq OWNER TO "user";
+
+--
+-- Name: articles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
+--
+
+ALTER SEQUENCE public.articles_id_seq OWNED BY public.articles.id;
+
+
+--
 -- Name: sessions; Type: TABLE; Schema: public; Owner: user
 --
 
@@ -288,6 +364,20 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
+-- Name: articles id; Type: DEFAULT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.articles ALTER COLUMN id SET DEFAULT nextval('public.articles_id_seq'::regclass);
+
+
+--
+-- Name: articles_favorites id; Type: DEFAULT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.articles_favorites ALTER COLUMN id SET DEFAULT nextval('public.articles_favorites_id_seq'::regclass);
+
+
+--
 -- Name: sessions id; Type: DEFAULT; Schema: public; Owner: user
 --
 
@@ -299,6 +389,22 @@ ALTER TABLE ONLY public.sessions ALTER COLUMN id SET DEFAULT nextval('public.ses
 --
 
 ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+
+
+--
+-- Data for Name: articles; Type: TABLE DATA; Schema: public; Owner: user
+--
+
+COPY public.articles (id, author_id, title, description, body, slug, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: articles_favorites; Type: TABLE DATA; Schema: public; Owner: user
+--
+
+COPY public.articles_favorites (id, article_id, user_id, value) FROM stdin;
+\.
 
 
 --
@@ -429,6 +535,22 @@ SELECT pg_catalog.setval('public.sessions_id_seq', 1, false);
 --
 
 SELECT pg_catalog.setval('public.users_id_seq', 100, true);
+
+
+--
+-- Name: articles_favorites articles_favorites_pkey; Type: CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.articles_favorites
+    ADD CONSTRAINT articles_favorites_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: articles articles_pkey; Type: CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.articles
+    ADD CONSTRAINT articles_pkey PRIMARY KEY (id);
 
 
 --

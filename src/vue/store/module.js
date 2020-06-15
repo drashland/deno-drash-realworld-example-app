@@ -7,4 +7,4 @@ export default {
   getters,
   mutations,
   state,
-}
+};
