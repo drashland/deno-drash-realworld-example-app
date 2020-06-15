@@ -80,6 +80,9 @@ export default {
           });
         })
         .then((response) => {
+          this.email = ""
+          this.username = ""
+          this.password = ""
           console.log(response);
           if (response === true) {
             swal({
