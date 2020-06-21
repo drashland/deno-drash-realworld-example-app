@@ -10,7 +10,15 @@ export type UserEntity = {
   token?: null | string;
 };
 
-export function createUserModelObject(user: any): UserModel {
+/**
+ * @description
+ * Creates a instance of the user model with the properties populated
+ *
+ * @param UserEntity user
+ *
+ * @return UserModel
+ */
+export function createUserModelObject(user: UserEntity): UserModel {
   return new UserModel(
     user.username,
     user.password,
@@ -26,17 +34,61 @@ export class UserModel extends BaseModel {
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * @var string
+   *
+   * Bio associated with the given user
+   */
   public bio: string;
+
+  /**
+   * @var string
+   *
+   * Email address for the given user
+   */
   public email: string;
+
+  /**
+   * @var number
+   *
+   * Associated row id for the database entry
+   */
   public id: number;
+
+  /**
+   * @var string
+   *
+   * Path to where the profile picture resides for the user
+   */
   public image: string;
+
+
+  /**
+   * @var string
+   *
+   * Password for the given user. Hashed if pulled from the database
+   */
   public password: string;
+
+  /**
+   * @var string
+   *
+   * Username for the user
+   */
   public username: string;
 
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - CONSTRCUTOR /////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * @param string username
+   * @param string password
+   * @param string email
+   * @param string bio=""
+   * @param string image="https://static.productionready.io/images/smiley-cyrus.jpg"
+   * @param number id=-1
+   */
   constructor(
     username: string,
     password: string,
@@ -177,6 +229,8 @@ export class UserModel extends BaseModel {
    *
    * @param string column
    * @param any values
+   *
+   * @return Promise<UserModel[]> | []
    */
   static async whereIn(
     column: string,
