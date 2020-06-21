@@ -1,6 +1,21 @@
 import BaseModel from "./base_model.ts";
 
-function createSessionModel(session: any): SessionModel {
+interface SessionModelEntity {
+  session_one:  string;
+  session_two: string
+  id: number
+  user_id: number
+}
+
+/**
+ * @description
+ * Creates an instance of the  SessionModel
+ *
+ * @param SessionModelEntity session
+ *
+ * @return SessionModelEntity  SessionModel a new instance of the SessionModel with the  properties set
+ */
+function createSessionModel(session: SessionModelEntity): SessionModel {
   return new SessionModel(
     session.session_one,
     session.session_two,
@@ -14,9 +29,32 @@ export class SessionModel extends BaseModel {
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * @var number
+   *
+   * Id associated with the database row
+   */
   public id: number;
+
+  /**
+   * @var number
+   *
+   * Associated id of the user from users table that holds this session
+   */
   public user_id: number;
+
+  /**
+   * @var string
+   *
+   * Value for session one, used with session two for stronger security (both must match instead of just one)
+   */
   public session_one: string;
+
+  /**
+   * @var string
+   *
+   * Value for session two, used with session one for stronger security (both must match instead of just one)
+   */
   public session_two: string;
 
   //////////////////////////////////////////////////////////////////////////////
@@ -29,7 +67,7 @@ export class SessionModel extends BaseModel {
    * @param string sessionOne
    * @param string sessionTwo
    * @param number userId
-   * @param number id
+   * @param number id=-1
    */
   constructor(
     sessionOne: string,
@@ -48,6 +86,16 @@ export class SessionModel extends BaseModel {
   // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * @description
+   * Get the session row by the passed in session values
+   *
+   * @param string sessionOne
+   * @param string sessionTwo
+   *
+   * @return Promise<SessionModel> | null
+   *     Null if no session was found
+   */
   static async getUserSession(
     sessionOne: string,
     sessionTwo: string,
