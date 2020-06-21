@@ -89,8 +89,8 @@ export default class ValidationService {
    * @param string password
    *
    * @return boolean
-   *     - Returns true if the email is unique.
-   *     - Returns false if the email is already taken.
+   *     - Returns true if the password passes any of the above checks.
+   *     - Returns false if the password fails any of the above checks.
    */
   static isPasswordStrong(password: string): boolean {
     return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(password);

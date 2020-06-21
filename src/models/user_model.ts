@@ -14,11 +14,24 @@ export type UserEntity = {
  * @description
  * Creates a instance of the user model with the properties populated
  *
- * @param UserEntity user
+ * @param object user
+ * @param string user.username
+ * @param string user.password
+ * @param string user.email
+ * @param string user.bio
+ * @param string user.image
+ * @param number user.id
  *
  * @return UserModel
  */
-export function createUserModelObject(user: UserEntity): UserModel {
+export function createUserModelObject(user: {
+  username: string,
+  password: string,
+  email: string,
+  bio: string,
+  image: string,
+  id: number
+}): UserModel {
   return new UserModel(
     user.username,
     user.password,
