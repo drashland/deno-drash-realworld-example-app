@@ -14,6 +14,9 @@ export default abstract class BaseModel {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
+   * @description
+   * Connects to a pool of the db and returns the connection object
+   *
    * @return Promise<PoolClient>
    */
   static async connect(): Promise<PoolClient> {
@@ -97,6 +100,7 @@ export default abstract class BaseModel {
    * @description
    *     Get records using the WHERE IN clause.
    *
+   * @param string table Tbale name to make the query
    * @param any data
    *     {
    *       column: string            (the column to target)
@@ -139,7 +143,7 @@ export default abstract class BaseModel {
    *
    * @param string query
    *     The db query string. Required.
-   * @param string[] data
+   * @param string[] [data]
    *     Array of strings to update each placeholder
    *
    * @example
