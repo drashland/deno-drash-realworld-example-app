@@ -49,7 +49,7 @@ class BaseResource extends Drash.Http.Resource {
    *
    * @return
    */
-  protected async getCurrentUser(): Promise<UserModel[] | null> {
+  protected async getCurrentUser(): Promise<UserModel | null> {
     console.log("Getting the current user.");
     if (this.current_user) {
       console.log(`Using cached User #${this.current_user.id}.`);
