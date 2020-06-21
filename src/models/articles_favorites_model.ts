@@ -7,6 +7,14 @@ export type ArticlesFavoritesEntity = {
   value: boolean;
 };
 
+/**
+ * @description
+ * Returns an instance of the ArticlesFavoritesModel
+ *
+ * @param ArticlesFavoritesEntity inputObj
+ *
+ * @return ArticlesFavoritesModel An instance of the model with all properties set
+ */
 export function createArticlesFavoritesModelObject(
   inputObj: ArticlesFavoritesEntity,
 ): ArticlesFavoritesModel {
@@ -23,16 +31,49 @@ export class ArticlesFavoritesModel extends BaseModel {
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * @var number
+   *
+   * id of the associated article in the database
+   */
   public article_id: number;
+
+  /**
+   * @var number
+   *
+   * Id of the associated user in the database
+   */
   public user_id: number;
+
+  /**
+   * @var number
+   *
+   * Id of the database row
+   */
   public id: number;
+
+  /**
+   * @var boolean
+   *
+   * TODO(ebebbington) What is this property used for?
+   */
   public value: boolean;
+
+  /**
+   * TODO(ebebbington) What is this property used for?
+   */
   public query: string = "";
 
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - CONSTRCUTOR /////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * @param number articleId
+   * @param number authorId
+   * @param boolean value
+   * @param number id=-1
+   */
   constructor(
     articleId: number,
     authorId: number,
@@ -189,6 +230,9 @@ export class ArticlesFavoritesModel extends BaseModel {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
+   * @description
+   * Constructs an object of this models properties
+   *
    * @return ArticlesFavoritesEntity
    */
   public toEntity(): ArticlesFavoritesEntity {
