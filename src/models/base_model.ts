@@ -39,7 +39,7 @@ export default abstract class BaseModel {
    *     Array of objects, each object holding column data. Used the get the
    *     column name.
    *
-   * @return []|{[key: string]: string}
+   * @return []|[{[key: string]: string}]
    *     Empty array of no db rows, else array of rows as key value pairs.
    *     For example:
    *         [{ name: "ed"}, {name: "eric}]
@@ -47,7 +47,7 @@ export default abstract class BaseModel {
    * @example
    * BaseModel.formatResults([[1, 'ed'], [2, 'john']], [{name: 'id', ...}, {name: 'name', ...}]);
    */
-  static formatResults(rows: Array<string[]>, columns: [{name: string}]): []|any[] {
+  static formatResults(rows: Array<string[]>, columns: [{name: string}]): []|Array<{[key: string]: string|number}> {
     if (!rows.length) {
       return [];
     }
@@ -78,7 +78,7 @@ export default abstract class BaseModel {
   protected static async where(
     table: string,
     fields: {[key: string]: string|number},
-  ): Promise<[]|any[]> {
+  ): Promise<[]|Array<{[key: string]: string|number}>> {
     let query = `SELECT * FROM ${table} WHERE `;
     let clauses: string[] = [];
     for (let field in fields) {
@@ -116,7 +116,7 @@ export default abstract class BaseModel {
   static async whereIn(
     table: string,
     data: { values: string[]|number[], column: string },
-  ): Promise<[]|{[key: string]: string}[]> {
+  ): Promise<[]|Array<{[key: string]: string|number}>> {
     if (data.values.length <= 0) {
       return [];
     }

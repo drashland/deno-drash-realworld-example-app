@@ -114,8 +114,11 @@ export class SessionModel extends BaseModel {
       dbResult.rows,
       dbResult.rowDescription.columns,
     );
-    const session: SessionModelEntity = sessionResult[0];
+    const session = sessionResult[0];
     if (sessionResult && sessionResult.length > 0) {
+      //@ts-ignore
+      // (ebebbington) Because we currently dont have a way to assign the entity type to `session` (and it work,
+      // as it would error because that type isn't the return value of `formatResults`)
       return createSessionModel(session);
     }
     return null;
