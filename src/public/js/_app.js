@@ -32,7 +32,7 @@ import module from "@/store/module.js";
 const store = new Vuex.Store({
   modules: {
     module,
-  }
+  },
 });
 
 Vue.prototype.$store = Vuex;
@@ -78,8 +78,8 @@ const router = new VueRouter({
           path: "tag/:tag",
           name: "home-tag",
           component: HomeTag,
-        }
-      ]
+        },
+      ],
     },
     {
       name: "login",
@@ -112,14 +112,14 @@ const router = new VueRouter({
           name: "profile-favorites",
           path: "favorites",
           component: ProfileFavorited,
-        }
-      ]
+        },
+      ],
     },
     {
       name: "article",
       path: "/articles/:slug",
       component: Article,
-      props: true
+      props: true,
     },
     {
       name: "article-edit",
@@ -137,15 +137,21 @@ const router = new VueRouter({
     if (to.hash) {
       return {
         selector: to.hash,
-        offset: { x: 0, y: 10 }
+        offset: { x: 0, y: 10 },
       };
     }
-  }
+  },
 });
 
 // Ensure we checked auth before each page load.
-router.beforeEach((to, from, next) => {
-  Promise.all([store.dispatch("checkIfUserIsAuthenticated")]).then(next);
+router.beforeEach(async (to, from, next) => {
+  store.dispatch("checkIfUserIsAuthenticated")
+    .then(() => {
+      next();
+    })
+    .catch(() => {
+      next();
+    });
 });
 
 //
@@ -158,16 +164,16 @@ window.app = new Vue({
   el: "#app",
   template: "<App/>",
   components: {
-    App
+    App,
   },
   router,
   store,
   mounted() {
     console.log("Vue mounted!");
-  }
+  },
 });
 
 export {
   store,
   router,
-}
+};

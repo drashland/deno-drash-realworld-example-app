@@ -46,7 +46,7 @@ export default class ValidationService {
    *     - Returns false if the email is already taken.
    */
   static async isEmailUnique(email: string): Promise<boolean> {
-    const user = await UserModel.getUserByEmail(email);
+    const user = await UserModel.where({ email: email });
     if (user) {
       return false;
     }
@@ -63,7 +63,7 @@ export default class ValidationService {
    */
   static async isPasswordCorrect(
     passwordOne: string,
-    passwordTwo: string
+    passwordTwo: string,
   ): Promise<boolean> {
     return await bcrypt.compare(passwordOne, passwordTwo);
   }

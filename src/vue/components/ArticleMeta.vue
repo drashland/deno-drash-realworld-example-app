@@ -1,18 +1,18 @@
 <template>
   <div class="article-meta">
     <router-link
-      :to="{ name: 'profile', params: { username: article.author.username } }"
+      :to="{ name: 'profile', params: { username: authorUsername() } }"
     >
-      <img :src="article.author.image" />
+      <img :src="authorImage()" />
     </router-link>
     <div class="info">
       <router-link
-        :to="{ name: 'profile', params: { username: article.author.username } }"
+        :to="{ name: 'profile', params: { username: authorUsername() } }"
         class="author"
       >
-        {{ article.author.username }}
+        {{ authorUsername() }}
       </router-link>
-      <span class="date">{{ article.createdAt | date }}</span>
+      <span class="date">{{ articleCreatedAt() | date }}</span>
     </div>
     <article-actions
       v-if="actions"
@@ -24,8 +24,8 @@
       class="btn btn-sm pull-xs-right"
       @click="toggleFavorite"
       :class="{
-        'btn-primary': article.favorited,
-        'btn-outline-primary': !article.favorited
+        'btn-primary': article && article.favorited,
+        'btn-outline-primary': article && !article.favorited
       }"
     >
       <i class="ion-heart"></i>
@@ -46,7 +46,7 @@ export default {
   props: {
     article: {
       type: Object,
-      required: true
+      required: false
     },
     actions: {
       type: Boolean,
@@ -60,9 +60,32 @@ export default {
       "user",
     ])
   },
+  mounted() {
+    console.log("ArticleMeta mounted!");
+  },
   methods: {
+    authorUsername() {
+      if (this.article && this.article.author) {
+        return this.article.author.username;
+      }
+    },
+    authorImage() {
+      if (this.article && this.article.author) {
+        return this.article.author.image;
+      }
+    },
+    articleCreatedAt() {
+      if (this.article && this.article.created_at) {
+        return this.article.created_at;
+      }
+      return Date();
+    },
     isCurrentUser() {
-      if (this.user.username && this.article.author.username) {
+      if (
+        (this.user && this.article && this.article.author)
+        && this.user.username
+        && this.article.author.username
+      ) {
         return this.user.username === this.article.author.username;
       }
       return false;
@@ -72,9 +95,12 @@ export default {
         this.$router.push({ name: "login" });
         return;
       }
-      this.$store.dispatch("setFavoriteArticle", {
-        article_slug: this.article.slug,
-        value: !this.article.favorited
+      const action = this.article.favorited
+        ? "unset"
+        : "set";
+      this.$store.dispatch("toggleArticleFavorite", {
+        slug: this.article.slug,
+        action: action
       });
     }
   }

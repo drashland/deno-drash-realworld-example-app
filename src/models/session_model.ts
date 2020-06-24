@@ -5,12 +5,11 @@ function createSessionModel(session: any): SessionModel {
     session.session_one,
     session.session_two,
     session.user_id,
-    session.id
+    session.id,
   );
 }
 
 export class SessionModel extends BaseModel {
-
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -36,7 +35,7 @@ export class SessionModel extends BaseModel {
     sessionOne: string,
     sessionTwo: string,
     userId: number,
-    id: number = -1
+    id: number = -1,
   ) {
     super();
     this.session_one = sessionOne;
@@ -51,15 +50,18 @@ export class SessionModel extends BaseModel {
 
   static async getUserSession(
     sessionOne: string,
-    sessionTwo: string
-  ): Promise<SessionModel|null> {
-    const query = "SELECT * FROM sessions "
-      + `WHERE session_one = '${sessionOne}' AND session_two = '${sessionTwo}' `
-      + "LIMIT 1;";
+    sessionTwo: string,
+  ): Promise<SessionModel | null> {
+    const query = "SELECT * FROM sessions " +
+      `WHERE session_one = '${sessionOne}' AND session_two = '${sessionTwo}' ` +
+      "LIMIT 1;";
     const client = await BaseModel.connect();
     const dbResult = await client.query(query);
     client.release();
-    const session = BaseModel.formatResults(dbResult.rows, dbResult.rowDescription.columns)
+    const session = BaseModel.formatResults(
+      dbResult.rows,
+      dbResult.rowDescription.columns,
+    );
     if (session && session.length > 0) {
       return createSessionModel(session[0]);
     }
@@ -80,16 +82,16 @@ export class SessionModel extends BaseModel {
       throw new Error("Session record already exists.");
     }
 
-    let query = "INSERT INTO sessions "
-      + " (user_id, session_one, session_two)"
-      + " VALUES (?, ?, ?);"
+    let query = "INSERT INTO sessions " +
+      " (user_id, session_one, session_two)" +
+      " VALUES (?, ?, ?);";
     query = this.prepareQuery(
       query,
       [
         String(this.user_id),
         this.session_one,
         this.session_two,
-      ]
+      ],
     );
     const client = await BaseModel.connect();
     await client.query(query);
@@ -100,7 +102,6 @@ export class SessionModel extends BaseModel {
     // session is not found. However, in this case, it will never be null.
     return SessionModel.getUserSession(this.session_one, this.session_two);
   }
-
 }
 
 export default SessionModel;

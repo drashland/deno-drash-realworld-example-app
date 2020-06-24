@@ -5,7 +5,7 @@
         <div class="col-md-10 offset-md-1 col-xs-12">
           <ListErrors :errors="errors" />
           <form @submit.prevent="onPublish(article.slug)">
-            <fieldset :disabled="inProgress">
+            <fieldset :disabled="publishing_article">
               <fieldset class="form-group">
                 <input
                   type="text"
@@ -36,8 +36,8 @@
                   type="text"
                   class="form-control"
                   placeholder="Enter tags"
-                  v-model="tagInput"
-                  @keypress.enter.prevent="addTag(tagInput)"
+                  v-model="tag_input"
+                  @keypress.enter.prevent="addTag(tag_input)"
                 />
                 <div class="tag-list">
                   <span
@@ -52,7 +52,7 @@
               </fieldset>
             </fieldset>
             <button
-              :disabled="inProgress"
+              :disabled="publishing_article"
               class="btn btn-lg pull-xs-right btn-primary"
               type="submit"
             >
@@ -80,8 +80,8 @@ export default {
   },
   data() {
     return {
-      tagInput: null,
-      inProgress: false,
+      tag_input: null,
+      publishing_article: false,
       errors: {}
     };
   },
@@ -92,19 +92,38 @@ export default {
   },
   methods: {
     onPublish(slug) {
+      // If the article has a slug, then it already exists in the database; and
+      // that means we're updating the article--not creating a new one.
       let action = slug ? "updateArticle" : "createArticle";
-      this.inProgress = true;
-      this.$store.dispatch(action)
-        .then(({ data }) => {
-          this.inProgress = false;
-          this.$router.push({
-            name: "article",
-            params: { slug: data.article.slug }
+      swal({
+        text: "Please wait...",
+        buttons: false,
+      });
+      this.publishing_article = true;
+      this.$store.dispatch(action, this.article)
+        .then((response) => {
+          swal.close();
+          console.log(response);
+          this.publishing_article = false;
+          this.$store.dispatch("unsetArticle");
+          this.tag_input = null;
+          if (response.data.article) {
+            this.$router.push({
+              name: "article",
+              params: { slug: response.data.article.slug }
+            });
+            return;
+          }
+          let error = "";
+          for (let key in response.errors) {
+            error += `${response.errors[key]} `;
+          }
+          console.log(error);
+          swal({
+            title: "Oops!",
+            text: error,
+            icon: "error"
           });
-        })
-        .catch(({ response }) => {
-          this.inProgress = false;
-          this.errors = response.data.errors;
         });
     },
     removeTag(tag) {
@@ -112,7 +131,7 @@ export default {
     },
     addTag(tag) {
       this.$store.dispatch("createArticleTag", tag);
-      this.tagInput = null;
+      this.tag_input = null;
     }
   }
 };

@@ -73,20 +73,43 @@ export default {
     CommentEditor,
     Tag
   },
-  beforeRouteEnter(to, from, next) {
-    Promise.all([
-      store.dispatch("fetchArticle", to.params.slug),
-      store.dispatch("fetchArticleComments", to.params.slug)
-    ]).then(() => {
-      next();
+  async beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      vm.$store.dispatch("fetchArticle", to.params.slug);
+      vm.$store.dispatch("fetchArticleComments", to.params.slug);
     });
   },
   computed: {
-    ...mapGetters(["article", "user", "comments", "is_authenticated"])
+    ...mapGetters([
+      "article",
+      "comments",
+      "is_authenticated",
+      "user",
+    ])
   },
   methods: {
+    articleCreatedAt() {
+      if (this.article && this.article.created_at) {
+        return this.article.created_at;
+      }
+      return null;
+    },
+    authorUsername() {
+      if (this.article && this.article.author) {
+        return this.article.author.username;
+      }
+      return null;
+    },
+    authorImage() {
+      if (this.article && this.article.author && this.article.author.image) {
+        return article.author.image;
+      }
+      return null;
+    },
     parseMarkdown(content) {
-      return marked(content);
+      if (content) {
+        return marked(content);
+      }
     }
   }
 };
