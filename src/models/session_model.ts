@@ -110,12 +110,13 @@ export class SessionModel extends BaseModel {
       return null
     }
     client.release();
-    const session = BaseModel.formatResults(
+    const sessionResult = BaseModel.formatResults(
       dbResult.rows,
       dbResult.rowDescription.columns,
     );
-    if (session && session.length > 0) {
-      return createSessionModel(session[0]);
+    const session: SessionModelEntity = sessionResult[0];
+    if (sessionResult && sessionResult.length > 0) {
+      return createSessionModel(session);
     }
     return null;
   }
@@ -127,9 +128,9 @@ export class SessionModel extends BaseModel {
   /**
    * Save this model.
    *
-   * @return Promise<SessionModel|[]> Empty array if the query failed to save
+   * @return Promise<SessionModel|null> Empty array if the query failed to save
    */
-  public async save(): Promise<SessionModel|[]> {
+  public async save(): Promise<SessionModel|null> {
     if (this.id != -1) {
       throw new Error("Session record already exists.");
     }
@@ -149,7 +150,7 @@ export class SessionModel extends BaseModel {
     const dbResult: IQueryResult = await client.query(query);
     client.release();
     if (dbResult.rowCount < 1) {
-      return []
+      return null
     }
 
     // @ts-ignore

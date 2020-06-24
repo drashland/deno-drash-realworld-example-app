@@ -131,8 +131,14 @@ class LoginResource extends BaseResource {
     // cookie.
     const sessionOne = await bcrypt.hash("sessionOne2020Drash");
     const sessionTwo = await bcrypt.hash("sessionTwo2020Drash");
-    let session = new SessionModel(sessionOne, sessionTwo, user.id);
-    session = await session.save();
+    const Session = new SessionModel(sessionOne, sessionTwo, user.id);
+    const session = await Session.save();
+    if (!session) {
+      return this.errorResponse(
+          422,
+          "An error occurred whilst saving your session"
+      )
+    }
 
     let entity = user.toEntity();
     entity.token = `${session.session_one}|::|${session.session_two}`;

@@ -43,6 +43,8 @@ export function createUserModelObject(user: {
   );
 }
 
+//@ts-ignore UserModel defines a where method that has different params than base models
+// where method. Might need to investigate the naming usage
 export class UserModel extends BaseModel {
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
@@ -155,9 +157,9 @@ export class UserModel extends BaseModel {
   /**
    * Save this model.
    *
-   * @return Promise<UserModel|[]> Empty array if no data was found
+   * @return Promise<UserModel|null> Empty array if no data was found
    */
-  public async save(): Promise<UserModel|[]> {
+  public async save(): Promise<UserModel|null> {
     // If this model already has an ID, then that means we're updating the model
     if (this.id != -1) {
       return this.update();
@@ -181,7 +183,7 @@ export class UserModel extends BaseModel {
     const dbResult: IQueryResult = await client.query(query);
     client.release();
     if (dbResult.rowCount < 1) {
-      return []
+      return null
     }
 
     // @ts-ignore
@@ -192,9 +194,9 @@ export class UserModel extends BaseModel {
   /**
    * Update this model.
    *
-   * @return Promise<UserModel|[]> Empty array if no results were found
+   * @return Promise<UserModel|null> False if no results were found
    */
-  public async update(): Promise<UserModel|[]> {
+  public async update(): Promise<UserModel|null> {
     let query = "UPDATE users SET " +
       "username = ?, password = ?, email = ?, bio = ?, image = ? " +
       `WHERE id = '${this.id}';`;
@@ -212,7 +214,7 @@ export class UserModel extends BaseModel {
     const dbResult: IQueryResult = await client.query(query);
     client.release();
     if (dbResult.rowCount < 1) {
-      return []
+      return null
     }
 
     // @ts-ignore
@@ -228,12 +230,12 @@ export class UserModel extends BaseModel {
    * @description
    *     See BaseModel.where()
    *
-   * @param any fields
+   * @param {[key: string]: string} fields
    *
    * @return Promise<UserModel[]|[]>
    */
   static async where(
-    fields: any,
+    fields: {[key: string]: string|number},
   ): Promise<UserModel[] | []> {
     let results = await BaseModel.where("users", fields);
 
@@ -241,7 +243,9 @@ export class UserModel extends BaseModel {
       return [];
     }
 
-    return results.map((result: any) => {
+    //@ts-ignore Nothing we can do about this.. the createUserModelObject expect
+    // a user object type, but there's no way to type it like that the return type of whereIn can't be user
+    return results.map(result => {
       return createUserModelObject(result);
     });
   }
@@ -257,7 +261,7 @@ export class UserModel extends BaseModel {
    */
   static async whereIn(
     column: string,
-    values: any,
+    values: string[]|number[],
   ): Promise<UserModel[] | []> {
     let results = await BaseModel.whereIn("users", {
       column,
@@ -268,7 +272,9 @@ export class UserModel extends BaseModel {
       return [];
     }
 
-    return results.map((result: any) => {
+    //@ts-ignore Nothing we can do about this.. the createUserModelObject expect
+    // a user object type, but there's no way to type it like that the return type of whereIn can't be user
+    return results.map(result => {
       return createUserModelObject(result);
     });
   }

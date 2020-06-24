@@ -27,6 +27,9 @@ export function createArticlesFavoritesModelObject(
   );
 }
 
+//@ts-ignore
+// (ebebbington) Error comes from this model adding the where method, that uses different
+// params compared to BaseModel's where method
 export class ArticlesFavoritesModel extends BaseModel {
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
@@ -123,9 +126,9 @@ export class ArticlesFavoritesModel extends BaseModel {
   /**
    * Save this model.
    *
-   * @return Promise<ArticlesFavoritesModel> Empty array if the query failed to save
+   * @return Promise<ArticlesFavoritesModel|null> Null if the query failed to save
    */
-  public async save(): Promise<ArticlesFavoritesModel|[]> {
+  public async save(): Promise<ArticlesFavoritesModel|null> {
     // If this model already has an ID, then that means we're updating the model
     if (this.id != -1) {
       return this.update();
@@ -147,7 +150,7 @@ export class ArticlesFavoritesModel extends BaseModel {
     const dbResult: IQueryResult = await client.query(query);
     client.release();
     if (dbResult.rowCount < 1) {
-      return []
+      return null
     }
 
     // @ts-ignore
@@ -158,9 +161,9 @@ export class ArticlesFavoritesModel extends BaseModel {
   /**
    * Update this model.
    *
-   * @return Promise<ArticlesFavoritesModel|[]> Empty array if the query failed to update
+   * @return Promise<ArticlesFavoritesModel|null> Null if the query failed to update
    */
-  public async update(): Promise<ArticlesFavoritesModel|[]> {
+  public async update(): Promise<ArticlesFavoritesModel|null> {
     let query = "UPDATE articles_favorites SET " +
       "value = ? " +
       `WHERE id = '${this.id}';`;
@@ -174,7 +177,7 @@ export class ArticlesFavoritesModel extends BaseModel {
     const dbResult: IQueryResult = await client.query(query);
     client.release();
     if (dbResult.rowCount < 1) {
-      return false
+      return null
     }
 
     // @ts-ignore
@@ -190,12 +193,12 @@ export class ArticlesFavoritesModel extends BaseModel {
    * @description
    *     See BaseModel.where()
    *
-   * @param any fields
+   * @param {[key: string]: string|number} fields
    *
    * @return Promise<ArticlesFavoritesModel[]|[]>
    */
   static async where(
-    fields: any,
+    fields: {[key: string]: string|number},
   ): Promise<ArticlesFavoritesModel[] | []> {
     let results = await BaseModel.where("articles_favorites", fields);
 
@@ -203,7 +206,9 @@ export class ArticlesFavoritesModel extends BaseModel {
       return [];
     }
 
-    return results.map((result: any) => {
+    //@ts-ignore Nothing we can do about this.. the createUserModelObject expect
+    // a user object type, but there's no way to type it like that the return type of whereIn can't be user
+    return results.map(result => {
       return createArticlesFavoritesModelObject(result);
     });
   }
@@ -213,13 +218,13 @@ export class ArticlesFavoritesModel extends BaseModel {
    *     See BaseModel.whereIn()
    *
    * @param string column
-   * @param any values
+   * @param string[]|number[] values
    *
    * @return Promise<ArticlesFavoritesModel[]|[]>
    */
   static async whereIn(
     column: string,
-    values: any,
+    values: string[]|number[],
   ): Promise<ArticlesFavoritesModel[] | []> {
     let results = await BaseModel.whereIn("articles_favorites", {
       column,
@@ -230,7 +235,9 @@ export class ArticlesFavoritesModel extends BaseModel {
       return [];
     }
 
-    return results.map((result: any) => {
+    //@ts-ignore Nothing we can do about this.. the createUserModelObject expect
+    // a user object type, but there's no way to type it like that the return type of whereIn can't be user
+    return results.map(result => {
       return createArticlesFavoritesModelObject(result);
     });
   }
