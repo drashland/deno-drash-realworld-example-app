@@ -5,8 +5,8 @@
 This real world example application uses Deno, Drash, Vue, webpack, and docker-compose.
 
 Requires:
-* Deno v1.0.2
-* Drash v1.0.2
+* Deno v1.1.1
+* Drash v1.0.6
 
 # How to Run
 
