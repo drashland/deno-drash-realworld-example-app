@@ -1,4 +1,5 @@
 import BaseModel from "./base_model.ts";
+import { IQueryResult } from "../deps.ts";
 
 export type ArticlesFavoritesEntity = {
   article_id: number;
@@ -107,8 +108,11 @@ export class ArticlesFavoritesModel extends BaseModel {
 
     try {
       const client = await BaseModel.connect();
-      await client.query(query);
+      const dbResult: IQueryResult = await client.query(query);
       client.release();
+      if (dbResult.rowCount < 1) {
+        return false
+      }
     } catch (error) {
       console.log(error);
       return false;
@@ -119,9 +123,9 @@ export class ArticlesFavoritesModel extends BaseModel {
   /**
    * Save this model.
    *
-   * @return Promise<ArticlesFavoritesModel>
+   * @return Promise<ArticlesFavoritesModel> Empty array if the query failed to save
    */
-  public async save(): Promise<ArticlesFavoritesModel> {
+  public async save(): Promise<ArticlesFavoritesModel|[]> {
     // If this model already has an ID, then that means we're updating the model
     if (this.id != -1) {
       return this.update();
@@ -140,8 +144,11 @@ export class ArticlesFavoritesModel extends BaseModel {
     );
 
     const client = await BaseModel.connect();
-    await client.query(query);
+    const dbResult: IQueryResult = await client.query(query);
     client.release();
+    if (dbResult.rowCount < 1) {
+      return []
+    }
 
     // @ts-ignore
     // (crookse) We ignore this because this will never return null.
@@ -151,9 +158,9 @@ export class ArticlesFavoritesModel extends BaseModel {
   /**
    * Update this model.
    *
-   * @return Promise<ArticlesFavoritesModel>
+   * @return Promise<ArticlesFavoritesModel|[]> Empty array if the query failed to update
    */
-  public async update(): Promise<ArticlesFavoritesModel> {
+  public async update(): Promise<ArticlesFavoritesModel|[]> {
     let query = "UPDATE articles_favorites SET " +
       "value = ? " +
       `WHERE id = '${this.id}';`;
@@ -164,8 +171,11 @@ export class ArticlesFavoritesModel extends BaseModel {
       ],
     );
     const client = await BaseModel.connect();
-    await client.query(query);
+    const dbResult: IQueryResult = await client.query(query);
     client.release();
+    if (dbResult.rowCount < 1) {
+      return false
+    }
 
     // @ts-ignore
     // (crookse) We ignore this because this will never return null.

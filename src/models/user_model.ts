@@ -1,4 +1,5 @@
 import BaseModel from "./base_model.ts";
+import { IQueryResult } from "../deps.ts";
 
 export type UserEntity = {
   bio?: string;
@@ -126,7 +127,7 @@ export class UserModel extends BaseModel {
   /**
    * Delete this model.
    *
-   * @return Promise<boolean>
+   * @return Promise<boolean> False if the query failed to delete
    */
   public async delete(): Promise<boolean> {
     let query = `DELETE FROM users WHERE id = ?`;
@@ -139,8 +140,11 @@ export class UserModel extends BaseModel {
 
     try {
       const client = await BaseModel.connect();
-      await client.query(query);
+      const dbResult: IQueryResult  = await client.query(query);
       client.release();
+      if (dbResult.rowCount < 1) {
+        return false
+      }
     } catch (error) {
       console.log(error);
       return false;
@@ -151,9 +155,9 @@ export class UserModel extends BaseModel {
   /**
    * Save this model.
    *
-   * @return Promise<UserModel>
+   * @return Promise<UserModel|[]> Empty array if no data was found
    */
-  public async save(): Promise<UserModel> {
+  public async save(): Promise<UserModel|[]> {
     // If this model already has an ID, then that means we're updating the model
     if (this.id != -1) {
       return this.update();
@@ -174,8 +178,11 @@ export class UserModel extends BaseModel {
     );
 
     const client = await BaseModel.connect();
-    await client.query(query);
+    const dbResult: IQueryResult = await client.query(query);
     client.release();
+    if (dbResult.rowCount < 1) {
+      return []
+    }
 
     // @ts-ignore
     // (crookse) We ignore this because this will never return null.
@@ -185,9 +192,9 @@ export class UserModel extends BaseModel {
   /**
    * Update this model.
    *
-   * @return Promise<UserModel>
+   * @return Promise<UserModel|[]> Empty array if no results were found
    */
-  public async update(): Promise<UserModel> {
+  public async update(): Promise<UserModel|[]> {
     let query = "UPDATE users SET " +
       "username = ?, password = ?, email = ?, bio = ?, image = ? " +
       `WHERE id = '${this.id}';`;
@@ -202,8 +209,11 @@ export class UserModel extends BaseModel {
       ],
     );
     const client = await BaseModel.connect();
-    await client.query(query);
+    const dbResult: IQueryResult = await client.query(query);
     client.release();
+    if (dbResult.rowCount < 1) {
+      return []
+    }
 
     // @ts-ignore
     // (crookse) We ignore this because this will never return null.

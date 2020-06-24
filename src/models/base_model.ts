@@ -1,4 +1,5 @@
 import { Pool, PoolClient } from "../deps.ts";
+import { IQueryResult } from "./deps.ts";
 
 export const dbPool = new Pool({
   user: "user",
@@ -72,7 +73,7 @@ export default abstract class BaseModel {
    * @param string table
    * @param any fields
    *
-   * @return Promise<any>
+   * @return Promise<any> Empty array if no results were found
    */
   static async where(
     table: string,
@@ -87,8 +88,11 @@ export default abstract class BaseModel {
     query += clauses.join(" AND ");
 
     const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
+    const dbResult: IQueryResult = await client.query(query);
     client.release();
+    if (dbResult.rowCount < 1) {
+      return []
+    }
 
     return BaseModel.formatResults(
       dbResult.rows,
@@ -107,7 +111,7 @@ export default abstract class BaseModel {
    *       values: number[]|string[] (the values to put in the IN array)
    *     }
    *
-   * @return Promise<any>
+   * @return Promise<any> Empty array if no data was found
    */
   static async whereIn(
     table: string,
@@ -122,8 +126,11 @@ export default abstract class BaseModel {
       ` IN (${data.values.join(",")})`;
 
     const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
+    const dbResult: IQueryResult = await client.query(query);
     client.release();
+    if (dbResult.rowCount < 1) {
+      return []
+    }
 
     return BaseModel.formatResults(
       dbResult.rows,
