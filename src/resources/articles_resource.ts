@@ -50,7 +50,7 @@ class ArticlesResource extends BaseResource {
    * @param number[] authorIds
    * @param ArticleEntity[] entities
    *
-   * @return ArticleEntity[]
+   * @return Promise<ArticleEntity[]>
    */
   protected async addAuthorsToEntities(
     authorIds: number[],
@@ -77,7 +77,7 @@ class ArticlesResource extends BaseResource {
    * @param number[] articleIds
    * @param ArticleEntity[] entities
    *
-   * @return ArticleEntity[]
+   * @return Promise<ArticleEntity[]>
    */
   protected async addFavoritedToEntities(
     articleIds: number[],
@@ -112,7 +112,7 @@ class ArticlesResource extends BaseResource {
    * @param number[] articleIds
    * @param ArticleEntity[] entities
    *
-   * @return ArticleEntity[]
+   * @return Promise<ArticleEntity[]>
    */
   protected async addFavoritesCountToEntities(
     articleIds: number[],
@@ -136,6 +136,17 @@ class ArticlesResource extends BaseResource {
   }
 
   /**
+   * @description
+   * Gets data from the request to save a new article. Data would come in like so:
+   * {
+   *   article: {
+   *     author_id: number,
+   *     title: string,
+   *     description: string,
+   *     body: string
+   *   }
+   * }
+   *
    * @return Promise<Drash.Http.Response>
    */
   protected async createArticle(): Promise<Drash.Http.Response> {
@@ -316,7 +327,7 @@ class ArticlesResource extends BaseResource {
    * @description
    *     Get the filters for filtering article records.
    *
-   * @return ArticleFilters
+   * @return Promise<ArticleFilters>
    */
   protected async getQueryFilters(): Promise<ArticleFilters> {
     const author = this.request.getUrlQueryParam("author");

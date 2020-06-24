@@ -13,7 +13,7 @@ export default class ValidationService {
    *     - Returns the input back if it is not a string. This method only
    *       decodes strings.
    */
-  static decodeInput(input: string): any {
+  static decodeInput(input: string): string|undefined {
     if ((typeof input) !== "string") {
       return input;
     }
@@ -25,6 +25,8 @@ export default class ValidationService {
    * Validate that the given email passes validation by testing it against a
    * regular expression. The regular expression tests to see if the given email
    * is actually an email.
+   *
+   * @param string email
    *
    * @return boolean
    *     - Returns true if the email passes validation.
@@ -41,7 +43,9 @@ export default class ValidationService {
    * @description
    *  Validate that the given email is unique in the database.
    *
-   * @return boolean
+   *  @param string email
+   *
+   * @return Promise<boolean>
    *     - Returns true if the email is unique.
    *     - Returns false if the email is already taken.
    */
@@ -57,7 +61,10 @@ export default class ValidationService {
    * @description
    * Validate that the two given passwords match.
    *
-   * @return boolean
+   * @param string passwordOne
+   * @param string passwordTwo
+   *
+   * @return Promise<boolean>
    *     - Returns true if the two passwords match.
    *     - Returns false if the two passwords do not match.
    */
@@ -79,9 +86,11 @@ export default class ValidationService {
    *     - Includes 1 uppercase letter
    *     - Includes 1 lowercase letter
    *
+   * @param string password
+   *
    * @return boolean
-   *     - Returns true if the email is unique.
-   *     - Returns false if the email is already taken.
+   *     - Returns true if the password passes any of the above checks.
+   *     - Returns false if the password fails any of the above checks.
    */
   static isPasswordStrong(password: string): boolean {
     return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(password);
