@@ -42,7 +42,6 @@ export function createArticleModelObject(article: ArticleEntity): ArticleModel {
   );
 }
 
-//@ts-ignore
 // (ebebbington) Error comes from this model adding the where method, that uses different
 // params compared to BaseModel's where method
 export class ArticleModel extends BaseModel {
@@ -221,7 +220,6 @@ export class ArticleModel extends BaseModel {
       return []
     }
 
-    // @ts-ignore
     // (crookse) We ignore this because this will never return null.
     return ArticleModel.where({ slug: this.slug });
   }
@@ -251,7 +249,6 @@ export class ArticleModel extends BaseModel {
     }
     client.release();
 
-    // @ts-ignore
     // (crookse) We ignore this because this will never return null.
     return ArticleModel.where({ id: this.id });
   }
@@ -287,7 +284,6 @@ export class ArticleModel extends BaseModel {
       dbResult.rowDescription.columns,
     );
     if (results && results.length > 0) {
-      // @ts-ignore
       // Nothing we can do about this.. the createUserModelObject expect
       // a user object type, but there's no way to type it like that the return type of whereIn can't be user
       return results.map(article => {
@@ -314,7 +310,6 @@ export class ArticleModel extends BaseModel {
       return [];
     }
 
-    //@ts-ignore
     // (ebebbington) Nothing we can do about this.. the createUserModelObject expect
     // a user object type, but there's no way to type it like that the return type of whereIn can't be user
     return results.map(result => {
@@ -344,7 +339,6 @@ export class ArticleModel extends BaseModel {
       return [];
     }
 
-    //@ts-ignore
     // (ebebbington) Nothing we can do about this.. the createUserModelObject expect
     // a user object type, but there's no way to type it like that the return type of whereIn can't be user
     return results.map(result => {

@@ -186,7 +186,6 @@ export class UserModel extends BaseModel {
       return null
     }
 
-    // @ts-ignore
     // (crookse) We ignore this because this will never return null.
     return UserModel.where({ email: this.email });
   }
@@ -217,7 +216,6 @@ export class UserModel extends BaseModel {
       return null
     }
 
-    // @ts-ignore
     // (crookse) We ignore this because this will never return null.
     return UserModel.where({ email: this.email });
   }

@@ -27,7 +27,6 @@ export function createArticlesFavoritesModelObject(
   );
 }
 
-//@ts-ignore
 // (ebebbington) Error comes from this model adding the where method, that uses different
 // params compared to BaseModel's where method
 export class ArticlesFavoritesModel extends BaseModel {
@@ -153,7 +152,6 @@ export class ArticlesFavoritesModel extends BaseModel {
       return null
     }
 
-    // @ts-ignore
     // (crookse) We ignore this because this will never return null.
     return ArticlesFavoritesModel.where({ article_id: this.article_id });
   }
@@ -180,7 +178,6 @@ export class ArticlesFavoritesModel extends BaseModel {
       return null
     }
 
-    // @ts-ignore
     // (crookse) We ignore this because this will never return null.
     return ArticlesFavoritesModel.where({ article_id: this.article_id });
   }
@@ -206,7 +203,7 @@ export class ArticlesFavoritesModel extends BaseModel {
       return [];
     }
 
-    //@ts-ignore Nothing we can do about this.. the createUserModelObject expect
+    // Nothing we can do about this.. the createUserModelObject expect
     // a user object type, but there's no way to type it like that the return type of whereIn can't be user
     return results.map(result => {
       return createArticlesFavoritesModelObject(result);
@@ -235,7 +232,7 @@ export class ArticlesFavoritesModel extends BaseModel {
       return [];
     }
 
-    //@ts-ignore Nothing we can do about this.. the createUserModelObject expect
+    // Nothing we can do about this.. the createUserModelObject expect
     // a user object type, but there's no way to type it like that the return type of whereIn can't be user
     return results.map(result => {
       return createArticlesFavoritesModelObject(result);

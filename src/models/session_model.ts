@@ -116,7 +116,6 @@ export class SessionModel extends BaseModel {
     );
     const session = sessionResult[0];
     if (sessionResult && sessionResult.length > 0) {
-      //@ts-ignore
       // (ebebbington) Because we currently dont have a way to assign the entity type to `session` (and it work,
       // as it would error because that type isn't the return value of `formatResults`)
       return createSessionModel(session);
@@ -156,7 +155,6 @@ export class SessionModel extends BaseModel {
       return null
     }
 
-    // @ts-ignore
     // (crookse) We ignore this because getUserSession() can return null if the
     // session is not found. However, in this case, it will never be null.
     return SessionModel.getUserSession(this.session_one, this.session_two);
