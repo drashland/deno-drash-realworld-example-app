@@ -30,7 +30,10 @@ type CommandType = (
     );
 
 export interface IQueryResult {
-  rowDescription: RowDescription;
+  rowDescription: {
+    columnCount: number,
+    columns: [{name: string}]
+  };
   _done: boolean;
   // deno-lint-ignore no-explicit-any
   rows: any[];

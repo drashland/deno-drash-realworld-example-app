@@ -90,7 +90,7 @@ export default abstract class BaseModel {
     const client = await BaseModel.connect();
     const dbResult: IQueryResult = await client.query(query);
     client.release();
-    if (dbResult.rowCount < 1) {
+    if (dbResult.rowCount! < 1) {
       return []
     }
 
@@ -116,7 +116,7 @@ export default abstract class BaseModel {
   static async whereIn(
     table: string,
     data: { values: string[]|number[], column: string },
-  ): Promise<[]|Array<{[key: string]: string|number}>> {
+  ): Promise<[]|Array<{[key: string]: string|number|boolean}>> {
     if (data.values.length <= 0) {
       return [];
     }
@@ -128,7 +128,7 @@ export default abstract class BaseModel {
     const client = await BaseModel.connect();
     const dbResult: IQueryResult = await client.query(query);
     client.release();
-    if (dbResult.rowCount < 1) {
+    if (dbResult.rowCount! < 1) {
       return []
     }
 

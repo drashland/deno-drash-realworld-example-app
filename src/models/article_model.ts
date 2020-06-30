@@ -176,7 +176,7 @@ export class ArticleModel extends BaseModel {
       const client = await BaseModel.connect();
       const dbResult: IQueryResult =  await client.query(query);
       client.release();
-      if (dbResult.rowCount < 1) {
+      if (dbResult.rowCount! < 1) {
         return false
       }
     } catch (error) {
@@ -221,7 +221,11 @@ export class ArticleModel extends BaseModel {
     }
 
     // (crookse) We ignore this because this will never return null.
-    return ArticleModel.where({ slug: this.slug });
+    const savedResult = await ArticleModel.where({ slug: this.slug });
+    if (savedResult.length === 0) {
+      return []
+    }
+    return savedResult[0]
   }
 
   /**
@@ -244,13 +248,17 @@ export class ArticleModel extends BaseModel {
     );
     const client = await BaseModel.connect();
     const dbResult: IQueryResult = await client.query(query);
-    if (dbResult.rowCount < 1) {
+    if (dbResult.rowCount! < 1) {
       return []
     }
     client.release();
 
     // (crookse) We ignore this because this will never return null.
-    return ArticleModel.where({ id: this.id });
+    const updatedResult = await ArticleModel.where({ id: this.id });
+    if (updatedResult.length  === 0) {
+      return []
+    }
+    return updatedResult[0]
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -275,7 +283,7 @@ export class ArticleModel extends BaseModel {
     const client = await BaseModel.connect();
     const dbResult: IQueryResult = await client.query(query);
     client.release();
-    if (dbResult.rowCount < 1) {
+    if (dbResult.rowCount! < 1) {
       return []
     }
 
@@ -302,7 +310,7 @@ export class ArticleModel extends BaseModel {
    * @return Promise<ArticleModel[]|[]>
    */
   static async where(
-    fields: {[key: string]: string},
+    fields: {[key: string]: string|number},
   ): Promise<ArticleModel[] | []> {
     let results = await BaseModel.where("articles", fields);
 

@@ -106,7 +106,7 @@ export class SessionModel extends BaseModel {
       "LIMIT 1;";
     const client = await BaseModel.connect();
     const dbResult: IQueryResult = await client.query(query);
-    if (dbResult.rowCount < 1) {
+    if (dbResult.rowCount! < 1) {
       return null
     }
     client.release();
@@ -118,7 +118,13 @@ export class SessionModel extends BaseModel {
     if (sessionResult && sessionResult.length > 0) {
       // (ebebbington) Because we currently dont have a way to assign the entity type to `session` (and it work,
       // as it would error because that type isn't the return value of `formatResults`)
-      return createSessionModel(session);
+      const sessionEntity: SessionModelEntity = {
+        session_one: typeof session.session_one === "string" ? session.session_one : "",
+        session_two: typeof session.session_two === "string" ? session.session_two : "",
+        id: typeof session.id === "number" ? session.id : 0,
+        user_id: typeof session.user_id === "number" ? session.user_id : 0
+      }
+      return createSessionModel(sessionEntity);
     }
     return null;
   }
@@ -151,7 +157,7 @@ export class SessionModel extends BaseModel {
     const client = await BaseModel.connect();
     const dbResult: IQueryResult = await client.query(query);
     client.release();
-    if (dbResult.rowCount < 1) {
+    if (dbResult.rowCount! < 1) {
       return null
     }
 

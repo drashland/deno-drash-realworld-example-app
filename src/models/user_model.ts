@@ -144,7 +144,7 @@ export class UserModel extends BaseModel {
       const client = await BaseModel.connect();
       const dbResult: IQueryResult  = await client.query(query);
       client.release();
-      if (dbResult.rowCount < 1) {
+      if (dbResult.rowCount! < 1) {
         return false
       }
     } catch (error) {
@@ -182,12 +182,16 @@ export class UserModel extends BaseModel {
     const client = await BaseModel.connect();
     const dbResult: IQueryResult = await client.query(query);
     client.release();
-    if (dbResult.rowCount < 1) {
+    if (dbResult.rowCount! < 1) {
       return null
     }
 
     // (crookse) We ignore this because this will never return null.
-    return UserModel.where({ email: this.email });
+    const savedResult = await UserModel.where({ email: this.email });
+    if (savedResult.length === 0) {
+      return null
+    }
+    return savedResult[0]
   }
 
   /**
@@ -212,12 +216,15 @@ export class UserModel extends BaseModel {
     const client = await BaseModel.connect();
     const dbResult: IQueryResult = await client.query(query);
     client.release();
-    if (dbResult.rowCount < 1) {
+    if (dbResult.rowCount! < 1) {
       return null
     }
 
-    // (crookse) We ignore this because this will never return null.
-    return UserModel.where({ email: this.email });
+    const updatedResult = await UserModel.where({ email: this.email });
+    if (updatedResult.length === 0) {
+      return null
+    }
+    return updatedResult[0]
   }
 
   //////////////////////////////////////////////////////////////////////////////

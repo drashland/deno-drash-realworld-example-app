@@ -112,7 +112,7 @@ export class ArticlesFavoritesModel extends BaseModel {
       const client = await BaseModel.connect();
       const dbResult: IQueryResult = await client.query(query);
       client.release();
-      if (dbResult.rowCount < 1) {
+      if (dbResult.rowCount! < 1) {
         return false
       }
     } catch (error) {
@@ -148,12 +148,15 @@ export class ArticlesFavoritesModel extends BaseModel {
     const client = await BaseModel.connect();
     const dbResult: IQueryResult = await client.query(query);
     client.release();
-    if (dbResult.rowCount < 1) {
+    if (dbResult.rowCount! < 1) {
       return null
     }
 
-    // (crookse) We ignore this because this will never return null.
-    return ArticlesFavoritesModel.where({ article_id: this.article_id });
+    const savedResult = await ArticlesFavoritesModel.where({ article_id: this.article_id });
+    if (savedResult.length  === 0) {
+      return null
+    }
+    return savedResult[0]
   }
 
   /**
@@ -174,12 +177,18 @@ export class ArticlesFavoritesModel extends BaseModel {
     const client = await BaseModel.connect();
     const dbResult: IQueryResult = await client.query(query);
     client.release();
-    if (dbResult.rowCount < 1) {
-      return null
+    if (dbResult !== undefined) {
+      if (dbResult.rowCount! < 1) {
+        return null
+      }
     }
 
     // (crookse) We ignore this because this will never return null.
-    return ArticlesFavoritesModel.where({ article_id: this.article_id });
+    const updatedResult = await ArticlesFavoritesModel.where({ article_id: this.article_id });
+    if (updatedResult.length >= 1) {
+      return updatedResult[0]
+    }
+    return null
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -232,10 +241,14 @@ export class ArticlesFavoritesModel extends BaseModel {
       return [];
     }
 
-    // Nothing we can do about this.. the createUserModelObject expect
-    // a user object type, but there's no way to type it like that the return type of whereIn can't be user
-    return results.map(result => {
-      return createArticlesFavoritesModelObject(result);
+    return results.map((result: any) => {
+      const entity:  ArticlesFavoritesEntity = {
+        article_id: typeof result.article_id ===  "number" ? result.article_id : 0,
+        user_id: typeof result.user_id ===  "number" ? result.user_id : 0,
+        value: typeof result.value === "boolean" ? result.value : false,
+        id: typeof result.id === "number" ? result.id : 0
+      }
+      return createArticlesFavoritesModelObject(entity);
     });
   }
 
