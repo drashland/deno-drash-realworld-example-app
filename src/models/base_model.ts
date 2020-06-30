@@ -1,5 +1,4 @@
-import { Pool, PoolClient } from "../deps.ts";
-import { IQueryResult } from "../deps.ts";
+import { Pool, PoolClient, QueryResult, Column } from "../deps.ts";
 
 export const dbPool = new Pool({
   user: "user",
@@ -35,7 +34,7 @@ export default abstract class BaseModel {
    *
    * @param Array<string[]> rows
    *     An array of the rows from the table, each containing column values.
-   * @param [{name: string}] columns
+   * @param Column[] columns
    *     Array of objects, each object holding column data. Used the get the
    *     column name.
    *
@@ -47,7 +46,7 @@ export default abstract class BaseModel {
    * @example
    * BaseModel.formatResults([[1, 'ed'], [2, 'john']], [{name: 'id', ...}, {name: 'name', ...}]);
    */
-  static formatResults(rows: Array<string[]>, columns: [{name: string}]): []|Array<{[key: string]: string|number}> {
+  static formatResults(rows: Array<string[]>, columns: Column[]): []|Array<{[key: string]: string|number}> {
     if (!rows.length) {
       return [];
     }
@@ -88,7 +87,7 @@ export default abstract class BaseModel {
     query += clauses.join(" AND ");
 
     const client = await BaseModel.connect();
-    const dbResult: IQueryResult = await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
     client.release();
     if (dbResult.rowCount! < 1) {
       return []
@@ -126,7 +125,7 @@ export default abstract class BaseModel {
       ` IN (${data.values.join(",")})`;
 
     const client = await BaseModel.connect();
-    const dbResult: IQueryResult = await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
     client.release();
     if (dbResult.rowCount! < 1) {
       return []

@@ -1,5 +1,5 @@
 import BaseModel from "./base_model.ts";
-import { IQueryResult } from "../deps.ts";
+import { QueryResult } from "../deps.ts";
 
 export type ArticlesFavoritesEntity = {
   article_id: number;
@@ -110,7 +110,7 @@ export class ArticlesFavoritesModel extends BaseModel {
 
     try {
       const client = await BaseModel.connect();
-      const dbResult: IQueryResult = await client.query(query);
+      const dbResult: QueryResult = await client.query(query);
       client.release();
       if (dbResult.rowCount! < 1) {
         return false
@@ -146,7 +146,7 @@ export class ArticlesFavoritesModel extends BaseModel {
     );
 
     const client = await BaseModel.connect();
-    const dbResult: IQueryResult = await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
     client.release();
     if (dbResult.rowCount! < 1) {
       return null
@@ -175,7 +175,7 @@ export class ArticlesFavoritesModel extends BaseModel {
       ],
     );
     const client = await BaseModel.connect();
-    const dbResult: IQueryResult = await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
     client.release();
     if (dbResult !== undefined) {
       if (dbResult.rowCount! < 1) {

@@ -1,5 +1,5 @@
 import BaseModel from "./base_model.ts";
-import {  IQueryResult  } from "./../deps.ts";
+import {  QueryResult } from "../deps.ts";
 
 interface SessionModelEntity {
   session_one:  string;
@@ -105,7 +105,7 @@ export class SessionModel extends BaseModel {
       `WHERE session_one = '${sessionOne}' AND session_two = '${sessionTwo}' ` +
       "LIMIT 1;";
     const client = await BaseModel.connect();
-    const dbResult: IQueryResult = await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
     if (dbResult.rowCount! < 1) {
       return null
     }
@@ -155,7 +155,7 @@ export class SessionModel extends BaseModel {
       ],
     );
     const client = await BaseModel.connect();
-    const dbResult: IQueryResult = await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
     client.release();
     if (dbResult.rowCount! < 1) {
       return null

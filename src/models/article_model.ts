@@ -1,6 +1,6 @@
 import BaseModel from "./base_model.ts";
 import { UserEntity, UserModel } from "./user_model.ts";
-import { IQueryResult } from "../deps.ts"
+import {  QueryResult } from "../deps.ts";
 
 export type ArticleEntity = {
   author?: UserEntity | null;
@@ -174,7 +174,7 @@ export class ArticleModel extends BaseModel {
 
     try {
       const client = await BaseModel.connect();
-      const dbResult: IQueryResult =  await client.query(query);
+      const dbResult: QueryResult =  await client.query(query);
       client.release();
       if (dbResult.rowCount! < 1) {
         return false
@@ -214,7 +214,7 @@ export class ArticleModel extends BaseModel {
     );
 
     const client = await BaseModel.connect();
-    const dbResult: IQueryResult = await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
     client.release();
     if (dbResult!.rowCount! < 1) {
       return []
@@ -247,7 +247,7 @@ export class ArticleModel extends BaseModel {
       ],
     );
     const client = await BaseModel.connect();
-    const dbResult: IQueryResult = await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
     if (dbResult.rowCount! < 1) {
       return []
     }
@@ -281,7 +281,7 @@ export class ArticleModel extends BaseModel {
       query += ` OFFSET ${filters.offset} `;
     }
     const client = await BaseModel.connect();
-    const dbResult: IQueryResult = await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
     client.release();
     if (dbResult.rowCount! < 1) {
       return []
