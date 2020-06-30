@@ -46,7 +46,7 @@ export default abstract class BaseModel {
    * @example
    * BaseModel.formatResults([[1, 'ed'], [2, 'john']], [{name: 'id', ...}, {name: 'name', ...}]);
    */
-  static formatResults(rows: Array<string[]>, columns: Column[]): []|Array<{[key: string]: string|number}> {
+  static formatResults(rows: Array<string[]>, columns: Column[]): []|Array<{[key: string]: string|number|boolean}> {
     if (!rows.length) {
       return [];
     }
@@ -74,10 +74,10 @@ export default abstract class BaseModel {
    *
    * @return Promise<[]|[{[key: string]: string}]> Empty array if no results were found, else array of objects
    */
-  protected static async where(
+  protected static async Where(
     table: string,
     fields: {[key: string]: string|number},
-  ): Promise<[]|Array<{[key: string]: string|number}>> {
+  ): Promise<[]|Array<{[key: string]: string|number|boolean}>> {
     let query = `SELECT * FROM ${table} WHERE `;
     let clauses: string[] = [];
     for (let field in fields) {
@@ -112,7 +112,7 @@ export default abstract class BaseModel {
    *
    * @return Promise<any> Empty array if no data was found
    */
-  static async whereIn(
+  static async WhereIn(
     table: string,
     data: { values: string[]|number[], column: string },
   ): Promise<[]|Array<{[key: string]: string|number|boolean}>> {

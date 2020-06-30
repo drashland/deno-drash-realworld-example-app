@@ -197,7 +197,7 @@ export class ArticlesFavoritesModel extends BaseModel {
 
   /**
    * @description
-   *     See BaseModel.where()
+   *     See BaseModel.Where()
    *
    * @param {[key: string]: string|number} fields
    *
@@ -206,7 +206,7 @@ export class ArticlesFavoritesModel extends BaseModel {
   static async where(
     fields: {[key: string]: string|number},
   ): Promise<ArticlesFavoritesModel[] | []> {
-    let results = await BaseModel.where("articles_favorites", fields);
+    let results = await BaseModel.Where("articles_favorites", fields);
 
     if (results.length <= 0) {
       return [];
@@ -214,14 +214,22 @@ export class ArticlesFavoritesModel extends BaseModel {
 
     // Nothing we can do about this.. the createUserModelObject expect
     // a user object type, but there's no way to type it like that the return type of whereIn can't be user
-    return results.map(result => {
-      return createArticlesFavoritesModelObject(result);
+    const articleFavorites: Array<ArticlesFavoritesModel> = []
+    results.forEach(result => {
+      const entity: ArticlesFavoritesEntity = {
+        article_id: typeof result.article_id === "number" ? result.article_id : 0,
+        id: typeof result.id === "number" ? result.id : 0,
+        user_id: typeof result.user_id === "number" ? result.user_id : 0,
+        value: typeof result.value === "boolean" ? result.value : false
+      }
+      articleFavorites.push(createArticlesFavoritesModelObject(entity));
     });
+    return articleFavorites
   }
 
   /**
    * @description
-   *     See BaseModel.whereIn()
+   *     See BaseModel.WhereIn()
    *
    * @param string column
    * @param string[]|number[] values
@@ -232,7 +240,7 @@ export class ArticlesFavoritesModel extends BaseModel {
     column: string,
     values: string[]|number[],
   ): Promise<ArticlesFavoritesModel[] | []> {
-    let results = await BaseModel.whereIn("articles_favorites", {
+    let results = await BaseModel.WhereIn("articles_favorites", {
       column,
       values,
     });
@@ -241,15 +249,26 @@ export class ArticlesFavoritesModel extends BaseModel {
       return [];
     }
 
-    return results.map((result: any) => {
+    const articles: Array<ArticlesFavoritesModel> = []
+    results.forEach(result => {
       const entity:  ArticlesFavoritesEntity = {
         article_id: typeof result.article_id ===  "number" ? result.article_id : 0,
         user_id: typeof result.user_id ===  "number" ? result.user_id : 0,
         value: typeof result.value === "boolean" ? result.value : false,
         id: typeof result.id === "number" ? result.id : 0
       }
-      return createArticlesFavoritesModelObject(entity);
-    });
+      articles.push(createArticlesFavoritesModelObject(entity));
+    })
+    return articles
+    // return results.map((result: any) => {
+    //   const entity:  ArticlesFavoritesEntity = {
+    //     article_id: typeof result.article_id ===  "number" ? result.article_id : 0,
+    //     user_id: typeof result.user_id ===  "number" ? result.user_id : 0,
+    //     value: typeof result.value === "boolean" ? result.value : false,
+    //     id: typeof result.id === "number" ? result.id : 0
+    //   }
+    //   return createArticlesFavoritesModelObject(entity);
+    // });
   }
 
   //////////////////////////////////////////////////////////////////////////////

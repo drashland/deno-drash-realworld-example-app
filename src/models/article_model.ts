@@ -291,19 +291,31 @@ export class ArticleModel extends BaseModel {
       dbResult.rows,
       dbResult.rowDescription.columns,
     );
-    if (results && results.length > 0) {
-      // Nothing we can do about this.. the createUserModelObject expect
-      // a user object type, but there's no way to type it like that the return type of whereIn can't be user
-      return results.map(article => {
-        return createArticleModelObject(article);
-      });
+
+    if (results.length === 0) {
+      return []
     }
-    return [];
+    const articles: Array<ArticleModel> = []
+    results.forEach(result => {
+      const entity: ArticleEntity = {
+        id: typeof result.id === "number" ? result.id : 0,
+        body: typeof result.body === "string" ? result.body : "",
+        author_id: typeof result.author_id === "number" ? result.author_id : 0,
+        created_at: typeof result.created_at === "number" ? result.created_at : 0,
+        description: typeof result.description === "string" ? result.description : "",
+        favorited: typeof result.favorited === "boolean" ? result.favorited : false,
+        favoritesCount: typeof result.favoritesCount === "number" ? result.favoritesCount : 0,
+        title: typeof result.title === "string" ? result.title : "",
+        updated_at: typeof result.updated_at === "number" ? result.updated_at : 0
+      };
+      articles.push(createArticleModelObject(entity));
+    });
+    return articles
   }
 
   /**
    * @description
-   *     See BaseModel.where()
+   *     See BaseModel.Where()
    *
    * @param {[key: string]: string} fields
    *
@@ -312,22 +324,33 @@ export class ArticleModel extends BaseModel {
   static async where(
     fields: {[key: string]: string|number},
   ): Promise<ArticleModel[] | []> {
-    let results = await BaseModel.where("articles", fields);
+    let results = await BaseModel.Where("articles", fields);
 
     if (results.length <= 0) {
       return [];
     }
 
-    // (ebebbington) Nothing we can do about this.. the createUserModelObject expect
-    // a user object type, but there's no way to type it like that the return type of whereIn can't be user
-    return results.map(result => {
-      return createArticleModelObject(result);
+    const articles: Array<ArticleModel> = []
+    results.forEach(result => {
+      const entity: ArticleEntity = {
+        id: typeof result.id === "number" ? result.id : 0,
+        body: typeof result.body === "string" ? result.body : "",
+        author_id: typeof result.author_id === "number" ? result.author_id : 0,
+        created_at: typeof result.created_at === "number" ? result.created_at : 0,
+        description: typeof result.description === "string" ? result.description : "",
+        favorited: typeof result.favorited === "boolean" ? result.favorited : false,
+        favoritesCount: typeof result.favoritesCount === "number" ? result.favoritesCount : 0,
+        title: typeof result.title === "string" ? result.title : "",
+        updated_at: typeof result.updated_at === "number" ? result.updated_at : 0
+      };
+      articles.push(createArticleModelObject(entity));
     });
+    return articles
   }
 
   /**
    * @description
-   *     See BaseModel.whereIn()
+   *     See BaseModel.WhereIn()
    *
    * @param string column
    * @param string[]|number[] values
@@ -338,7 +361,7 @@ export class ArticleModel extends BaseModel {
     column: string,
     values: string[]|number[],
   ): Promise<ArticleModel[] | []> {
-    let results = await BaseModel.whereIn("articles", {
+    let results = await BaseModel.WhereIn("articles", {
       column,
       values,
     });
@@ -347,11 +370,22 @@ export class ArticleModel extends BaseModel {
       return [];
     }
 
-    // (ebebbington) Nothing we can do about this.. the createUserModelObject expect
-    // a user object type, but there's no way to type it like that the return type of whereIn can't be user
-    return results.map(result => {
-      return createArticleModelObject(result);
+    const articles: Array<ArticleModel> = [];
+    results.forEach(result => {
+      const entity: ArticleEntity = {
+        id: typeof result.id === "number" ? result.id : 0,
+        body: typeof result.body === "string" ? result.body : "",
+        author_id: typeof result.author_id === "number" ? result.author_id : 0,
+        created_at: typeof result.created_at === "number" ? result.created_at : 0,
+        description: typeof result.description === "string" ? result.description : "",
+        favorited: typeof result.favorited === "boolean" ? result.favorited : false,
+        favoritesCount: typeof result.favoritesCount === "number" ? result.favoritesCount : 0,
+        title: typeof result.title === "string" ? result.title : "",
+        updated_at: typeof result.updated_at === "number" ? result.updated_at : 0
+      };
+       articles.push(createArticleModelObject(entity));
     });
+    return articles
   }
 
   //////////////////////////////////////////////////////////////////////////////
