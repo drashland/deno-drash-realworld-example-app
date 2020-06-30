@@ -37,11 +37,4 @@ jobs:
             run: deno fmt --check
 
           - name: Linter
-            run: |
-              deno lint --unstable src/app.ts
-              deno lint --unstable src/config
-              deno lint --unstable src/deps.ts
-              deno lint --unstable src/middlewares
-              deno lint --unstable src/models
-              deno lint --unstable src/resources
-              deno lint --unstable src/services
+            run: deno lint --unstable
