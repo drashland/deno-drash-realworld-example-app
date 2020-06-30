@@ -1,3 +1,3 @@
-import "./app.ts"
+import "./app.ts";
 
-Deno.exit()
+Deno.exit();

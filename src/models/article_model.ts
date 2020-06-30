@@ -1,6 +1,6 @@
 import BaseModel from "./base_model.ts";
 import { UserEntity, UserModel } from "./user_model.ts";
-import {  QueryResult } from "../deps.ts";
+import { QueryResult } from "../deps.ts";
 
 export type ArticleEntity = {
   author?: UserEntity | null;
@@ -174,10 +174,10 @@ export class ArticleModel extends BaseModel {
 
     try {
       const client = await BaseModel.connect();
-      const dbResult: QueryResult =  await client.query(query);
+      const dbResult: QueryResult = await client.query(query);
       client.release();
       if (dbResult.rowCount! < 1) {
-        return false
+        return false;
       }
     } catch (error) {
       console.log(error);
@@ -191,7 +191,7 @@ export class ArticleModel extends BaseModel {
    *
    * @return Promise<ArticleModel|[]> The saved article, else [] if failure to save
    */
-  public async save(): Promise<ArticleModel|[]> {
+  public async save(): Promise<ArticleModel | []> {
     // If this model already has an ID, then that means we're updating the model
     if (this.id != -1) {
       return this.update();
@@ -217,15 +217,15 @@ export class ArticleModel extends BaseModel {
     const dbResult: QueryResult = await client.query(query);
     client.release();
     if (dbResult!.rowCount! < 1) {
-      return []
+      return [];
     }
 
     // (crookse) We ignore this because this will never return null.
     const savedResult = await ArticleModel.where({ slug: this.slug });
     if (savedResult.length === 0) {
-      return []
+      return [];
     }
-    return savedResult[0]
+    return savedResult[0];
   }
 
   /**
@@ -233,7 +233,7 @@ export class ArticleModel extends BaseModel {
    *
    * @return Promise<ArticleModel|[]> The updated article, else [] if it failed to update
    */
-  public async update(): Promise<ArticleModel|[]> {
+  public async update(): Promise<ArticleModel | []> {
     let query = "UPDATE articles SET " +
       "title = ?, description = ?, body = ?, updatedAt = to_timestamp(?) " +
       `WHERE id = '${this.id}';`;
@@ -249,16 +249,16 @@ export class ArticleModel extends BaseModel {
     const client = await BaseModel.connect();
     const dbResult: QueryResult = await client.query(query);
     if (dbResult.rowCount! < 1) {
-      return []
+      return [];
     }
     client.release();
 
     // (crookse) We ignore this because this will never return null.
     const updatedResult = await ArticleModel.where({ id: this.id });
-    if (updatedResult.length  === 0) {
-      return []
+    if (updatedResult.length === 0) {
+      return [];
     }
-    return updatedResult[0]
+    return updatedResult[0];
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -284,7 +284,7 @@ export class ArticleModel extends BaseModel {
     const dbResult: QueryResult = await client.query(query);
     client.release();
     if (dbResult.rowCount! < 1) {
-      return []
+      return [];
     }
 
     let results = BaseModel.formatResults(
@@ -293,24 +293,33 @@ export class ArticleModel extends BaseModel {
     );
 
     if (results.length === 0) {
-      return []
+      return [];
     }
-    const articles: Array<ArticleModel> = []
-    results.forEach(result => {
+    const articles: Array<ArticleModel> = [];
+    results.forEach((result) => {
       const entity: ArticleEntity = {
         id: typeof result.id === "number" ? result.id : 0,
         body: typeof result.body === "string" ? result.body : "",
         author_id: typeof result.author_id === "number" ? result.author_id : 0,
-        created_at: typeof result.created_at === "number" ? result.created_at : 0,
-        description: typeof result.description === "string" ? result.description : "",
-        favorited: typeof result.favorited === "boolean" ? result.favorited : false,
-        favoritesCount: typeof result.favoritesCount === "number" ? result.favoritesCount : 0,
+        created_at: typeof result.created_at === "number"
+          ? result.created_at
+          : 0,
+        description: typeof result.description === "string"
+          ? result.description
+          : "",
+        favorited: typeof result.favorited === "boolean"
+          ? result.favorited
+          : false,
+        favoritesCount: typeof result.favoritesCount === "number"
+          ? result.favoritesCount
+          : 0,
         title: typeof result.title === "string" ? result.title : "",
-        updated_at: typeof result.updated_at === "number" ? result.updated_at : 0
+        updated_at: typeof result.updated_at === "number" ? result.updated_at
+        : 0,
       };
       articles.push(createArticleModelObject(entity));
     });
-    return articles
+    return articles;
   }
 
   /**
@@ -322,7 +331,7 @@ export class ArticleModel extends BaseModel {
    * @return Promise<ArticleModel[]|[]>
    */
   static async where(
-    fields: {[key: string]: string|number},
+    fields: { [key: string]: string | number },
   ): Promise<ArticleModel[] | []> {
     let results = await BaseModel.Where("articles", fields);
 
@@ -330,22 +339,31 @@ export class ArticleModel extends BaseModel {
       return [];
     }
 
-    const articles: Array<ArticleModel> = []
-    results.forEach(result => {
+    const articles: Array<ArticleModel> = [];
+    results.forEach((result) => {
       const entity: ArticleEntity = {
         id: typeof result.id === "number" ? result.id : 0,
         body: typeof result.body === "string" ? result.body : "",
         author_id: typeof result.author_id === "number" ? result.author_id : 0,
-        created_at: typeof result.created_at === "number" ? result.created_at : 0,
-        description: typeof result.description === "string" ? result.description : "",
-        favorited: typeof result.favorited === "boolean" ? result.favorited : false,
-        favoritesCount: typeof result.favoritesCount === "number" ? result.favoritesCount : 0,
+        created_at: typeof result.created_at === "number"
+          ? result.created_at
+          : 0,
+        description: typeof result.description === "string"
+          ? result.description
+          : "",
+        favorited: typeof result.favorited === "boolean"
+          ? result.favorited
+          : false,
+        favoritesCount: typeof result.favoritesCount === "number"
+          ? result.favoritesCount
+          : 0,
         title: typeof result.title === "string" ? result.title : "",
-        updated_at: typeof result.updated_at === "number" ? result.updated_at : 0
+        updated_at: typeof result.updated_at === "number" ? result.updated_at
+        : 0,
       };
       articles.push(createArticleModelObject(entity));
     });
-    return articles
+    return articles;
   }
 
   /**
@@ -359,7 +377,7 @@ export class ArticleModel extends BaseModel {
    */
   static async whereIn(
     column: string,
-    values: string[]|number[],
+    values: string[] | number[],
   ): Promise<ArticleModel[] | []> {
     let results = await BaseModel.WhereIn("articles", {
       column,
@@ -371,21 +389,30 @@ export class ArticleModel extends BaseModel {
     }
 
     const articles: Array<ArticleModel> = [];
-    results.forEach(result => {
+    results.forEach((result) => {
       const entity: ArticleEntity = {
         id: typeof result.id === "number" ? result.id : 0,
         body: typeof result.body === "string" ? result.body : "",
         author_id: typeof result.author_id === "number" ? result.author_id : 0,
-        created_at: typeof result.created_at === "number" ? result.created_at : 0,
-        description: typeof result.description === "string" ? result.description : "",
-        favorited: typeof result.favorited === "boolean" ? result.favorited : false,
-        favoritesCount: typeof result.favoritesCount === "number" ? result.favoritesCount : 0,
+        created_at: typeof result.created_at === "number"
+          ? result.created_at
+          : 0,
+        description: typeof result.description === "string"
+          ? result.description
+          : "",
+        favorited: typeof result.favorited === "boolean"
+          ? result.favorited
+          : false,
+        favoritesCount: typeof result.favoritesCount === "number"
+          ? result.favoritesCount
+          : 0,
         title: typeof result.title === "string" ? result.title : "",
-        updated_at: typeof result.updated_at === "number" ? result.updated_at : 0
+        updated_at: typeof result.updated_at === "number" ? result.updated_at
+        : 0,
       };
-       articles.push(createArticleModelObject(entity));
+      articles.push(createArticleModelObject(entity));
     });
-    return articles
+    return articles;
   }
 
   //////////////////////////////////////////////////////////////////////////////

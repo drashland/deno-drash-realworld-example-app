@@ -135,9 +135,9 @@ class LoginResource extends BaseResource {
     const session = await Session.save();
     if (!session) {
       return this.errorResponse(
-          422,
-          "An error occurred whilst saving your session"
-      )
+        422,
+        "An error occurred whilst saving your session",
+      );
     }
 
     let entity = user.toEntity();

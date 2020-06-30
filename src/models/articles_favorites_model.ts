@@ -113,7 +113,7 @@ export class ArticlesFavoritesModel extends BaseModel {
       const dbResult: QueryResult = await client.query(query);
       client.release();
       if (dbResult.rowCount! < 1) {
-        return false
+        return false;
       }
     } catch (error) {
       console.log(error);
@@ -127,7 +127,7 @@ export class ArticlesFavoritesModel extends BaseModel {
    *
    * @return Promise<ArticlesFavoritesModel|null> Null if the query failed to save
    */
-  public async save(): Promise<ArticlesFavoritesModel|null> {
+  public async save(): Promise<ArticlesFavoritesModel | null> {
     // If this model already has an ID, then that means we're updating the model
     if (this.id != -1) {
       return this.update();
@@ -149,14 +149,16 @@ export class ArticlesFavoritesModel extends BaseModel {
     const dbResult: QueryResult = await client.query(query);
     client.release();
     if (dbResult.rowCount! < 1) {
-      return null
+      return null;
     }
 
-    const savedResult = await ArticlesFavoritesModel.where({ article_id: this.article_id });
-    if (savedResult.length  === 0) {
-      return null
+    const savedResult = await ArticlesFavoritesModel.where(
+      { article_id: this.article_id },
+    );
+    if (savedResult.length === 0) {
+      return null;
     }
-    return savedResult[0]
+    return savedResult[0];
   }
 
   /**
@@ -164,7 +166,7 @@ export class ArticlesFavoritesModel extends BaseModel {
    *
    * @return Promise<ArticlesFavoritesModel|null> Null if the query failed to update
    */
-  public async update(): Promise<ArticlesFavoritesModel|null> {
+  public async update(): Promise<ArticlesFavoritesModel | null> {
     let query = "UPDATE articles_favorites SET " +
       "value = ? " +
       `WHERE id = '${this.id}';`;
@@ -179,16 +181,18 @@ export class ArticlesFavoritesModel extends BaseModel {
     client.release();
     if (dbResult !== undefined) {
       if (dbResult.rowCount! < 1) {
-        return null
+        return null;
       }
     }
 
     // (crookse) We ignore this because this will never return null.
-    const updatedResult = await ArticlesFavoritesModel.where({ article_id: this.article_id });
+    const updatedResult = await ArticlesFavoritesModel.where(
+      { article_id: this.article_id },
+    );
     if (updatedResult.length >= 1) {
-      return updatedResult[0]
+      return updatedResult[0];
     }
-    return null
+    return null;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -204,7 +208,7 @@ export class ArticlesFavoritesModel extends BaseModel {
    * @return Promise<ArticlesFavoritesModel[]|[]>
    */
   static async where(
-    fields: {[key: string]: string|number},
+    fields: { [key: string]: string | number },
   ): Promise<ArticlesFavoritesModel[] | []> {
     let results = await BaseModel.Where("articles_favorites", fields);
 
@@ -214,17 +218,19 @@ export class ArticlesFavoritesModel extends BaseModel {
 
     // Nothing we can do about this.. the createUserModelObject expect
     // a user object type, but there's no way to type it like that the return type of whereIn can't be user
-    const articleFavorites: Array<ArticlesFavoritesModel> = []
-    results.forEach(result => {
+    const articleFavorites: Array<ArticlesFavoritesModel> = [];
+    results.forEach((result) => {
       const entity: ArticlesFavoritesEntity = {
-        article_id: typeof result.article_id === "number" ? result.article_id : 0,
+        article_id: typeof result.article_id === "number"
+          ? result.article_id
+          : 0,
         id: typeof result.id === "number" ? result.id : 0,
         user_id: typeof result.user_id === "number" ? result.user_id : 0,
-        value: typeof result.value === "boolean" ? result.value : false
-      }
+        value: typeof result.value === "boolean" ? result.value : false,
+      };
       articleFavorites.push(createArticlesFavoritesModelObject(entity));
     });
-    return articleFavorites
+    return articleFavorites;
   }
 
   /**
@@ -238,7 +244,7 @@ export class ArticlesFavoritesModel extends BaseModel {
    */
   static async whereIn(
     column: string,
-    values: string[]|number[],
+    values: string[] | number[],
   ): Promise<ArticlesFavoritesModel[] | []> {
     let results = await BaseModel.WhereIn("articles_favorites", {
       column,
@@ -249,17 +255,19 @@ export class ArticlesFavoritesModel extends BaseModel {
       return [];
     }
 
-    const articles: Array<ArticlesFavoritesModel> = []
-    results.forEach(result => {
-      const entity:  ArticlesFavoritesEntity = {
-        article_id: typeof result.article_id ===  "number" ? result.article_id : 0,
-        user_id: typeof result.user_id ===  "number" ? result.user_id : 0,
+    const articles: Array<ArticlesFavoritesModel> = [];
+    results.forEach((result) => {
+      const entity: ArticlesFavoritesEntity = {
+        article_id: typeof result.article_id === "number"
+          ? result.article_id
+          : 0,
+        user_id: typeof result.user_id === "number" ? result.user_id : 0,
         value: typeof result.value === "boolean" ? result.value : false,
-        id: typeof result.id === "number" ? result.id : 0
-      }
+        id: typeof result.id === "number" ? result.id : 0,
+      };
       articles.push(createArticlesFavoritesModelObject(entity));
-    })
-    return articles
+    });
+    return articles;
     // return results.map((result: any) => {
     //   const entity:  ArticlesFavoritesEntity = {
     //     article_id: typeof result.article_id ===  "number" ? result.article_id : 0,

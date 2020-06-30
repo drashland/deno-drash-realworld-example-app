@@ -1,11 +1,11 @@
 import BaseModel from "./base_model.ts";
-import {  QueryResult } from "../deps.ts";
+import { QueryResult } from "../deps.ts";
 
 interface SessionModelEntity {
-  session_one:  string;
-  session_two: string
-  id: number
-  user_id: number
+  session_one: string;
+  session_two: string;
+  id: number;
+  user_id: number;
 }
 
 /**
@@ -107,7 +107,7 @@ export class SessionModel extends BaseModel {
     const client = await BaseModel.connect();
     const dbResult: QueryResult = await client.query(query);
     if (dbResult.rowCount! < 1) {
-      return null
+      return null;
     }
     client.release();
     const sessionResult = BaseModel.formatResults(
@@ -119,11 +119,15 @@ export class SessionModel extends BaseModel {
       // (ebebbington) Because we currently dont have a way to assign the entity type to `session` (and it work,
       // as it would error because that type isn't the return value of `formatResults`)
       const sessionEntity: SessionModelEntity = {
-        session_one: typeof session.session_one === "string" ? session.session_one : "",
-        session_two: typeof session.session_two === "string" ? session.session_two : "",
+        session_one: typeof session.session_one === "string"
+          ? session.session_one
+          : "",
+        session_two: typeof session.session_two === "string"
+          ? session.session_two
+          : "",
         id: typeof session.id === "number" ? session.id : 0,
-        user_id: typeof session.user_id === "number" ? session.user_id : 0
-      }
+        user_id: typeof session.user_id === "number" ? session.user_id : 0,
+      };
       return createSessionModel(sessionEntity);
     }
     return null;
@@ -138,7 +142,7 @@ export class SessionModel extends BaseModel {
    *
    * @return Promise<SessionModel|null> Empty array if the query failed to save
    */
-  public async save(): Promise<SessionModel|null> {
+  public async save(): Promise<SessionModel | null> {
     if (this.id != -1) {
       throw new Error("Session record already exists.");
     }
@@ -158,7 +162,7 @@ export class SessionModel extends BaseModel {
     const dbResult: QueryResult = await client.query(query);
     client.release();
     if (dbResult.rowCount! < 1) {
-      return null
+      return null;
     }
 
     // (crookse) We ignore this because getUserSession() can return null if the

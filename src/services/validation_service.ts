@@ -13,7 +13,7 @@ export default class ValidationService {
    *     - Returns the input back if it is not a string. This method only
    *       decodes strings.
    */
-  static decodeInput(input: string): string|undefined {
+  static decodeInput(input: string): string | undefined {
     if ((typeof input) !== "string") {
       return input;
     }

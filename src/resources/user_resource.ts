@@ -109,9 +109,9 @@ export default class UserResource extends BaseResource {
     const savedUser = await user.save();
     if (savedUser === null) {
       return this.errorResponse(
-          422,
-          "An error occurred whilst saving your user"
-      )
+        422,
+        "An error occurred whilst saving your user",
+      );
     }
 
     let entity = savedUser.toEntity();

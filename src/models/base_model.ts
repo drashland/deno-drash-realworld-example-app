@@ -46,16 +46,19 @@ export default abstract class BaseModel {
    * @example
    * BaseModel.formatResults([[1, 'ed'], [2, 'john']], [{name: 'id', ...}, {name: 'name', ...}]);
    */
-  static formatResults(rows: Array<string[]>, columns: Column[]): []|Array<{[key: string]: string|number|boolean}> {
+  static formatResults(
+    rows: Array<string[]>,
+    columns: Column[],
+  ): [] | Array<{ [key: string]: string | number | boolean }> {
     if (!rows.length) {
       return [];
     }
     const columnNames: string[] = columns.map((column) => {
       return column.name;
     });
-    let newResult: Array<{[key: string]: string}> = [];
+    let newResult: Array<{ [key: string]: string }> = [];
     rows.forEach((row, rowIndex) => {
-      let rowData: {[key: string]: string} = {};
+      let rowData: { [key: string]: string } = {};
       row.forEach((rVal, rIndex) => {
         const columnName: string = columnNames[rIndex];
         rowData[columnName] = row[rIndex];
@@ -76,8 +79,8 @@ export default abstract class BaseModel {
    */
   protected static async Where(
     table: string,
-    fields: {[key: string]: string|number},
-  ): Promise<[]|Array<{[key: string]: string|number|boolean}>> {
+    fields: { [key: string]: string | number },
+  ): Promise<[] | Array<{ [key: string]: string | number | boolean }>> {
     let query = `SELECT * FROM ${table} WHERE `;
     let clauses: string[] = [];
     for (let field in fields) {
@@ -90,7 +93,7 @@ export default abstract class BaseModel {
     const dbResult: QueryResult = await client.query(query);
     client.release();
     if (dbResult.rowCount! < 1) {
-      return []
+      return [];
     }
 
     return BaseModel.formatResults(
@@ -114,8 +117,8 @@ export default abstract class BaseModel {
    */
   static async WhereIn(
     table: string,
-    data: { values: string[]|number[], column: string },
-  ): Promise<[]|Array<{[key: string]: string|number|boolean}>> {
+    data: { values: string[] | number[]; column: string },
+  ): Promise<[] | Array<{ [key: string]: string | number | boolean }>> {
     if (data.values.length <= 0) {
       return [];
     }
@@ -128,7 +131,7 @@ export default abstract class BaseModel {
     const dbResult: QueryResult = await client.query(query);
     client.release();
     if (dbResult.rowCount! < 1) {
-      return []
+      return [];
     }
 
     return BaseModel.formatResults(
