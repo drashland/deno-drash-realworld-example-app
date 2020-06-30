@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+
+  drash:
+    container_name: realworld_drash
+    build:
+      context: .
+      dockerfile: .docker/drash.dockerfile
+    volumes:
+      - ./src:/var/www/src
+    working_dir: /var/www/src
+    ports:
+      - "1667:1667"
+    command: bash -c "npm install && npm run webpack && deno run --allow-net --allow-read --unstable app.test.ts"
+    networks:
+      - drash-app-network
