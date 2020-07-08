@@ -392,7 +392,7 @@ class ArticlesResource extends BaseResource {
       case "unset":
         favorite = await ArticlesFavoritesModel.where({
           article_id: article.id,
-          "user_id": currentUser.id,
+          user_id: currentUser.id,
         });
         if (!favorite) {
           return this.errorResponse(

@@ -268,15 +268,6 @@ export class ArticlesFavoritesModel extends BaseModel {
       articles.push(createArticlesFavoritesModelObject(entity));
     });
     return articles;
-    // return results.map((result: any) => {
-    //   const entity:  ArticlesFavoritesEntity = {
-    //     article_id: typeof result.article_id ===  "number" ? result.article_id : 0,
-    //     user_id: typeof result.user_id ===  "number" ? result.user_id : 0,
-    //     value: typeof result.value === "boolean" ? result.value : false,
-    //     id: typeof result.id === "number" ? result.id : 0
-    //   }
-    //   return createArticlesFavoritesModelObject(entity);
-    // });
   }
 
   //////////////////////////////////////////////////////////////////////////////
