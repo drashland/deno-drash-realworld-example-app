@@ -24,9 +24,9 @@ export type Filters = {
  * @description
  * Returns an instance of the ArticleModel with the data passed in attached
  *
- * @param {ArticleEntity} article
+ * @param ArticleEntity article
  *
- * @return {ArticleModel}
+ * @return ArticleModel
  */
 export function createArticleModelObject(article: ArticleEntity): ArticleModel {
   return new ArticleModel(
@@ -47,70 +47,70 @@ export class ArticleModel extends BaseModel {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @var {number}
+   * @var number
    *
    * Id of the associated author in the author table
    */
   public author_id: number;
 
   /**
-   * @var {string}
+   * @var string
    *
    * Body (content) for the article
    */
   public body: string;
 
   /**
-   * @var {created_at}
+   * @var created_at
    *
    * Timestamp of when the row was created inside the database
    */
   public created_at: number;
 
   /**
-   * @var {description}
+   * @var description
    *
    * Desription for the article
    */
   public description: string;
 
   /**
-   * @var {boolean} [=false]
+   * @var boolean [=false]
    *
    * If the article is favorited
    */
   public favorited: boolean = false;
 
   /**
-   * @var {numbers} [=0]
+   * @var numbers [=0]
    *
    * Number of favourites the article has accumulated
    */
   public favoritesCount: number = 0;
 
   /**
-   * @var {number}
+   * @var number
    *
    * Id of the related row in the database
    */
   public id: number;
 
   /**
-   * @var {string}
+   * @var string
    *
    * Slug for the article content
    */
   public slug: string;
 
   /**
-   * @var {string}
+   * @var string
    *
    * Title of the article
    */
   public title: string;
 
   /**
-   * @var {number}
+   * @var number
    *
    * Timestamp of the last time the database row was updated
    */
@@ -121,14 +121,14 @@ export class ArticleModel extends BaseModel {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @param {number} authorId
-   * @param {string} title
-   * @param {string} description
-   * @param {string} body
-   * @param {string} slug=""
-   * @param {number} createdAt=Date
-   * @param {number} updatedAt=Date
-   * @param {number} id=-1
+   * @param number authorId
+   * @param string title
+   * @param string description
+   * @param string body
+   * @param string slug=""
+   * @param number createdAt=Date
+   * @param number updatedAt=Date
+   * @param number id=-1
    */
   constructor(
     authorId: number,
