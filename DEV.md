@@ -33,7 +33,10 @@ Example query from the CLI:
 CREATE TABLE article_comments (
   id SERIAL PRIMARY KEY,
   article_id integer NOT NULL REFERENCES articles(id),
-  comment VARCHAR (255),
+  author_image VARCHAR (255) NOT NULL,
+  author_id integer NOT NULL
+  author_username VARCHAR (255) NOT NULL
+  body VARCHAR (255) NOT NULL,
   created_at timestamp without time zone NOT NULL,
   updated_at timestamp without time zone NOT NULL
 );
