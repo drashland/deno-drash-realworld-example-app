@@ -5,6 +5,9 @@ export default class UserService {
   /**
    * Get user model for logged in user
    *
+   * @param string cookieValue
+   *     this.request.getCookie("...")
+   *
    * @return UserModel|boolean
    *     - Returns the user model.
    *     - Returns false if:
@@ -12,8 +15,8 @@ export default class UserService {
    *       - No session exists with the "drash_sess" cookie
    *       - No user was found with that session
    */
-  static async getLoggedInUser(): Promise<UserModel|boolean> {
-    const sessionCookie = this.request.getCookie("drash_sess");
+  static async getLoggedInUser(cookieValue: string): Promise<UserModel|boolean> {
+    const sessionCookie = cookieValue
     if (!sessionCookie) {
       return false
     }
@@ -28,6 +31,6 @@ export default class UserService {
     if (!user.length) {
       return false
     }
-    return user
+    return user[0]
   }
 }

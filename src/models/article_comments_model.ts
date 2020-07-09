@@ -169,7 +169,7 @@ export class ArticleCommentsModel extends BaseModel {
     // }
 
     let query = "INSERT INTO article_comments " +
-        " (article_id, author_image, author_id, author_username, body created_at, updated_at)" +
+        " (article_id, author_image, author_id, author_username, body, created_at, updated_at)" +
         " VALUES (?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?));";
     query = this.prepareQuery(
         query,
@@ -234,7 +234,7 @@ export class ArticleCommentsModel extends BaseModel {
    */
   static async all(filters: Filters): Promise<ArticleCommentsModel[] | []> {
     let query = "SELECT * FROM article_comments ";
-    if (filters.author) {
+    if (filters.article) {
       query += ` WHERE article_id = '${filters.article.id}' `;
     }
     if (filters.offset) {

@@ -10,9 +10,10 @@ export default class ArticleCommentsResource extends Drash.Http.Resource {
   ];
 
   public async GET() {
-    const slug = this.request.getQueryParam("slug");
-    const article = await ArticleModel.where({ slug })
-    if (!article.length) {
+    const slug = this.request.getPathParam("slug");
+    const articles = await ArticleModel.where({ slug })
+    if (!articles.length) {
+      console.error("No article was found with the slug of: " + slug)
       this.response.status_code = 404
       this.response.body = {
         errors: {
@@ -21,24 +22,26 @@ export default class ArticleCommentsResource extends Drash.Http.Resource {
       }
       return this.response
     }
+    const article = articles[0]
     const comments = await ArticleCommentsModel.whereIn("article_id", [article.id]);
     if (!comments.length) {
-      this.response.status_code = 404
-      this.response.body = {
-        errors: {
-          comment: "No comments were found for the given article"
-        }
-      }
+      console.log("No comments were found for the article with id: " + article.id)
+      this.response.body = []
       return this.response
     }
-    this.response.body = comments;
+    console.log("Returning comments (length of " + comments.length + ") for article with id: " + article.id)
+    this.response.body = {
+      success: true,
+      data: comments
+    };
     return this.response;
   }
 
   public async POST() {
     console.log('Handling ArticleCommentsResource POST.')
     const comment = this.request.getBodyParam("comment")
-    const slug = this.request.getUrlQueryParam("slug")
+    const slug = this.request.getPathParam("slug")
+    console.log("The slug for the article: " + slug)
     // First find an article by that slug. The article should exist.
     const articles = await ArticleModel.where({ slug })
     if (!articles.length) {
@@ -54,6 +57,7 @@ export default class ArticleCommentsResource extends Drash.Http.Resource {
     const article = articles[0]
     // Get user and validation check
     if (!comment) {
+      console.error("No comment was passed in. A comment is required.")
       this.response.status_code = 422
       this.response.body = {
         errors: {
@@ -62,8 +66,10 @@ export default class ArticleCommentsResource extends Drash.Http.Resource {
       }
       return this.response
     }
-    const user = await UserService.getLoggedInUser();
-    if (!user) {
+    const cookie = this.request.getCookie("drash_sess")
+    const user = await UserService.getLoggedInUser(cookie || "");
+    if (typeof user === "boolean") {
+      console.error("Seems like the 'user' isn\'t authenticated.")
       this.response.status_code = 403
       this.response.body  =  {
         errors: {
@@ -76,6 +82,7 @@ export default class ArticleCommentsResource extends Drash.Http.Resource {
     const articleComment = new ArticleCommentsModel(article.id, comment, user.image, user.id, user.username)
     const savedArticleComment = await articleComment.save()
     if (!savedArticleComment) {
+      console.error("Failed to save the comment")
       this.response.status_code = 500
       this.response.body =  {
         errors: {
@@ -84,12 +91,12 @@ export default class ArticleCommentsResource extends Drash.Http.Resource {
       }
       return this.response
     }
+    console.log("Saved the comment")
     this.response.status_code = 200
     this.response.body = {
-      data: {
-        success: true
-      }
-    }
+      success: true,
+      data: savedArticleComment
+    };
     return this.response
   }
 }
