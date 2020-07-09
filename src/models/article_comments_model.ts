@@ -94,6 +94,8 @@ export class ArticleCommentsModel extends BaseModel {
    */
   public updated_at: number;
 
+  public slug: string
+
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - CONSTRCUTOR /////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -116,6 +118,7 @@ export class ArticleCommentsModel extends BaseModel {
       createdAt: number = Date.now(),
       updatedAt: number = Date.now(),
       id: number = -1,
+      slug: string = ""
   ) {
     super();
     this.id = id;
@@ -126,6 +129,7 @@ export class ArticleCommentsModel extends BaseModel {
     this.author_username = authorUsername
     this.created_at = createdAt;
     this.updated_at = updatedAt;
+    this.slug = this.id == -1 ? this.createSlug(this.author_id + this.body + this.author_username) : slug;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -190,7 +194,8 @@ export class ArticleCommentsModel extends BaseModel {
 
     // @ts-ignore
     // (crookse) We ignore this because this will never return null.
-    return ArticleCommentsModel.where({ id: this.id });
+    const tmp = await ArticleCommentsModel.where({ author_id: this.author_id, body: this.body });
+    return tmp[0]
   }
 
   /**
@@ -266,7 +271,7 @@ export class ArticleCommentsModel extends BaseModel {
    */
   static async where(
       fields: any,
-  ): Promise<ArticleModel[] | []> {
+  ): Promise<ArticleCommentsModel[] | []> {
     let results = await BaseModel.where("article_comments", fields);
 
     if (results.length <= 0) {
@@ -336,9 +341,9 @@ export class ArticleCommentsModel extends BaseModel {
    *
    * @return string
    */
-  // protected createSlug(title: string): string {
-  //   return title.toLowerCase()
-  //       .replace(/[^a-zA-Z0-9 ]/g, "")
-  //       .replace(/\s/g, "-");
-  // }
+  protected createSlug(title: string): string {
+    return title.toLowerCase()
+        .replace(/[^a-zA-Z0-9 ]/g, "")
+        .replace(/\s/g, "-");
+  }
 }

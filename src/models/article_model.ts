@@ -191,6 +191,7 @@ export class ArticleModel extends BaseModel {
       return this.update();
     }
 
+    // TODO(ebebbington) Dont allow duplicate aerticles, because the slug is just the article name
     let query = "INSERT INTO articles " +
       " (author_id, title, description, body, slug, created_at, updated_at)" +
       " VALUES (?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?));";

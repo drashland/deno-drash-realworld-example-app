@@ -80,7 +80,7 @@ export default class ArticleCommentsResource extends Drash.Http.Resource {
     }
     // save the comment
     const articleComment = new ArticleCommentsModel(article.id, comment, user.image, user.id, user.username)
-    const savedArticleComment = await articleComment.save()
+    const savedArticleComment: ArticleCommentsModel = await articleComment.save()
     if (!savedArticleComment) {
       console.error("Failed to save the comment")
       this.response.status_code = 500
@@ -91,11 +91,11 @@ export default class ArticleCommentsResource extends Drash.Http.Resource {
       }
       return this.response
     }
-    console.log("Saved the comment")
+    const articleEntity = savedArticleComment.toEntity()
     this.response.status_code = 200
     this.response.body = {
       success: true,
-      data: savedArticleComment
+      data: articleEntity
     };
     return this.response
   }
