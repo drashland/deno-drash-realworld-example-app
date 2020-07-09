@@ -38,7 +38,7 @@ export default {
   methods: {
     onSubmit(slug, comment) {
       this.$store
-        .dispatch("createComment", { slug, comment })
+        .dispatch("createArticleComment", { slug, comment })
         .then(() => {
           this.comment = null;
           this.errors = {};

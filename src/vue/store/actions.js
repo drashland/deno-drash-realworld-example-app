@@ -214,7 +214,7 @@ export default {
   },
 
   toggleArticleFavorite(context, params) {
-    console.log(`Handling action: toggleArtileFavorite (${params.action})`);
+    console.log(`Handling action: toggleArticleFavorite (${params.action})`);
     return new Promise((resolve) => {
       axios
         .post(`/articles/${params.slug}/favorite`, {
@@ -245,6 +245,24 @@ export default {
 
   unsetProfile(context) {
     context.commit("setProfile", userDefault);
+  },
+
+  createArticleComment(context, params) {
+    return new Promise((resolve, reject) => {
+      axios
+        .post(`/articles/${params.slug}/comments`, {
+          comment: params.comment
+        })
+        .then(async (response) => {
+          console.log("Create article comment successful")
+          resolve()
+        })
+        .catch((error) => {
+          console.error("Create article comment unsuccessful")
+          console.error(error)
+          reject({ data: { message: error.message }})
+        })
+    })
   },
 
   updateUser(context, user) {
