@@ -23,7 +23,7 @@ export default class UserService {
     if (!session) {
       return false
     }
-    const userId = session.id
+    const userId = session.user_id;
     const user = await UserModel.where({ id: userId })
     if (!user.length) {
       return false
