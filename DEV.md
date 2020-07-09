@@ -2,9 +2,10 @@
 
 * [Login to Postgres Container](#login-to-postgres-container)
 * [Make a DB Data Dump](#make-a-db-data-dump-update-the-db)
+* [Creating a Database](#creating-a-database)
 * [Updating Deno](#updating-deno)
 
-#Login to Postgres Container
+# Login to Postgres Container
 
 ```shell script
 $ docker exec -it realworld_postgres bash
@@ -23,6 +24,20 @@ $ docker exec -t realworld_postgres pg_dumpall -c -U user > postgres_dump.sql
 $ mv ./postgres_dump.sql ./.docker/data/postgres_dump.sql
 ```
 Remember to commit this file
+
+# Creating a Database
+
+Example query from the CLI:
+
+```
+CREATE TABLE article_comments (
+  id SERIAL PRIMARY KEY,
+  article_id integer NOT NULL REFERENCES articles(id),
+  comment VARCHAR (255),
+  created_at timestamp without time zone NOT NULL,
+  updated_at timestamp without time zone NOT NULL
+);
+```
 
 # Updating Deno
 
