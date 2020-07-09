@@ -37,6 +37,7 @@ export default {
   },
   methods: {
     onSubmit(slug, comment) {
+      console.log("Dispatching event: createArticleComment")
       this.$store
         .dispatch("createArticleComment", { slug, comment })
         .then(() => {

@@ -7,6 +7,14 @@ export default {
     state.articles = articles;
   },
 
+  setComment(state, comment) {
+    state.comment = comment
+  },
+
+  setComments(state, comments) {
+    state.comments = comments
+  },
+
   setError(state, errors) {
     state.errors = errors;
   },

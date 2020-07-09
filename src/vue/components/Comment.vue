@@ -5,15 +5,15 @@
     </div>
     <div class="card-footer">
       <a href="" class="comment-author">
-        <img :src="comment.author.image" class="comment-author-img" />
+        <img :src="comment.author_image" class="comment-author-img" />
       </a>
       <router-link
         class="comment-author"
-        :to="{ name: 'profile', params: { username: comment.author.username } }"
+        :to="{ name: 'profile', params: { username: comment.author_username } }"
       >
-        {{ comment.author.username }}
+        {{ comment.author_username }}
       </router-link>
-      <span class="date-posted">{{ comment.createdAt | date }}</span>
+      <span class="date-posted">{{ comment.created_at | date }}</span>
       <span v-if="isCurrentUser" class="mod-options">
         <i class="ion-trash-a" @click="destroy(slug, comment.id)"></i>
       </span>
@@ -34,8 +34,8 @@ export default {
       "user"
     ]),
     isCurrentUser() {
-      if (this.user.username && this.comment.author.username) {
-        return this.comment.author.username === this.user.username;
+      if (this.user.username && this.comment.author_username) {
+        return this.comment.author_username === this.user.username;
       }
       return false;
     },

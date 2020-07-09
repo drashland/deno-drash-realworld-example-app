@@ -77,10 +77,14 @@ export default {
   },
 
   fetchArticleComments({ commit }, slug) {
+    console.log("Handling action: fetchArticleComments")
     return new Promise((resolve) => {
       axios
         .get(`/articles/${slug}/comments`)
         .then((response) => {
+          console.log("Received comments for: " +  slug)
+          console.log(response)
+          commit("setComments", response.data)
           resolve(response);
         })
         .catch((error) => {
@@ -203,6 +207,23 @@ export default {
     context.commit("setArticles", articles);
   },
 
+  setComment(context, comment) {
+    context.commit("setComment", comment)
+    let comments = []
+    context.getters.comments.forEach((a, i) => {
+      if (a.id === comment.id) {
+        comments.push(comment)
+        return
+      }
+      comments.push(a)
+    })
+    context.commit("setComments", comments)
+  },
+
+  setComments(context, comments) {
+    context.commit("setComments", comments)
+  },
+
   setProfile(context, profile) {
     context.commit("setProfile", profile);
   },
@@ -248,6 +269,7 @@ export default {
   },
 
   createArticleComment(context, params) {
+    console.log(`Handling action: createArticleComment (${params.slug})`);
     return new Promise((resolve, reject) => {
       axios
         .post(`/articles/${params.slug}/comments`, {
@@ -255,12 +277,13 @@ export default {
         })
         .then(async (response) => {
           console.log("Create article comment successful")
-          resolve()
+          context.commit("setComment", response.data);
+          resolve(response)
         })
         .catch((error) => {
           console.error("Create article comment unsuccessful")
           console.error(error)
-          reject({ data: { message: error.message }})
+          reject({ data: { success: false, message: error.message }})
         })
     })
   },
