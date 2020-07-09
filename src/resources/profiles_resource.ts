@@ -19,6 +19,7 @@ class ProfilesResource extends BaseResource {
           username: ["Username path param is required."],
         },
       };
+      // TODO(ebebbington) Return response
     }
 
     this.response.body = {
