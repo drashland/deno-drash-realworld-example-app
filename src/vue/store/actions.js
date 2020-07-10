@@ -2,6 +2,7 @@ import Vue from "vue";
 import axios from "axios";
 import { router } from "../../public/js/_app.js";
 import JwtService from "@/common/jwt_service.js";
+import { store } from '../../public/js/_app'
 
 const userDefault = {
   created_on: null,
@@ -82,9 +83,7 @@ export default {
       axios
         .get(`/articles/${slug}/comments`)
         .then((response) => {
-          console.log("Received comments for: " +  slug)
-          console.log(response)
-          commit("setComments", response.data)
+          commit("setComments", response.data.data)
           resolve(response);
         })
         .catch((error) => {
@@ -208,6 +207,7 @@ export default {
   },
 
   setComment(context, comment) {
+    console.log("Handling action: setComment")
     context.commit("setComment", comment)
     let comments = []
     context.getters.comments.forEach((a, i) => {
@@ -276,8 +276,20 @@ export default {
           comment: params.comment
         })
         .then(async (response) => {
-          console.log("Create article comment successful")
-          context.commit("setComment", response.data);
+          const comment = response.data.data
+          context.commit("setComment", comment)
+          // TODO :: This shouldn't obviously be done here... How do i call the `setComment` action?
+          let comments = []
+          comments.push(comment)
+          context.getters.comments.forEach((a, i) => {
+            if (a.id === comment.id) {
+              comments.push(comment)
+              return
+            }
+            comments.push(a)
+          })
+          // TODO :: End of todo
+          context.commit("setComments", comments)
           resolve(response)
         })
         .catch((error) => {
