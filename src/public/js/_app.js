@@ -56,7 +56,7 @@ import ProfileArticles from "@/routes/ProfileArticles.vue";
 import ProfileFavorited from "@/routes/ProfileFavorited.vue";
 import Article from "@/routes/Article.vue";
 import ArticleEdit from "@/routes/ArticleEdit.vue";
-import NotFound from "@/routes/404.vue"
+import NotFound from "@/routes/404.vue";
 
 const router = new VueRouter({
   routes: [
@@ -129,8 +129,8 @@ const router = new VueRouter({
     },
     {
       path: "*",
-      component: NotFound
-    }
+      component: NotFound,
+    },
   ],
   scrollBehavior(to, from, savedPosition) {
     // Make "#" anchor links work as expected

@@ -1,10 +1,11 @@
 import BaseModel from "./base_model.ts";
+import { QueryResult } from "../deps.ts";
 
 interface SessionModelEntity {
-  session_one:  string;
-  session_two: string
-  id: number
-  user_id: number
+  session_one: string;
+  session_two: string;
+  id: number;
+  user_id: number;
 }
 
 /**
@@ -104,14 +105,30 @@ export class SessionModel extends BaseModel {
       `WHERE session_one = '${sessionOne}' AND session_two = '${sessionTwo}' ` +
       "LIMIT 1;";
     const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
+    if (dbResult.rowCount! < 1) {
+      return null;
+    }
     client.release();
-    const session = BaseModel.formatResults(
+    const sessionResult = BaseModel.formatResults(
       dbResult.rows,
       dbResult.rowDescription.columns,
     );
-    if (session && session.length > 0) {
-      return createSessionModel(session[0]);
+    const session = sessionResult[0];
+    if (sessionResult && sessionResult.length > 0) {
+      // (ebebbington) Because we currently dont have a way to assign the entity type to `session` (and it work,
+      // as it would error because that type isn't the return value of `formatResults`)
+      const sessionEntity: SessionModelEntity = {
+        session_one: typeof session.session_one === "string"
+          ? session.session_one
+          : "",
+        session_two: typeof session.session_two === "string"
+          ? session.session_two
+          : "",
+        id: typeof session.id === "number" ? session.id : 0,
+        user_id: typeof session.user_id === "number" ? session.user_id : 0,
+      };
+      return createSessionModel(sessionEntity);
     }
     return null;
   }
@@ -123,9 +140,9 @@ export class SessionModel extends BaseModel {
   /**
    * Save this model.
    *
-   * @return Promise<SessionModel>
+   * @return Promise<SessionModel|null> Empty array if the query failed to save
    */
-  public async save(): Promise<SessionModel> {
+  public async save(): Promise<SessionModel | null> {
     if (this.id != -1) {
       throw new Error("Session record already exists.");
     }
@@ -142,10 +159,12 @@ export class SessionModel extends BaseModel {
       ],
     );
     const client = await BaseModel.connect();
-    await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
     client.release();
+    if (dbResult.rowCount! < 1) {
+      return null;
+    }
 
-    // @ts-ignore
     // (crookse) We ignore this because getUserSession() can return null if the
     // session is not found. However, in this case, it will never be null.
     return SessionModel.getUserSession(this.session_one, this.session_two);

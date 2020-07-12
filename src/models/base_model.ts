@@ -1,4 +1,4 @@
-import { Pool, PoolClient } from "../deps.ts";
+import { Pool, PoolClient, QueryResult, Column } from "../deps.ts";
 
 export const dbPool = new Pool({
   user: "user",
@@ -34,28 +34,31 @@ export default abstract class BaseModel {
    *
    * @param Array<string[]> rows
    *     An array of the rows from the table, each containing column values.
-   * @param any[] columns
+   * @param Column[] columns
    *     Array of objects, each object holding column data. Used the get the
    *     column name.
    *
-   * @return any[]
+   * @return []|[{[key: string]: string}]
    *     Empty array of no db rows, else array of rows as key value pairs.
+   *     For example:
+   *         [{ name: "ed"}, {name: "eric}]
    *
    * @example
    * BaseModel.formatResults([[1, 'ed'], [2, 'john']], [{name: 'id', ...}, {name: 'name', ...}]);
-   *
-   * TODO: Figure out return type (its format of: [{key: string}]
    */
-  static formatResults(rows: Array<string[]>, columns: any[]): any[] {
+  static formatResults(
+    rows: Array<string[]>,
+    columns: Column[],
+  ): [] | Array<{ [key: string]: string | number | boolean }> {
     if (!rows.length) {
       return [];
     }
     const columnNames: string[] = columns.map((column) => {
       return column.name;
     });
-    let newResult: any = [];
+    let newResult: Array<{ [key: string]: string }> = [];
     rows.forEach((row, rowIndex) => {
-      let rowData: any = {};
+      let rowData: { [key: string]: string } = {};
       row.forEach((rVal, rIndex) => {
         const columnName: string = columnNames[rIndex];
         rowData[columnName] = row[rIndex];
@@ -70,14 +73,14 @@ export default abstract class BaseModel {
    *     Get records using the WHERE clause.
    *
    * @param string table
-   * @param any fields
+   * @param {[key: string]: string} fields eg {name: "ed", location: "uk"}
    *
-   * @return Promise<any>
+   * @return Promise<[]|[{[key: string]: string}]> Empty array if no results were found, else array of objects
    */
-  static async where(
+  protected static async Where(
     table: string,
-    fields: any,
-  ): Promise<any> {
+    fields: { [key: string]: string | number },
+  ): Promise<[] | Array<{ [key: string]: string | number | boolean }>> {
     let query = `SELECT * FROM ${table} WHERE `;
     let clauses: string[] = [];
     for (let field in fields) {
@@ -87,8 +90,11 @@ export default abstract class BaseModel {
     query += clauses.join(" AND ");
 
     const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
     client.release();
+    if (dbResult.rowCount! < 1) {
+      return [];
+    }
 
     return BaseModel.formatResults(
       dbResult.rows,
@@ -101,18 +107,18 @@ export default abstract class BaseModel {
    *     Get records using the WHERE IN clause.
    *
    * @param string table Tbale name to make the query
-   * @param any data
+   * @param {column: string,  values: number[]|string[]} data
    *     {
    *       column: string            (the column to target)
    *       values: number[]|string[] (the values to put in the IN array)
    *     }
    *
-   * @return Promise<any>
+   * @return Promise<any> Empty array if no data was found
    */
-  static async whereIn(
+  static async WhereIn(
     table: string,
-    data: any,
-  ): Promise<any> {
+    data: { values: string[] | number[]; column: string },
+  ): Promise<[] | Array<{ [key: string]: string | number | boolean }>> {
     if (data.values.length <= 0) {
       return [];
     }
@@ -122,8 +128,11 @@ export default abstract class BaseModel {
       ` IN (${data.values.join(",")})`;
 
     const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
     client.release();
+    if (dbResult.rowCount! < 1) {
+      return [];
+    }
 
     return BaseModel.formatResults(
       dbResult.rows,

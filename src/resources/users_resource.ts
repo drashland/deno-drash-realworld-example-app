@@ -58,12 +58,12 @@ class RegisterResource extends BaseResource {
     }
 
     // Create user
-    let user = new UserModel(
+    const User = new UserModel(
       username,
       await bcrypt.hash(rawPassword), // HASH THE PASSWORD
       email,
     );
-    user = await user.save();
+    const user = await User.save();
 
     if (!user) {
       return this.errorResponse(

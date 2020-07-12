@@ -183,29 +183,27 @@ class ArticlesResource extends BaseResource {
       );
     }
 
-    let result: any;
-
     const slug = this.request.getPathParam("slug");
-    result = await ArticleModel.where({ slug: slug });
+    const articleResult = await ArticleModel.where({ slug: slug });
 
-    if (result.length <= 0) {
+    if (articleResult.length <= 0) {
       return this.errorResponse(
         404,
         "Article not found.",
       );
     }
 
-    let article = result[0];
+    let article = articleResult[0];
 
-    result = await UserModel.where({ id: article.author_id });
-    if (result.length <= 0) {
+    const userResult = await UserModel.where({ id: article.author_id });
+    if (userResult.length <= 0) {
       return this.errorResponse(
         400,
         "Unable to determine the article's author.",
       );
     }
 
-    let user = result[0];
+    const user = userResult[0];
 
     let entity: ArticleEntity = article.toEntity();
     entity.author = user.toEntity();

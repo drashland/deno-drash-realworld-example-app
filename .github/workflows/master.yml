@@ -1,0 +1,40 @@
+name: master
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+      -
+jobs:
+  tests:
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        deno: ["1.1.1"]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Builds and Starts
+        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up
+
+    linter:
+        # Only one OS is required since fmt is cross platform
+        runs-on: ubuntu-latest
+
+        steps:
+          - uses: actions/checkout@v2
+
+          - name: Install Deno v${{ matrix.deno }}
+            uses: denolib/setup-deno@master
+
+          - name: Formatter
+            run: deno fmt --check
+
+          - name: Linter
+            run: deno lint --unstable

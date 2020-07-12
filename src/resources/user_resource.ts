@@ -106,9 +106,15 @@ export default class UserResource extends BaseResource {
     if (rawPassword) {
       user.password = await bcrypt.hash(rawPassword); // HASH THE PASSWORD
     }
-    user = await user.save();
+    const savedUser = await user.save();
+    if (savedUser === null) {
+      return this.errorResponse(
+        422,
+        "An error occurred whilst saving your user",
+      );
+    }
 
-    let entity = user.toEntity();
+    let entity = savedUser.toEntity();
     // Make sure to pass the user's session token back to them
     entity.token = token;
 

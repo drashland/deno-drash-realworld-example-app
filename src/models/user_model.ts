@@ -1,4 +1,5 @@
 import BaseModel from "./base_model.ts";
+import { QueryResult } from "../deps.ts";
 
 export type UserEntity = {
   bio?: string;
@@ -25,12 +26,12 @@ export type UserEntity = {
  * @return UserModel
  */
 export function createUserModelObject(user: {
-  username: string,
-  password: string,
-  email: string,
-  bio: string,
-  image: string,
-  id: number
+  username: string;
+  password: string;
+  email: string;
+  bio: string;
+  image: string;
+  id: number;
 }): UserModel {
   return new UserModel(
     user.username,
@@ -42,6 +43,8 @@ export function createUserModelObject(user: {
   );
 }
 
+//@ts-ignore UserModel defines a where method that has different params than base models
+// where method. Might need to investigate the naming usage
 export class UserModel extends BaseModel {
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
@@ -74,7 +77,6 @@ export class UserModel extends BaseModel {
    * Path to where the profile picture resides for the user
    */
   public image: string;
-
 
   /**
    * @var string
@@ -126,7 +128,7 @@ export class UserModel extends BaseModel {
   /**
    * Delete this model.
    *
-   * @return Promise<boolean>
+   * @return Promise<boolean> False if the query failed to delete
    */
   public async delete(): Promise<boolean> {
     let query = `DELETE FROM users WHERE id = ?`;
@@ -139,8 +141,11 @@ export class UserModel extends BaseModel {
 
     try {
       const client = await BaseModel.connect();
-      await client.query(query);
+      const dbResult: QueryResult = await client.query(query);
       client.release();
+      if (dbResult.rowCount! < 1) {
+        return false;
+      }
     } catch (error) {
       console.log(error);
       return false;
@@ -151,9 +156,9 @@ export class UserModel extends BaseModel {
   /**
    * Save this model.
    *
-   * @return Promise<UserModel>
+   * @return Promise<UserModel|null> Empty array if no data was found
    */
-  public async save(): Promise<UserModel> {
+  public async save(): Promise<UserModel | null> {
     // If this model already has an ID, then that means we're updating the model
     if (this.id != -1) {
       return this.update();
@@ -174,20 +179,26 @@ export class UserModel extends BaseModel {
     );
 
     const client = await BaseModel.connect();
-    await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
     client.release();
+    if (dbResult.rowCount! < 1) {
+      return null;
+    }
 
-    // @ts-ignore
     // (crookse) We ignore this because this will never return null.
-    return UserModel.where({ email: this.email });
+    const savedResult = await UserModel.where({ email: this.email });
+    if (savedResult.length === 0) {
+      return null;
+    }
+    return savedResult[0];
   }
 
   /**
    * Update this model.
    *
-   * @return Promise<UserModel>
+   * @return Promise<UserModel|null> False if no results were found
    */
-  public async update(): Promise<UserModel> {
+  public async update(): Promise<UserModel | null> {
     let query = "UPDATE users SET " +
       "username = ?, password = ?, email = ?, bio = ?, image = ? " +
       `WHERE id = '${this.id}';`;
@@ -202,12 +213,17 @@ export class UserModel extends BaseModel {
       ],
     );
     const client = await BaseModel.connect();
-    await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
     client.release();
+    if (dbResult.rowCount! < 1) {
+      return null;
+    }
 
-    // @ts-ignore
-    // (crookse) We ignore this because this will never return null.
-    return UserModel.where({ email: this.email });
+    const updatedResult = await UserModel.where({ email: this.email });
+    if (updatedResult.length === 0) {
+      return null;
+    }
+    return updatedResult[0];
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -216,29 +232,31 @@ export class UserModel extends BaseModel {
 
   /**
    * @description
-   *     See BaseModel.where()
+   *     See BaseModel.Where()
    *
-   * @param any fields
+   * @param {[key: string]: string} fields
    *
    * @return Promise<UserModel[]|[]>
    */
   static async where(
-    fields: any,
+    fields: { [key: string]: string | number },
   ): Promise<UserModel[] | []> {
-    let results = await BaseModel.where("users", fields);
+    let results = await BaseModel.Where("users", fields);
 
     if (results.length <= 0) {
       return [];
     }
 
-    return results.map((result: any) => {
+    //@ts-ignore Nothing we can do about this.. the createUserModelObject expect
+    // a user object type, but there's no way to type it like that the return type of whereIn can't be user
+    return results.map((result) => {
       return createUserModelObject(result);
     });
   }
 
   /**
    * @description
-   *     See BaseModel.whereIn()
+   *     See BaseModel.WhereIn()
    *
    * @param string column
    * @param any values
@@ -247,9 +265,9 @@ export class UserModel extends BaseModel {
    */
   static async whereIn(
     column: string,
-    values: any,
+    values: string[] | number[],
   ): Promise<UserModel[] | []> {
-    let results = await BaseModel.whereIn("users", {
+    let results = await BaseModel.WhereIn("users", {
       column,
       values,
     });
@@ -258,7 +276,9 @@ export class UserModel extends BaseModel {
       return [];
     }
 
-    return results.map((result: any) => {
+    //@ts-ignore Nothing we can do about this.. the createUserModelObject expect
+    // a user object type, but there's no way to type it like that the return type of whereIn can't be user
+    return results.map((result) => {
       return createUserModelObject(result);
     });
   }

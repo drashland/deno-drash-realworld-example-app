@@ -1,5 +1,6 @@
 import BaseModel from "./base_model.ts";
 import { UserEntity, UserModel } from "./user_model.ts";
+import { QueryResult } from "../deps.ts";
 
 export type ArticleEntity = {
   author?: UserEntity | null;
@@ -41,6 +42,8 @@ export function createArticleModelObject(article: ArticleEntity): ArticleModel {
   );
 }
 
+// (ebebbington) Error comes from this model adding the where method, that uses different
+// params compared to BaseModel's where method
 export class ArticleModel extends BaseModel {
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
@@ -171,8 +174,11 @@ export class ArticleModel extends BaseModel {
 
     try {
       const client = await BaseModel.connect();
-      await client.query(query);
+      const dbResult: QueryResult = await client.query(query);
       client.release();
+      if (dbResult.rowCount! < 1) {
+        return false;
+      }
     } catch (error) {
       console.log(error);
       return false;
@@ -183,9 +189,9 @@ export class ArticleModel extends BaseModel {
   /**
    * Save this model.
    *
-   * @return Promise<ArticleModel> The saved article
+   * @return Promise<ArticleModel|[]> The saved article, else [] if failure to save
    */
-  public async save(): Promise<ArticleModel> {
+  public async save(): Promise<ArticleModel | []> {
     // If this model already has an ID, then that means we're updating the model
     if (this.id != -1) {
       return this.update();
@@ -208,20 +214,26 @@ export class ArticleModel extends BaseModel {
     );
 
     const client = await BaseModel.connect();
-    await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
     client.release();
+    if (dbResult!.rowCount! < 1) {
+      return [];
+    }
 
-    // @ts-ignore
     // (crookse) We ignore this because this will never return null.
-    return ArticleModel.where({ slug: this.slug });
+    const savedResult = await ArticleModel.where({ slug: this.slug });
+    if (savedResult.length === 0) {
+      return [];
+    }
+    return savedResult[0];
   }
 
   /**
    * Update this model.
    *
-   * @return Promise<ArticleModel> The updated article
+   * @return Promise<ArticleModel|[]> The updated article, else [] if it failed to update
    */
-  public async update(): Promise<ArticleModel> {
+  public async update(): Promise<ArticleModel | []> {
     let query = "UPDATE articles SET " +
       "title = ?, description = ?, body = ?, updatedAt = to_timestamp(?) " +
       `WHERE id = '${this.id}';`;
@@ -235,12 +247,18 @@ export class ArticleModel extends BaseModel {
       ],
     );
     const client = await BaseModel.connect();
-    await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
+    if (dbResult.rowCount! < 1) {
+      return [];
+    }
     client.release();
 
-    // @ts-ignore
     // (crookse) We ignore this because this will never return null.
-    return ArticleModel.where({ id: this.id });
+    const updatedResult = await ArticleModel.where({ id: this.id });
+    if (updatedResult.length === 0) {
+      return [];
+    }
+    return updatedResult[0];
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -263,57 +281,105 @@ export class ArticleModel extends BaseModel {
       query += ` OFFSET ${filters.offset} `;
     }
     const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
+    const dbResult: QueryResult = await client.query(query);
     client.release();
+    if (dbResult.rowCount! < 1) {
+      return [];
+    }
 
     let results = BaseModel.formatResults(
       dbResult.rows,
       dbResult.rowDescription.columns,
     );
-    if (results && results.length > 0) {
-      return results.map((article: any) => {
-        return createArticleModelObject(article);
-      });
+
+    if (results.length === 0) {
+      return [];
     }
-    return [];
+    const articles: Array<ArticleModel> = [];
+    results.forEach((result) => {
+      const entity: ArticleEntity = {
+        id: typeof result.id === "number" ? result.id : 0,
+        body: typeof result.body === "string" ? result.body : "",
+        author_id: typeof result.author_id === "number" ? result.author_id : 0,
+        created_at: typeof result.created_at === "number"
+          ? result.created_at
+          : 0,
+        description: typeof result.description === "string"
+          ? result.description
+          : "",
+        favorited: typeof result.favorited === "boolean"
+          ? result.favorited
+          : false,
+        favoritesCount: typeof result.favoritesCount === "number"
+          ? result.favoritesCount
+          : 0,
+        title: typeof result.title === "string" ? result.title : "",
+        updated_at: typeof result.updated_at === "number" ? result.updated_at
+        : 0,
+      };
+      articles.push(createArticleModelObject(entity));
+    });
+    return articles;
   }
 
   /**
    * @description
-   *     See BaseModel.where()
+   *     See BaseModel.Where()
    *
-   * @param any fields
+   * @param {[key: string]: string} fields
    *
    * @return Promise<ArticleModel[]|[]>
    */
   static async where(
-    fields: any,
+    fields: { [key: string]: string | number },
   ): Promise<ArticleModel[] | []> {
-    let results = await BaseModel.where("articles", fields);
+    let results = await BaseModel.Where("articles", fields);
 
     if (results.length <= 0) {
       return [];
     }
 
-    return results.map((result: any) => {
-      return createArticleModelObject(result);
+    const articles: Array<ArticleModel> = [];
+    results.forEach((result) => {
+      const entity: ArticleEntity = {
+        id: typeof result.id === "number" ? result.id : 0,
+        body: typeof result.body === "string" ? result.body : "",
+        author_id: typeof result.author_id === "number" ? result.author_id : 0,
+        created_at: typeof result.created_at === "number"
+          ? result.created_at
+          : 0,
+        description: typeof result.description === "string"
+          ? result.description
+          : "",
+        favorited: typeof result.favorited === "boolean"
+          ? result.favorited
+          : false,
+        favoritesCount: typeof result.favoritesCount === "number"
+          ? result.favoritesCount
+          : 0,
+        title: typeof result.title === "string" ? result.title : "",
+        updated_at: typeof result.updated_at === "number" ? result.updated_at
+        : 0,
+      };
+      articles.push(createArticleModelObject(entity));
     });
+    return articles;
   }
 
   /**
    * @description
-   *     See BaseModel.whereIn()
+   *     See BaseModel.WhereIn()
    *
    * @param string column
-   * @param any values
+   * @param string[]|number[] values
    *
    * @return Promise<ArticleModel[]|[]>
    */
   static async whereIn(
     column: string,
-    values: any,
+    values: string[] | number[],
   ): Promise<ArticleModel[] | []> {
-    let results = await BaseModel.whereIn("articles", {
+    let results = await BaseModel.WhereIn("articles", {
       column,
       values,
     });
@@ -322,9 +388,31 @@ export class ArticleModel extends BaseModel {
       return [];
     }
 
-    return results.map((result: any) => {
-      return createArticleModelObject(result);
+    const articles: Array<ArticleModel> = [];
+    results.forEach((result) => {
+      const entity: ArticleEntity = {
+        id: typeof result.id === "number" ? result.id : 0,
+        body: typeof result.body === "string" ? result.body : "",
+        author_id: typeof result.author_id === "number" ? result.author_id : 0,
+        created_at: typeof result.created_at === "number"
+          ? result.created_at
+          : 0,
+        description: typeof result.description === "string"
+          ? result.description
+          : "",
+        favorited: typeof result.favorited === "boolean"
+          ? result.favorited
+          : false,
+        favoritesCount: typeof result.favoritesCount === "number"
+          ? result.favoritesCount
+          : 0,
+        title: typeof result.title === "string" ? result.title : "",
+        updated_at: typeof result.updated_at === "number" ? result.updated_at
+        : 0,
+      };
+      articles.push(createArticleModelObject(entity));
     });
+    return articles;
   }
 
   //////////////////////////////////////////////////////////////////////////////
