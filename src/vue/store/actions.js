@@ -58,6 +58,26 @@ export default {
     });
   },
 
+  createArticleComment(context, params) {
+    console.log(`Handling action: createArticleComment (${params.slug})`);
+    return new Promise((resolve, reject) => {
+      axios
+        .post(`/articles/${params.slug}/comments`, {
+          comment: params.comment
+        })
+        .then(async (response) => {
+          const comment = response.data.data
+          context.dispatch("setComment", comment)
+          resolve(response)
+        })
+        .catch((error) => {
+          console.error("Create article comment unsuccessful")
+          console.error(error)
+          reject({ data: { success: false, message: error.message }})
+        })
+    })
+  },
+
   fetchArticle(context, slug) {
     console.log("Handling action: fetchArticle");
     return new Promise((resolve) => {
@@ -210,14 +230,11 @@ export default {
     console.log("Handling action: setComment")
     context.commit("setComment", comment)
     let comments = []
+    comments.push(comment)
     context.getters.comments.forEach((a, i) => {
-      if (a.id === comment.id) {
-        comments.push(comment)
-        return
-      }
       comments.push(a)
     })
-    context.commit("setComments", comments)
+    context.dispatch("setComments", comments)
   },
 
   setComments(context, comments) {
@@ -266,38 +283,6 @@ export default {
 
   unsetProfile(context) {
     context.commit("setProfile", userDefault);
-  },
-
-  createArticleComment(context, params) {
-    console.log(`Handling action: createArticleComment (${params.slug})`);
-    return new Promise((resolve, reject) => {
-      axios
-        .post(`/articles/${params.slug}/comments`, {
-          comment: params.comment
-        })
-        .then(async (response) => {
-          const comment = response.data.data
-          context.commit("setComment", comment)
-          // TODO :: This shouldn't obviously be done here... How do i call the `setComment` action?
-          let comments = []
-          comments.push(comment)
-          context.getters.comments.forEach((a, i) => {
-            if (a.id === comment.id) {
-              comments.push(comment)
-              return
-            }
-            comments.push(a)
-          })
-          // TODO :: End of todo
-          context.commit("setComments", comments)
-          resolve(response)
-        })
-        .catch((error) => {
-          console.error("Create article comment unsuccessful")
-          console.error(error)
-          reject({ data: { success: false, message: error.message }})
-        })
-    })
   },
 
   updateUser(context, user) {
