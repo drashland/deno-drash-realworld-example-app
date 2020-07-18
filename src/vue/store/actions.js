@@ -2,6 +2,7 @@ import Vue from "vue";
 import axios from "axios";
 import { router } from "../../public/js/_app.js";
 import JwtService from "@/common/jwt_service.js";
+import { store } from '../../public/js/_app'
 
 const userDefault = {
   created_on: null,
@@ -57,6 +58,26 @@ export default {
     });
   },
 
+  createArticleComment(context, params) {
+    console.log(`Handling action: createArticleComment (${params.slug})`);
+    return new Promise((resolve, reject) => {
+      axios
+        .post(`/articles/${params.slug}/comments`, {
+          comment: params.comment
+        })
+        .then(async (response) => {
+          const comment = response.data.data
+          context.dispatch("setComment", comment)
+          resolve(response)
+        })
+        .catch((error) => {
+          console.error("Create article comment unsuccessful")
+          console.error(error)
+          reject({ data: { success: false, message: error.message }})
+        })
+    })
+  },
+
   fetchArticle(context, slug) {
     console.log("Handling action: fetchArticle");
     return new Promise((resolve) => {
@@ -77,10 +98,12 @@ export default {
   },
 
   fetchArticleComments({ commit }, slug) {
+    console.log("Handling action: fetchArticleComments")
     return new Promise((resolve) => {
       axios
         .get(`/articles/${slug}/comments`)
         .then((response) => {
+          commit("setComments", response.data.data)
           resolve(response);
         })
         .catch((error) => {
@@ -203,6 +226,21 @@ export default {
     context.commit("setArticles", articles);
   },
 
+  setComment(context, comment) {
+    console.log("Handling action: setComment")
+    context.commit("setComment", comment)
+    let comments = []
+    comments.push(comment)
+    context.getters.comments.forEach((a, i) => {
+      comments.push(a)
+    })
+    context.dispatch("setComments", comments)
+  },
+
+  setComments(context, comments) {
+    context.commit("setComments", comments)
+  },
+
   setProfile(context, profile) {
     context.commit("setProfile", profile);
   },
@@ -214,7 +252,7 @@ export default {
   },
 
   toggleArticleFavorite(context, params) {
-    console.log(`Handling action: toggleArtileFavorite (${params.action})`);
+    console.log(`Handling action: toggleArticleFavorite (${params.action})`);
     return new Promise((resolve) => {
       axios
         .post(`/articles/${params.slug}/favorite`, {

@@ -84,7 +84,7 @@ export default {
       "article",
       "comments",
       "is_authenticated",
-      "user",
+      "user"
     ])
   },
   methods: {

@@ -162,7 +162,7 @@ export default abstract class BaseModel {
    * @return string
    *     The query with the placeholders replaced with the data
    */
-  protected prepareQuery(query: string, data?: string[]): string {
+  protected prepareQuery(query: string, data?: Array<string|number>): string {
     if (!data || !data.length) {
       return query;
     }
