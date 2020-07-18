@@ -39,6 +39,7 @@ export default {
 
     console.log("User is not authenticated.");
     context.dispatch("unsetUser");
+    router.push("/login")
   },
 
   createArticle(context, article) {
@@ -74,6 +75,29 @@ export default {
           console.error("Create article comment unsuccessful")
           console.error(error)
           reject({ data: { success: false, message: error.message }})
+        })
+    })
+  },
+
+  deleteComment(context, { slug, commentId }) {
+    console.log("Handling action: deleteComment")
+    console.log(slug, commentId)
+    return new Promise((resolve) => {
+      axios
+        .delete(`/articles/comment/${commentId}`)
+        .then((response => {
+          let comments = []
+          context.getters.comments.forEach((a, i) => {
+            if (a.id == commentId) {
+              return
+            }
+            comments.push(a)
+          })
+          context.dispatch("setComments", comments)
+          resolve(response)
+        }))
+        .catch((err) => {
+          resolve(err.response)
         })
     })
   },
@@ -231,10 +255,14 @@ export default {
     context.commit("setComment", comment)
     let comments = []
     comments.push(comment)
-    context.getters.comments.forEach((a, i) => {
-      comments.push(a)
-    })
-    context.dispatch("setComments", comments)
+    if (!context.getters.comments) {
+      context.dispatch("setComments", comments)
+    } else {
+      context.getters.comments.forEach((a, i) => {
+        comments.push(a)
+      })
+      context.dispatch("setComments", comments)
+    }
   },
 
   setComments(context, comments) {
