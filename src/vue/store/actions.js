@@ -39,7 +39,7 @@ export default {
 
     console.log("User is not authenticated.");
     context.dispatch("unsetUser");
-    window.location.href = "/#/login"
+    router.push("/login")
   },
 
   createArticle(context, article) {
