@@ -253,12 +253,7 @@ export class ArticleCommentsModel extends BaseModel {
         dbResult.rows,
         dbResult.rowDescription.columns,
     );
-    if (results && results.length > 0) {
-      return results.map((article: any) => {
-        return createArticleCommentsModelObject(article);
-      });
-    }
-    return [];
+    return ArticleCommentsModel.constructArticleComments(results)
   }
 
   /**
@@ -272,15 +267,13 @@ export class ArticleCommentsModel extends BaseModel {
   static async where(
       fields: any,
   ): Promise<ArticleCommentsModel[] | []> {
-    let results = await BaseModel.where("article_comments", fields);
+    let results = await BaseModel.Where("article_comments", fields);
 
     if (results.length <= 0) {
       return [];
     }
 
-    return results.map((result: any) => {
-      return createArticleCommentsModelObject(result);
-    });
+    return ArticleCommentsModel.constructArticleComments(results)
   }
 
   /**
@@ -295,8 +288,8 @@ export class ArticleCommentsModel extends BaseModel {
   static async whereIn(
       column: string,
       values: any,
-  ): Promise<ArticleModel[] | []> {
-    let results = await BaseModel.whereIn("article_comments", {
+  ): Promise<ArticleCommentsModel[] | []> {
+    let results = await BaseModel.WhereIn("article_comments", {
       column,
       values,
     });
@@ -305,9 +298,7 @@ export class ArticleCommentsModel extends BaseModel {
       return [];
     }
 
-    return results.map((result: any) => {
-      return createArticleCommentsModelObject(result);
-    });
+    return ArticleCommentsModel.constructArticleComments(results)
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -345,5 +336,28 @@ export class ArticleCommentsModel extends BaseModel {
     return title.toLowerCase()
         .replace(/[^a-zA-Z0-9 ]/g, "")
         .replace(/\s/g, "-");
+  }
+
+  protected static constructArticleComments (results: Array<{ [key: string]: string | number | boolean }>): Array<ArticleCommentsModel>|[] {
+    const articleComments: Array<ArticleCommentsModel> = [];
+    results.forEach((result) => {
+      const entity: ArticleCommentEntity = {
+        id: typeof result.id === "number" ? result.id : 0,
+        body: typeof result.body === "string" ? result.body : "",
+        author_id: typeof result.author_id === "number" ? result.author_id : 0,
+        created_at: typeof result.created_at === "number"
+            ? result.created_at
+            : 0,
+        updated_at: typeof result.updated_at === "number" ? result.updated_at
+            : 0,
+        article_id: typeof result.article_id === "number"
+            ? result.article_id
+            : 0,
+        author_username: typeof result.author_username === "string" ? result.author_username : "",
+        author_image: typeof result.author_image === "string" ? result.author_image : ""
+      };
+      articleComments.push(createArticleCommentsModelObject(entity));
+    });
+    return articleComments;
   }
 }
