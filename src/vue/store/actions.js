@@ -26,18 +26,18 @@ export default {
             .then(async (response) => {
               console.log("User is authenticated.");
               await context.dispatch("setUser", response.data.user);
-              resolve();
+              resolve(true);
             })
             .catch((error) => {
               console.log("User has a session, but it's invalid.");
               console.log(error.response);
               context.dispatch("unsetUser");
-              reject();
+              resolve(false);
             });
         } else {
           console.log("User is not authenticated.");
           context.dispatch("unsetUser");
-          reject()
+          resolve(false)
         }
       });
   },
