@@ -16,30 +16,30 @@ const userDefault = {
 export default {
   checkIfUserIsAuthenticated(context) {
     console.log("Checking if the user is authenticated.");
-    if (getCookie("drash_sess") && getCookie("drash_sess") != "null") {
-      return new Promise((resolve) => {
-        axios
-          .post("/users/login", {
-            action: "check_if_user_is_authenticated",
-            token: getCookie("drash_sess"),
-          })
-          .then(async (response) => {
-            console.log("User is authenticated.");
-            await context.dispatch("setUser", response.data.user);
-            resolve();
-          })
-          .catch((error) => {
-            console.log("User has a session, but it's invalid.");
-            console.log(error.response);
-            context.dispatch("unsetUser");
-            resolve();
-          });
+      return new Promise((resolve, reject) => {
+        if (getCookie("drash_sess") && getCookie("drash_sess") != "null") {
+          axios
+            .post("/users/login", {
+              action: "check_if_user_is_authenticated",
+              token: getCookie("drash_sess"),
+            })
+            .then(async (response) => {
+              console.log("User is authenticated.");
+              await context.dispatch("setUser", response.data.user);
+              resolve(true);
+            })
+            .catch((error) => {
+              console.log("User has a session, but it's invalid.");
+              console.log(error.response);
+              context.dispatch("unsetUser");
+              resolve(false);
+            });
+        } else {
+          console.log("User is not authenticated.");
+          context.dispatch("unsetUser");
+          resolve(false)
+        }
       });
-    }
-
-    console.log("User is not authenticated.");
-    context.dispatch("unsetUser");
-    router.push("/login")
   },
 
   createArticle(context, article) {

@@ -145,13 +145,15 @@ const router = new VueRouter({
 
 // Ensure we checked auth before each page load.
 router.beforeEach(async (to, from, next) => {
-  store.dispatch("checkIfUserIsAuthenticated")
-    .then(() => {
-      next();
-    })
-    .catch(() => {
-      next();
-    });
+  if (to.path !== "/login" && to.path !== "/register" && to.path !== "/") {
+    const result = await store.dispatch("checkIfUserIsAuthenticated")
+    if (!result) {
+      router.push("/login")
+    }
+    next()
+  } else {
+    next()
+  }
 });
 
 //
