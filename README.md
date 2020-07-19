@@ -1,6 +1,6 @@
 # ![Drash Example App](logo.png)
 
-___This respository is still very much under development. Things will change. Things will break. Please take caution when looking/using the code in this repository.__
+___This respository is still very much under development. Things will change. Things will break. Please take caution when looking at or using the code in this repository.___
 
 ### Drash codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) spec and API.
 
