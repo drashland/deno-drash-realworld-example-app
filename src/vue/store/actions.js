@@ -79,6 +79,13 @@ export default {
     })
   },
 
+  createArticleTag(context, tag) {
+    console.log("Handling action: createArticleTag")
+    const tags = context.getters.tags || []
+    tags.push(tag)
+    context.commit("setTags", tags)
+  },
+
   deleteComment(context, { slug, commentId }) {
     console.log("Handling action: deleteComment")
     console.log(slug, commentId)

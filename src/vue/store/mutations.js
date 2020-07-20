@@ -27,6 +27,10 @@ export default {
     state.profile = profile;
   },
 
+  setTags(state, tags) {
+    state.tags = tags
+  },
+
   setUser(state, user) {
     state.user = user;
   },

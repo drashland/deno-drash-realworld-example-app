@@ -42,7 +42,7 @@
                 <div class="tag-list">
                   <span
                     class="tag-default tag-pill"
-                    v-for="(tag, index) of article.tagList"
+                    v-for="(tag, index) of tags"
                     :key="tag + index"
                   >
                     <i class="ion-close-round" @click="removeTag(tag)"> </i>
@@ -87,7 +87,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      "article"
+      "article",
+      "tags"
     ])
   },
   methods: {
