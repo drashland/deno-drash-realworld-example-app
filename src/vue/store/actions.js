@@ -241,6 +241,7 @@ export default {
   },
 
   setArticle(context, article) {
+    article.tags = article.tags.split(",")
     context.commit("setArticle", article);
     let articles = [];
     context.getters.articles.forEach((a, i) => {
@@ -254,6 +255,9 @@ export default {
   },
 
   setArticles(context, articles) {
+    articles.forEach(article => {
+      article.tags = article.tags.split(",")
+    })
     context.commit("setArticles", articles);
   },
 

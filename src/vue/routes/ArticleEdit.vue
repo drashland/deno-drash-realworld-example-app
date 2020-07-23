@@ -100,6 +100,8 @@ export default {
         text: "Please wait...",
         buttons: false,
       });
+      const tags = store.getters.tags.join(",")
+      this.article.tags = tags
       this.publishing_article = true;
       this.$store.dispatch(action, this.article)
         .then((response) => {
