@@ -14,6 +14,7 @@ export type ArticleEntity = {
   slug?: string;
   title: string;
   updated_at: number;
+  tags?: string
 };
 
 export type Filters = {
@@ -35,6 +36,7 @@ export function createArticleModelObject(article: ArticleEntity): ArticleModel {
     article.title,
     article.description,
     article.body,
+    article.tags,
     article.slug,
     article.created_at,
     article.updated_at,
@@ -62,6 +64,16 @@ export class ArticleModel extends BaseModel {
    * Body (content) for the article
    */
   public body: string;
+
+  /**
+   * @var string[]
+   *
+   * Tags associated with the article, comma separated.
+   *
+   *     const tags = ["javascript", "webdev"];
+   *     new ArticleModel(..., tags.join(","))
+   */
+  public tags: string;
 
   /**
    * @var created_at
@@ -128,6 +140,7 @@ export class ArticleModel extends BaseModel {
    * @param string title
    * @param string description
    * @param string body
+   * @param string[] tags
    * @param string slug=""
    * @param number createdAt=Date
    * @param number updatedAt=Date
@@ -138,6 +151,7 @@ export class ArticleModel extends BaseModel {
     title: string,
     description: string,
     body: string,
+    tags: string = "",
     slug: string = "",
     createdAt: number = Date.now(),
     updatedAt: number = Date.now(),
@@ -149,6 +163,7 @@ export class ArticleModel extends BaseModel {
     this.title = title;
     this.description = description;
     this.body = body;
+    this.tags = tags;
     this.slug = this.id == -1 ? this.createSlug(title) : slug;
     this.created_at = createdAt;
     this.updated_at = updatedAt;
@@ -199,8 +214,8 @@ export class ArticleModel extends BaseModel {
 
     // TODO(ebebbington) Dont allow duplicate aerticles, because the slug is just the article name
     let query = "INSERT INTO articles " +
-      " (author_id, title, description, body, slug, created_at, updated_at)" +
-      " VALUES (?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?));";
+      " (author_id, title, description, body, slug, created_at, updated_at, tags)" +
+      " VALUES (?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?), ?);";
     query = this.prepareQuery(
       query,
       [
@@ -211,6 +226,7 @@ export class ArticleModel extends BaseModel {
         this.createSlug(this.title),
         String(Date.now() / 1000.00),
         String(Date.now() / 1000.00),
+        this.tags,
       ],
     );
 
@@ -317,6 +333,7 @@ export class ArticleModel extends BaseModel {
         title: typeof result.title === "string" ? result.title : "",
         updated_at: typeof result.updated_at === "number" ? result.updated_at
         : 0,
+        tags: typeof result.tags === "string" ? result.tags : ""
       };
       articles.push(createArticleModelObject(entity));
     });
@@ -361,6 +378,7 @@ export class ArticleModel extends BaseModel {
         title: typeof result.title === "string" ? result.title : "",
         updated_at: typeof result.updated_at === "number" ? result.updated_at
         : 0,
+        tags: typeof result.tags === "string" ? result.tags : ""
       };
       articles.push(createArticleModelObject(entity));
     });
@@ -410,6 +428,7 @@ export class ArticleModel extends BaseModel {
         title: typeof result.title === "string" ? result.title : "",
         updated_at: typeof result.updated_at === "number" ? result.updated_at
         : 0,
+        tags: typeof result.tags === "string" ? result.tags : ""
       };
       articles.push(createArticleModelObject(entity));
     });
@@ -432,6 +451,7 @@ export class ArticleModel extends BaseModel {
       favorited: this.favorited,
       favoritesCount: this.favoritesCount,
       body: this.body,
+      tags: this.tags,
       slug: this.slug,
       created_at: this.created_at,
       updated_at: this.updated_at,

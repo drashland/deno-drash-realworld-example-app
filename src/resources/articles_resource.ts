@@ -151,12 +151,15 @@ class ArticlesResource extends BaseResource {
    */
   protected async createArticle(): Promise<Drash.Http.Response> {
     const inputArticle: ArticleEntity = this.request.getBodyParam("article");
+    console.log('The article to create:')
+    console.log(inputArticle)
 
     let article: ArticleModel = new ArticleModel(
       inputArticle.author_id,
       inputArticle.title,
       inputArticle.description,
       inputArticle.body,
+      inputArticle.tags
     );
     await article.save();
 
@@ -268,6 +271,8 @@ class ArticlesResource extends BaseResource {
     entities = await this.addFavoritedToEntities(articleIds, entities);
     entities = await this.filterEntitiesByFavoritedBy(articleIds, entities);
 
+    console.log("Responding to GET on articles resource with:")
+    console.log(entities)
     this.response.body = {
       articles: entities,
     };
