@@ -252,7 +252,7 @@ export class ArticleModel extends BaseModel {
    */
   public async update(): Promise<ArticleModel | []> {
     let query = "UPDATE articles SET " +
-      "title = ?, description = ?, body = ?, updatedAt = to_timestamp(?) " +
+      "title = ?, description = ?, body = ?, updated_at = to_timestamp(?), tags = ? " +
       `WHERE id = '${this.id}';`;
     query = this.prepareQuery(
       query,
@@ -261,6 +261,7 @@ export class ArticleModel extends BaseModel {
         this.description,
         this.body,
         String(Date.now()),
+        this.tags
       ],
     );
     const client = await BaseModel.connect();

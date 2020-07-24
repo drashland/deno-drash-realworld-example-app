@@ -44,6 +44,8 @@ export default {
 
   createArticle(context, article) {
     console.log("Handling action: createArticle");
+    console.log('the article:')
+    console.log(article)
     article.author_id = context.getters.user.id;
     return new Promise((resolve) => {
       axios
@@ -129,9 +131,18 @@ export default {
           },
         })
         .then((response) => {
-          console.log("Response after fetching the article:")
-          console.log(response.data.article)
-          context.dispatch("setArticle", response.data.article);
+          // FIXME(edward) this is still a problem
+          // So there is a problem with vue. It is setting `article.tags` to be `[""]`, but the data from
+          // the server is coming back as `""`. To combat this, we have to fix it manually, which is
+          // just assigning the data to the variable. Now `newArticle.tags` is `""`.
+          // const article = response.data.article
+          // const tags = response.data.article.tags.split(',')
+          // if (tags && tags.length && tags[0] === "") {
+          //   article.tags = ""
+          // }
+          // console.log('and article after setting:')
+          // console.log(article)
+          context.dispatch("setArticle", article);
           resolve(response);
         })
         .catch((error) => {
@@ -336,22 +347,24 @@ export default {
     context.commit("setProfile", userDefault);
   },
 
-  // updateArticle(context, article) {
-  //   console.log("Handling action: updateArticle");
-  //   article.author_id = context.getters.user.id;
-  //   return new Promise((resolve) => {
-  //     axios
-  //       .put("/articles", {
-  //         article,
-  //       })
-  //       .then((response) => {
-  //         resolve(response);
-  //       })
-  //       .catch((error) => {
-  //         resolve(error.response);
-  //       });
-  //   });
-  // },
+  updateArticle(context, article) {
+    console.log("Handling action: updateArticle");
+    article.author_id = context.getters.user.id;
+    console.log("the article to update:")
+    console.log(article)
+    return new Promise((resolve) => {
+      axios
+        .put("/articles", {
+          article,
+        })
+        .then((response) => {
+          resolve(response);
+        })
+        .catch((error) => {
+          resolve(error.response);
+        });
+    });
+  },
 
   updateUser(context, user) {
     console.log("Handling action: updateUser");

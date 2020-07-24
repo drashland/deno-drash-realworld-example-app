@@ -93,9 +93,17 @@ export default {
   },
   async beforeRouteEnter(to, from, next) {
     next((vm) => {
-      const article = store.getters.article
-      if (article.tags) {
-        vm.$store.commit("setTags", article.tags || []);
+      // Unset the article if creating a new one
+      if (to.params.new && to.params.new === true) {
+        vm.$store.commit("setArticle", {})
+        vm.$store.commit("setTags", [])
+      } else {
+        const article = store.getters.article
+        if (article.tags && article.tags.length) {
+          vm.$store.commit("setTags", article.tags)
+        } else  {
+          vm.$store.commit("setTags", [])
+        }
       }
     })
   },
@@ -108,7 +116,10 @@ export default {
         text: "Please wait...",
         buttons: false,
       });
-      const tags = store.getters.tags.join(",")
+      let tags = store.getters.tags
+      if (tags.length) {
+        tags = tags.join(",")
+      }
       this.article.tags = tags
       this.publishing_article = true;
       this.$store.dispatch(action, this.article)

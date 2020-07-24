@@ -39,8 +39,10 @@ class ArticlesResource extends BaseResource {
     return await this.createArticle();
   }
 
-  public PUT(): Promise<Drash.Http.Response> {
-    console.log("Handling ArticlesResource ")
+  public async PUT(): Promise<Drash.Http.Response> {
+    console.log("Handling ArticlesResource PUT");
+
+    return await this.updateArticle()
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -137,6 +139,48 @@ class ArticlesResource extends BaseResource {
     });
 
     return entities;
+  }
+
+  /**
+   * @description
+   * Gets data from the request to update an article. Data would come in like so:
+   * {
+   *   article: {
+   *     author_id: number,
+   *     title: string,
+   *     description: string,
+   *     body: string,
+   *     ...
+   *   }
+   * }
+   *
+   * @return Promise<Drash.Http.Response>
+   */
+  protected async updateArticle(): Promise<Drash.Http.Response> {
+    const inputArticle: ArticleEntity = this.request.getBodyParam("article");
+
+    let article: ArticleModel = new ArticleModel(
+        inputArticle.author_id,
+        inputArticle.title,
+        inputArticle.description,
+        inputArticle.body,
+        inputArticle.tags,
+        inputArticle.slug,
+        inputArticle.created_at,
+        inputArticle.updated_at,
+        inputArticle.id
+    );
+    await article.save();
+
+    if (!article) {
+      return this.errorResponse(500, "Article could not be saved.");
+    }
+
+    this.response.body = {
+      article: article.toEntity(),
+    };
+
+    return this.response;
   }
 
   /**
