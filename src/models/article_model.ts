@@ -333,7 +333,8 @@ export class ArticleModel extends BaseModel {
         title: typeof result.title === "string" ? result.title : "",
         updated_at: typeof result.updated_at === "number" ? result.updated_at
         : 0,
-        tags: typeof result.tags === "string" ? result.tags : ""
+        tags: typeof result.tags === "string" ? result.tags : "",
+        slug: typeof result.slug === "string" ? result.slug : ""
       };
       articles.push(createArticleModelObject(entity));
     });
@@ -378,7 +379,8 @@ export class ArticleModel extends BaseModel {
         title: typeof result.title === "string" ? result.title : "",
         updated_at: typeof result.updated_at === "number" ? result.updated_at
         : 0,
-        tags: typeof result.tags === "string" ? result.tags : ""
+        tags: typeof result.tags === "string" ? result.tags : "",
+        slug: typeof result.slug === "string" ? result.slug : ""
       };
       articles.push(createArticleModelObject(entity));
     });
@@ -428,7 +430,8 @@ export class ArticleModel extends BaseModel {
         title: typeof result.title === "string" ? result.title : "",
         updated_at: typeof result.updated_at === "number" ? result.updated_at
         : 0,
-        tags: typeof result.tags === "string" ? result.tags : ""
+        tags: typeof result.tags === "string" ? result.tags : "",
+        slug: typeof result.slug === "string" ? result.slug : ""
       };
       articles.push(createArticleModelObject(entity));
     });

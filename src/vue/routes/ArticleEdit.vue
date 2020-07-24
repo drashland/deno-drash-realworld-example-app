@@ -91,6 +91,14 @@ export default {
       "tags"
     ])
   },
+  async beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      const article = store.getters.article
+      if (article.tags) {
+        vm.$store.commit("setTags", article.tags || []);
+      }
+    })
+  },
   methods: {
     onPublish(slug) {
       // If the article has a slug, then it already exists in the database; and

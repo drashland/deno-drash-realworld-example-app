@@ -11,7 +11,7 @@
         <div class="col-xs-12">
           <div v-html="parseMarkdown(article.body)"></div>
           <ul class="tag-list">
-            <li v-for="(tag, index) of article.tagList" :key="tag + index">
+            <li v-for="(tag, index) of article.tags" :key="tag + index">
               <Tag
                 :name="tag"
                 className="tag-default tag-pill tag-outline"

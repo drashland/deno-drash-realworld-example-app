@@ -39,6 +39,10 @@ class ArticlesResource extends BaseResource {
     return await this.createArticle();
   }
 
+  public PUT(): Promise<Drash.Http.Response> {
+    console.log("Handling ArticlesResource ")
+  }
+
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - METHODS - PROTECTED /////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -151,8 +155,6 @@ class ArticlesResource extends BaseResource {
    */
   protected async createArticle(): Promise<Drash.Http.Response> {
     const inputArticle: ArticleEntity = this.request.getBodyParam("article");
-    console.log('The article to create:')
-    console.log(inputArticle)
 
     let article: ArticleModel = new ArticleModel(
       inputArticle.author_id,
@@ -271,8 +273,6 @@ class ArticlesResource extends BaseResource {
     entities = await this.addFavoritedToEntities(articleIds, entities);
     entities = await this.filterEntitiesByFavoritedBy(articleIds, entities);
 
-    console.log("Responding to GET on articles resource with:")
-    console.log(entities)
     this.response.body = {
       articles: entities,
     };

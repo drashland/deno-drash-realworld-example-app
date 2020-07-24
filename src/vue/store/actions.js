@@ -86,6 +86,16 @@ export default {
     context.commit("setTags", tags)
   },
 
+  deleteArticleTag(context, tag) {
+    console.log("Handling action: deleteArticleTag")
+    let article = context.getters.article
+    const tags = article.tags
+    const index = tags.indexOf(tag);
+    tags.splice(index, 1);
+    article.tags = tags
+    context.commit("setArticle", article)
+  },
+
   deleteComment(context, { slug, commentId }) {
     console.log("Handling action: deleteComment")
     console.log(slug, commentId)
@@ -119,6 +129,8 @@ export default {
           },
         })
         .then((response) => {
+          console.log("Response after fetching the article:")
+          console.log(response.data.article)
           context.dispatch("setArticle", response.data.article);
           resolve(response);
         })
@@ -323,6 +335,23 @@ export default {
   unsetProfile(context) {
     context.commit("setProfile", userDefault);
   },
+
+  // updateArticle(context, article) {
+  //   console.log("Handling action: updateArticle");
+  //   article.author_id = context.getters.user.id;
+  //   return new Promise((resolve) => {
+  //     axios
+  //       .put("/articles", {
+  //         article,
+  //       })
+  //       .then((response) => {
+  //         resolve(response);
+  //       })
+  //       .catch((error) => {
+  //         resolve(error.response);
+  //       });
+  //   });
+  // },
 
   updateUser(context, user) {
     console.log("Handling action: updateUser");
