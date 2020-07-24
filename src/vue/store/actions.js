@@ -131,17 +131,7 @@ export default {
           },
         })
         .then((response) => {
-          // FIXME(edward) this is still a problem
-          // So there is a problem with vue. It is setting `article.tags` to be `[""]`, but the data from
-          // the server is coming back as `""`. To combat this, we have to fix it manually, which is
-          // just assigning the data to the variable. Now `newArticle.tags` is `""`.
-          // const article = response.data.article
-          // const tags = response.data.article.tags.split(',')
-          // if (tags && tags.length && tags[0] === "") {
-          //   article.tags = ""
-          // }
-          // console.log('and article after setting:')
-          // console.log(article)
+          const article = response.data.article
           context.dispatch("setArticle", article);
           resolve(response);
         })
