@@ -14,10 +14,10 @@ SET standard_conforming_strings = on;
 
 
 
-
 --
 -- Drop roles
 --
+
 
 
 --
@@ -261,7 +261,8 @@ CREATE TABLE public.articles (
     body character varying(255) NOT NULL,
     slug character varying(255) NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    tags character varying(255)
 );
 
 
@@ -448,7 +449,7 @@ COPY public.article_comments (id, article_id, author_image, author_id, author_us
 -- Data for Name: articles; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.articles (id, author_id, title, description, body, slug, created_at, updated_at) FROM stdin;
+COPY public.articles (id, author_id, title, description, body, slug, created_at, updated_at, tags) FROM stdin;
 \.
 
 
@@ -680,7 +681,6 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
 
 
 --

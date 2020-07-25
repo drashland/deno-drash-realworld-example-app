@@ -42,7 +42,7 @@
                 <div class="tag-list">
                   <span
                     class="tag-default tag-pill"
-                    v-for="(tag, index) of article.tagList"
+                    v-for="(tag, index) of tags"
                     :key="tag + index"
                   >
                     <i class="ion-close-round" @click="removeTag(tag)"> </i>
@@ -87,8 +87,25 @@ export default {
   },
   computed: {
     ...mapGetters([
-      "article"
+      "article",
+      "tags"
     ])
+  },
+  async beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      // Unset the article if creating a new one
+      if (to.params.new && to.params.new === true) {
+        vm.$store.commit("setArticle", {})
+        vm.$store.commit("setTags", [])
+      } else {
+        const article = store.getters.article
+        if (article.tags && article.tags.length) {
+          vm.$store.commit("setTags", article.tags)
+        } else  {
+          vm.$store.commit("setTags", [])
+        }
+      }
+    })
   },
   methods: {
     onPublish(slug) {
@@ -99,6 +116,11 @@ export default {
         text: "Please wait...",
         buttons: false,
       });
+      let tags = store.getters.tags
+      if (tags.length) {
+        tags = tags.join(",")
+      }
+      this.article.tags = tags
       this.publishing_article = true;
       this.$store.dispatch(action, this.article)
         .then((response) => {

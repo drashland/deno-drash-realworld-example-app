@@ -44,6 +44,8 @@ export default {
 
   createArticle(context, article) {
     console.log("Handling action: createArticle");
+    console.log('the article:')
+    console.log(article)
     article.author_id = context.getters.user.id;
     return new Promise((resolve) => {
       axios
@@ -79,6 +81,23 @@ export default {
     })
   },
 
+  createArticleTag(context, tag) {
+    console.log("Handling action: createArticleTag")
+    const tags = context.getters.tags || []
+    tags.push(tag)
+    context.commit("setTags", tags)
+  },
+
+  deleteArticleTag(context, tag) {
+    console.log("Handling action: deleteArticleTag")
+    let article = context.getters.article
+    const tags = article.tags
+    const index = tags.indexOf(tag);
+    tags.splice(index, 1);
+    article.tags = tags
+    context.commit("setArticle", article)
+  },
+
   deleteComment(context, { slug, commentId }) {
     console.log("Handling action: deleteComment")
     console.log(slug, commentId)
@@ -112,7 +131,8 @@ export default {
           },
         })
         .then((response) => {
-          context.dispatch("setArticle", response.data.article);
+          const article = response.data.article
+          context.dispatch("setArticle", article);
           resolve(response);
         })
         .catch((error) => {
@@ -234,6 +254,7 @@ export default {
   },
 
   setArticle(context, article) {
+    article.tags = article.tags.split(",")
     context.commit("setArticle", article);
     let articles = [];
     context.getters.articles.forEach((a, i) => {
@@ -247,6 +268,9 @@ export default {
   },
 
   setArticles(context, articles) {
+    articles.forEach(article => {
+      article.tags = article.tags.split(",")
+    })
     context.commit("setArticles", articles);
   },
 
@@ -311,6 +335,25 @@ export default {
 
   unsetProfile(context) {
     context.commit("setProfile", userDefault);
+  },
+
+  updateArticle(context, article) {
+    console.log("Handling action: updateArticle");
+    article.author_id = context.getters.user.id;
+    console.log("the article to update:")
+    console.log(article)
+    return new Promise((resolve) => {
+      axios
+        .put("/articles", {
+          article,
+        })
+        .then((response) => {
+          resolve(response);
+        })
+        .catch((error) => {
+          resolve(error.response);
+        });
+    });
   },
 
   updateUser(context, user) {

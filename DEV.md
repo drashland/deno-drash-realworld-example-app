@@ -53,3 +53,9 @@ CREATE TABLE article_comments (
 * Down, re-build and start the containers to check for any errors.
 
 * Run tests
+
+# Problems in Vue
+
+## `article.tags` returns as `["""]`
+
+When sent down from the server, the `article.tags` property is `""`. But when vue gets it from the `axios` response, the property is `[""]`. This seems to be a problem with vue, and to combat it, we have added the following checks into the tag components: `v-if="tags.length !== 1 && !!tags[0]"`.

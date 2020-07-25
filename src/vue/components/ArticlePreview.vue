@@ -5,7 +5,7 @@
       <h1 v-text="article.title" />
       <p v-text="article.description" />
       <span>Read more...</span>
-      <TagList :tags="article.tagList" />
+      <TagList :tags="article.tags" />
     </router-link>
   </div>
 </template>
