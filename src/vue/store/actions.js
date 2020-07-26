@@ -254,7 +254,10 @@ export default {
   },
 
   setArticle(context, article) {
-    article.tags = article.tags.split(",")
+    console.log("Handling action: setArticle")
+    if (article.tags.length > 0) {
+      article.tags = article.tags.split(",")
+    }
     context.commit("setArticle", article);
     let articles = [];
     context.getters.articles.forEach((a, i) => {

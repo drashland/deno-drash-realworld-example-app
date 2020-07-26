@@ -130,6 +130,7 @@ export default {
           this.$store.dispatch("unsetArticle");
           this.tag_input = null;
           if (response.data.article) {
+            this.$store.dispatch("setArticle", response.data.article)
             this.$router.push({
               name: "article",
               params: { slug: response.data.article.slug }
