@@ -46,3 +46,15 @@ Username: user32
 Password: Userpass1
 Email: user32@hotmail.com
 ```
+
+# Built With
+
+- [Docker](https://www.docker.com/) - Containerisation
+- [Apache](https://httpd.apache.org/) - Acts as how Apache can be used as a proxy server for Drash
+- [Deno](https://deno.land) - Javascript and Typescript runtime
+- [Drash](https://drash.land/drash) - Web server
+- [Vue](https://vuejs.org/) - Frontend framework
+- [Webpack](https://webpack.js.org/) - Bundling Vue
+- [Postgres](https://github.com/deno-postgres/deno-postgres) - Postgres driver for the applications database
+- [Bcrypt](https://github.com/jamesbroadberry/deno-bcrypt/tree/master) - Hashing and comparing passwords
+
