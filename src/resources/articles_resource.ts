@@ -45,6 +45,12 @@ class ArticlesResource extends BaseResource {
     return await this.updateArticle()
   }
 
+  public async DELETE(): Promise<Drash.Http.Response> {
+    console.log("Handling ArticlesResource DELETE");
+
+    return await this.deleteArticle()
+  }
+
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - METHODS - PROTECTED /////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -178,6 +184,50 @@ class ArticlesResource extends BaseResource {
 
     this.response.body = {
       article: article.toEntity(),
+    };
+
+    return this.response;
+  }
+
+  /**
+   * @description
+   * Deletes an article by the slug
+   *
+   * @return Promise<Drash.Http.Response>
+   */
+  protected async deleteArticle(): Promise<Drash.Http.Response> {
+    const articleSlug = this.request.getPathParam("slug");
+
+    if (!articleSlug) {
+      return this.errorResponse(400, "No article slug was passed in")
+    }
+
+    const articleResult: ArticleModel[] | []  = await ArticleModel.where({ slug: articleSlug });
+    if (!articleResult.length) {
+      return this.errorResponse(500, "Failed to fetch the article by slug: " + articleSlug)
+    }
+
+    const article: ArticleModel = articleResult[0]
+
+    const articleModel = new ArticleModel(
+        article.author_id,
+        article.title,
+        article.description,
+        article.body,
+        article.tags,
+        article.slug,
+        article.created_at,
+        article.updated_at,
+        article.id
+    );
+
+    const deleted = await article.delete();
+    if (deleted === false) {
+      return this.errorResponse(500, "Failed to delete the article of slug: " + articleSlug)
+    }
+
+    this.response.body = {
+      success: true
     };
 
     return this.response;
