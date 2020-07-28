@@ -37,5 +37,8 @@
   "scripts": {
     "webpack": "node_modules/.bin/webpack --hide-modules --env.environment=development",
     "webpack-watch": "node_modules/.bin/webpack --hide-modules --watch --env.environment=development"
+  },
+  "dependencies": {
+    "@johmun/vue-tags-input": "^2.1.0"
   }
 }

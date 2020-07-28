@@ -32,24 +32,13 @@
                 </textarea>
               </fieldset>
               <fieldset class="form-group">
-                <input
-                  type="text"
-                  class="form-control"
+                <vue-tags-input
                   placeholder="Enter tags"
-                  v-model="tag_input"
-                  @keypress.enter.prevent="addTag(tag_input)"
-                  @keyup="checkArticleTags(old_tag_input, tag_input)"
+                  class="form-control"
+                  v-model="tag"
+                  :tags="tags"
+                  @tags-changed="newTags => tags = newTags"
                 />
-                <div class="tag-list">
-                  <span
-                    class="tag-default tag-pill"
-                    v-for="(tag, index) of tags"
-                    :key="tag + index"
-                  >
-                    <i class="ion-close-round" @click="removeTag(tag)"> </i>
-                    {{ tag }}
-                  </span>
-                </div>
               </fieldset>
             </fieldset>
             <button
@@ -70,9 +59,13 @@
 import { mapGetters } from "vuex";
 import { store } from "../../public/js/_app.js";
 import ListErrors from "@/components/ListErrors.vue";
+import VueTagsInput from '@johmun/vue-tags-input';
 export default {
   name: "ArticleEdit",
-  components: { ListErrors },
+  components: {
+    ListErrors,
+    VueTagsInput
+  },
   props: {
     previousArticle: {
       type: Object,
@@ -81,8 +74,8 @@ export default {
   },
   data() {
     return {
-      tag_input: null,
-      old_tag_input: null,
+      tag: "",
+      tags: [],
       publishing_article: false,
       errors: {}
     };
@@ -90,7 +83,6 @@ export default {
   computed: {
     ...mapGetters([
       "article",
-      "tags"
     ])
   },
   async beforeRouteEnter(to, from, next) {
@@ -99,12 +91,11 @@ export default {
       if (to.params.new && to.params.new === true) {
         vm.$store.commit("setArticle", {})
         vm.$store.commit("setTags", [])
-      } else {
+      } else { // set the tags for the article
         const article = store.getters.article
-        if (article.tags && article.tags.length) {
-          vm.$store.commit("setTags", article.tags)
-        } else  {
-          vm.$store.commit("setTags", [])
+        const tags = article.tags
+        if (tags && tags !== "" && tags.length) {
+          vm.tags = tags
         }
       }
     })
@@ -118,10 +109,15 @@ export default {
         text: "Please wait...",
         buttons: false,
       });
-      let tags = store.getters.tags
+      let tags = this.tags.length ? this.tags.map(tag => tag.text) : []
+
+      // Prep for sending to the Drash backend, that accepts a string
       if (tags.length) {
         tags = tags.join(",")
+      } else {
+        tags = ""
       }
+
       this.article.tags = tags
       this.publishing_article = true;
       this.$store.dispatch(action, this.article)
@@ -130,7 +126,8 @@ export default {
           console.log(response);
           this.publishing_article = false;
           this.$store.dispatch("unsetArticle");
-          this.tag_input = null;
+          this.tag = ""
+          this.tags = [];
           if (response.data.article) {
             this.$router.push({
               name: "article",
@@ -150,43 +147,22 @@ export default {
           });
         });
     },
-    removeTag(tag) {
-      this.$store.dispatch("deleteArticleTag", tag);
-    },
-    addTag(tag) {
-      this.$store.dispatch("createArticleTag", tag);
-      this.tag_input = null;
-    },
-    checkArticleTags(oldTagInput, tagInput) {
-      const addedCharacters = this.old_tag_input ? tagInput.length > this.old_tag_input.length : !!tagInput
-      if (addedCharacters === true) {
-        // Added characters, possibly added a tag with a comma, meaning we add it to the tag list
-        const lastChar = tagInput[tagInput.length - 1]
-        if (lastChar === ",") {
-          // they entered a new tag
-          const tags = tagInput.split(',')
-          let tag = tags[tags.length - 1]
-          if (tag === "") {
-            tag = tags[tags.length - 2]
-          }
-          this.addTag(tag)
-        }
-      } else if (addedCharacters === false) {
-        // Removed characters, possibly removed a tag
-        // const originalTags = this.tag_input.split(",")
-        // const lastOriginalTag = originalTags[originalTags.length - 1]
-        // const currentTags = tagInput.split(',')
-        // const lastCurrentTag = currentTags[currentTags.length -1]
-        // if (lastCurrentTag !== lastOriginalTag) {
-        //   console.log('you removed a tag: ' + lastOriginalTag)
-        //   this.removeTag(lastOriginalTag)
-        //   delete originalTags[originalTags.indexOf(lastOriginalTag)]
-        //   const newTagString = originalTags.join(",")
-        //   this.tag_input = newTagString
-        // }
-      }
-      this.old_tag_input = tagInput
-    }
   }
 };
 </script>
+<style lang="scss">
+  /**
+   * Override some styling with the vue-tags component,
+   * to keep it consistent with the overall design of the form
+   */
+  form fieldset div.vue-tags-input.form-control {
+    max-width: none; /* Use bootstraps "form-control" style */
+  }
+  .vue-tags-input div.ti-input {
+    border: none; /* Border for input is already covered by botstraps "form-control" */
+    padding: 0; /* Same as above */
+  }
+  .vue-tags-input div.ti-input ul.ti-tags > li.ti-tag {
+    background-color: #5cb85c; /* Use conduits color instead of the blue that vue tags uses for the BG of each tag */
+  }
+</style>
