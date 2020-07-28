@@ -38,6 +38,7 @@
                   placeholder="Enter tags"
                   v-model="tag_input"
                   @keypress.enter.prevent="addTag(tag_input)"
+                  @keyup="checkArticleTags(old_tag_input, tag_input)"
                 />
                 <div class="tag-list">
                   <span
@@ -81,6 +82,7 @@ export default {
   data() {
     return {
       tag_input: null,
+      old_tag_input: null,
       publishing_article: false,
       errors: {}
     };
@@ -154,6 +156,36 @@ export default {
     addTag(tag) {
       this.$store.dispatch("createArticleTag", tag);
       this.tag_input = null;
+    },
+    checkArticleTags(oldTagInput, tagInput) {
+      const addedCharacters = this.old_tag_input ? tagInput.length > this.old_tag_input.length : !!tagInput
+      if (addedCharacters === true) {
+        // Added characters, possibly added a tag with a comma, meaning we add it to the tag list
+        const lastChar = tagInput[tagInput.length - 1]
+        if (lastChar === ",") {
+          // they entered a new tag
+          const tags = tagInput.split(',')
+          let tag = tags[tags.length - 1]
+          if (tag === "") {
+            tag = tags[tags.length - 2]
+          }
+          this.addTag(tag)
+        }
+      } else if (addedCharacters === false) {
+        // Removed characters, possibly removed a tag
+        // const originalTags = this.tag_input.split(",")
+        // const lastOriginalTag = originalTags[originalTags.length - 1]
+        // const currentTags = tagInput.split(',')
+        // const lastCurrentTag = currentTags[currentTags.length -1]
+        // if (lastCurrentTag !== lastOriginalTag) {
+        //   console.log('you removed a tag: ' + lastOriginalTag)
+        //   this.removeTag(lastOriginalTag)
+        //   delete originalTags[originalTags.indexOf(lastOriginalTag)]
+        //   const newTagString = originalTags.join(",")
+        //   this.tag_input = newTagString
+        // }
+      }
+      this.old_tag_input = tagInput
     }
   }
 };
