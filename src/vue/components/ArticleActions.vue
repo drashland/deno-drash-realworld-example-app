@@ -72,8 +72,19 @@ export default {
           article_slug: this.article.slug
         });
         if (result === true) {
-          this.$router.push("/");
+          swal({
+            text: "Deleted the article. Going home...",
+            timer: 1000,
+            buttons: false,
+          }).then(() => {
+            this.$router.push("/");
+          })
         } else {
+          swal({
+            title: "Oops!",
+            text: "Something went wrong whilst trying to delete the article.",
+            icon: "error"
+          });
           console.error("Failed to delete the article:")
           console.error(result)
         }

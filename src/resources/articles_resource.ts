@@ -208,19 +208,6 @@ class ArticlesResource extends BaseResource {
     }
 
     const article: ArticleModel = articleResult[0]
-
-    const articleModel = new ArticleModel(
-        article.author_id,
-        article.title,
-        article.description,
-        article.body,
-        article.tags,
-        article.slug,
-        article.created_at,
-        article.updated_at,
-        article.id
-    );
-
     const deleted = await article.delete();
     if (deleted === false) {
       return this.errorResponse(500, "Failed to delete the article of slug: " + articleSlug)
