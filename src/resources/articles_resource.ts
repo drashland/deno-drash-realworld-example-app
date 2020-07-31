@@ -200,13 +200,19 @@ class ArticlesResource extends BaseResource {
   protected async createArticle(): Promise<Drash.Http.Response> {
     const inputArticle: ArticleEntity = this.request.getBodyParam("article");
 
+    if (!inputArticle.title) {
+      return this.errorResponse(400, "You must set the article title.")
+    }
+
     let article: ArticleModel = new ArticleModel(
       inputArticle.author_id,
       inputArticle.title,
-      inputArticle.description,
-      inputArticle.body,
-      inputArticle.tags
+      inputArticle.description || "",
+      inputArticle.body || "",
+      inputArticle.tags || ""
     );
+    console.log('article to save:')
+    console.log(article)
     await article.save();
 
     if (!article) {
