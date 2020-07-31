@@ -281,6 +281,7 @@ export default {
   },
 
   setArticle(context, article) {
+    console.log("Handling action: setArticle")
     if (article.tags.length > 0) {
       article.tags = article.tags.split(",")
     } else {
