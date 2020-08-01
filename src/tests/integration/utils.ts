@@ -5,12 +5,21 @@ import HomeResource from "../../resources/home_resource.ts";
 import ProfilesResource from "../../resources/profiles_resource.ts";
 import TagsResource from "../../resources/tags_resource.ts";
 import UserResource from "../../resources/user_resource.ts";
-import UsersLoginResource from "../../resources/users_login_resource";
-import UsersResource from "../../resources/users_resource";
-import {ArticleEntity} from "../../models/article_model";
-import BaseModel from "../../models/base_model";
+import UsersLoginResource from "../../resources/users_login_resource.ts";
+import UsersResource from "../../resources/users_resource.ts";
+import {ArticleEntity} from "../../models/article_model.ts";
+import BaseModel from "../../models/base_model.ts";
 import { QueryResult } from "../../deps.ts";
-import {ArticleCommentEntity} from "../../models/article_comments_model";
+import {ArticleCommentEntity} from "../../models/article_comments_model.ts";
+
+const client = await BaseModel.connect();
+
+class TestModel extends BaseModel {
+  public getPreparedQuery (query: string, data: Array<string|number>)  {
+    return this.prepareQuery(query, data)
+  }
+}
+const testModel = new TestModel()
 
 export function createServerObject (): Drash.Http.Server {
   const server = new Drash.Http.Server({
@@ -31,49 +40,54 @@ export function createServerObject (): Drash.Http.Server {
 }
 
 export async function createTestArticle (overrides?: ArticleEntity) {
-  let query = `INSERT INTO articles (author_id, title, description, body, slug, created_at, updated_at, tags) VALUES(`
-  query += overrides!.author_id ? overrides.author_id : 1
-  query += ", "
-  query += overrides!.title ? overrides.title : "Test Article Title"
-  query += ", "
-  query += overrides!.description ? overrides.description : "Test Article Description"
-  query += ", "
-  query += overrides!.body ? overrides.body : "Test Article Body"
-  query += ", "
-  query += overrides!.slug ? overrides.slug : "test-article-title"
-  query += ", "
-  query += "to_timestamp(" + String(Date.now() / 1000.00) + ")"
-  query += ", "
-  query += "to_timestamp(" + String(Date.now() / 1000.00) + ")"
-  query += ", "
-  query += overrides!.tags ? overrides.tags : "\"\""
-  query += ")"
-  const client = await BaseModel.connect();
+  let query = `INSERT INTO articles (author_id, title, description, body, slug, created_at, updated_at, tags) VALUES(?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?), ?);`
+  const data = [
+    overrides && overrides.author_id ? overrides!.author_id : 1,
+    overrides && overrides!.title ? overrides!.title : "Test Article Title",
+    overrides && overrides!.description ? overrides!.description : "Test Article Description",
+    overrides && overrides!.body ? overrides!.body : "Test Article Body",
+    overrides && overrides!.slug ? overrides!.slug : "test-article-title",
+    String(Date.now()),
+    String(Date.now()),
+    overrides && overrides!.tags ? overrides!.tags : ""
+  ]
+  query = testModel.getPreparedQuery(query, data)
   await client.query(query);
-  const title = overrides!.title ? overrides.title : "Test Article Title"
-  const result: QueryResult = await client.query("SELECT * FROM articles WHERE title = " + title + " LIMIT 1");
+  const title = overrides && overrides!.title ? overrides!.title : "Test Article Title";
+  const result: QueryResult = await client.query(`SELECT * FROM articles WHERE title = '${title}' LIMIT 1;`);
+  const formattedResults = TestModel.formatResults(result.rows, result.rowDescription.columns);
+  client.release();
+  console.log(formattedResults)
+  return formattedResults[0].id
+}
+
+export async function clearTestArticles () {
+  const query = "DELETE FROM articles"
+  const client = await BaseModel.connect()
+  await client.query(query)
+  client.release()
+}
+
+export async function createTestComment (overrides: any = {}) {
+  let query = `INSERT INTO article_comments (article_id, author_image, author_id, author_username, body, created_at, updated_at) VALUES(?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?));`
+  const data = [
+    overrides!.article_id ? `${overrides!.article_id}` : 1,
+    overrides!.author_image ? overrides!.author_image : "https://static.productionready.io/images/smiley-cyrus.jpg",
+    overrides!.author_id ? overrides!.author_id : 1,
+    overrides!.author_username ? overrides!.author_username : "Test Username",
+    overrides!.body ? overrides!.body : "Test Body",
+    String(Date.now()),
+    String(Date.now())
+  ];
+  query = testModel.getPreparedQuery(query, data);
+  await client.query(query);
+  //const body = overrides && overrides!.body ? overrides!.body : "Test Body"
+  //const result: QueryResult = await client.query("SELECT * FROM article_comments WHERE body = " + body + " LIMIT 1;");
   client.release();
 }
 
-export async function createTestComment (overrides?: ArticleCommentEntity) {
-  let query = `INSERT INTO article_comments (article_id, author_image, author_id, author_username, body, created_at, updated_at) VALUES(`
-  query += overrides!.article_id ? overrides.article_id : 1;
-  query += ", ";
-  query += overrides!.author_image ? overrides.author_image : "https://static.productionready.io/images/smiley-cyrus.jpg
-  query += ", "
-  query += overrides!.author_id ? overrides.author_id : 1
-  query += ", "
-  query += overrides!.author_username ? overrides.author_username : "Test Username"
-  query += ", "
-  query += overrides!.body ? overrides.body : "Test Body"
-  query += ", "
-  query += "to_timestamp(" + String(Date.now() / 1000.00) + ")"
-  query += ", "
-  query += "to_timestamp(" + String(Date.now() / 1000.00) + ")"
-  query += ")"
-  const client = await BaseModel.connect();
-  await client.query(query);
-  const body = overrides!.body ? overrides.body : "Test Body"
-  const result: QueryResult = await client.query("SELECT * FROM article_comments WHERE body = " + title + " LIMIT 1;");
-  client.release();
+export async function clearTestComments () {
+  const query = "DELETE FROM article_comments"
+  await client.query(query)
+  client.release()
 }
