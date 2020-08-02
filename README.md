@@ -57,4 +57,5 @@ Email: user32@hotmail.com
 - [Webpack](https://webpack.js.org/) - Bundling Vue
 - [Postgres](https://github.com/deno-postgres/deno-postgres) - Postgres driver for the applications database
 - [Bcrypt](https://github.com/jamesbroadberry/deno-bcrypt/tree/master) - Hashing and comparing passwords
+- [Rhum](https://github.com/drashland/rhum) - Testing framework
 
