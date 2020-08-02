@@ -36,7 +36,8 @@ export function createServerObject (): Drash.Http.Server {
         UserResource,
         UsersLoginResource,
         UsersResource
-    ]
+    ],
+    views_path: "./public/views"
   });
   return server
 }
