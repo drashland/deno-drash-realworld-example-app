@@ -13,15 +13,21 @@ jobs:
   tests:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         deno: ["1.1.1"]
-    runs-on: ${{ matrix.os }}
+
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Builds and Starts
-        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up
+        run: |
+          docker-compose up -d
+
+      - name: Run Integration Tests
+        run: |
+          docker-compose up -d
+          decker exec realworld_drash deno test -A --unstable tests/integration/test.ts
 
   linter:
       # Only one OS is required since fmt is cross platform
