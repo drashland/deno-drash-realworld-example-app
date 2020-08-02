@@ -1,4 +1,4 @@
-import { Drash } from "../../deps.ts";
+import {bcrypt, Drash} from "../../deps.ts";
 import ArticleCommentsResource from "../../resources/article_comments_resource.ts";
 import ArticlesResource from "../../resources/articles_resource.ts";
 import HomeResource from "../../resources/home_resource.ts";
@@ -122,7 +122,7 @@ export async function createTestUser (overrides: any  = {}) {
   let query = `INSERT INTO users (username, password, email, created_on, last_login, image, bio) VALUES(?, ?, ?, to_timestamp(?), to_timestamp(?), ?, ?);`;
   const data = [
     overrides && overrides.username ? overrides.username : "testUsername",
-    overrides && overrides.password ? overrides.password : "TestPassword1",
+    overrides && overrides.password ? await bcrypt.hash(overrides.password) : await bcrypt.hash("TestPassword1"),
     overrides && overrides.email ? overrides.email : "test@hotmail.com",
     String(Date.now() / 100.00),
     String(Date.now() / 100.00),
