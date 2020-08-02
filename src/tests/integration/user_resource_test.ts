@@ -1,4 +1,4 @@
-import {Rhum} from "../deps,ts";
+import {Rhum} from "../deps.ts";
 import {createServerObject, createTestUser} from "./utils.ts";
 
 const server = createServerObject();
@@ -10,11 +10,13 @@ Rhum.testPlan("integration/users_resource_test.ts", () => {
 
       await createTestUser();
 
-      const res = await fetch("http://localhost:1447/users/testUsername")
+      const res = await fetch("http://localhost:1447/user/testUsername")
       const body = await res.json()
 
       Rhum.asserts.assertEquals(res.status, 200)
       // TODO(any) Assert `body`
+
+      await server.close()
     })
   })
   Rhum.testSuite("POST /user", () => {
@@ -52,3 +54,5 @@ Rhum.testPlan("integration/users_resource_test.ts", () => {
     // })
   })
 })
+
+Rhum.run()

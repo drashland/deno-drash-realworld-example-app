@@ -130,7 +130,6 @@ export async function createTestUser (overrides: any  = {}) {
     overrides && overrides.bio ? overrides.bio : "Test bio"
   ];
   query = testModel.getPreparedQuery(query, data);
-  console.log(query)
   await client.query(query);
   const username = overrides && overrides.username ? overrides.username : "testUsername";
   const result: QueryResult = await client.query(`SELECT * FROM users WHERE username = '${username}' LIMIT 1;`);
