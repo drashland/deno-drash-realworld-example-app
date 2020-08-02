@@ -117,3 +117,31 @@ export async function clearTestSessions () {
   await client.query(query)
   client.release()
 }
+
+export async function createTestUser (overrides: any  = {}) {
+  let query = `INSERT INTO users (username, password, email, created_on, last_login, image, bio) VALUES(?, ?, ?, to_timestamp(?), to_timestamp(?), ?, ?);`;
+  const data = [
+    overrides && overrides.username ? overrides.username : "testUsername",
+    overrides && overrides.password ? overrides.password : "TestPassword1",
+    overrides && overrides.email ? overrides.email : "test@hotmail.com",
+    String(Date.now() / 100.00),
+    String(Date.now() / 100.00),
+    overrides && overrides.image ? overrides.image : "https://static.productionready.io/images/smiley-cyrus.jpg",
+    overrides && overrides.bio ? overrides.bio : "Test bio"
+  ];
+  query = testModel.getPreparedQuery(query, data);
+  console.log(query)
+  await client.query(query);
+  const username = overrides && overrides.username ? overrides.username : "testUsername";
+  const result: QueryResult = await client.query(`SELECT * FROM users WHERE username = '${username}' LIMIT 1;`);
+  const formattedResults = TestModel.formatResults(result.rows, result.rowDescription.columns);
+  client.release();
+  return formattedResults[0]
+}
+
+export async function clearTestUsers (username?: string) {
+  username = username ? username : "testUsername"
+  const query = `DELETE FROM users WHERE username ='${username}'`;
+  await client.query(query)
+  client.release()
+}
