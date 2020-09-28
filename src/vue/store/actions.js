@@ -88,6 +88,33 @@ export default {
     context.commit("setTags", tags)
   },
 
+  deleteArticle(context, data) {
+    console.log("Handling action: deleteArticle")
+    const slug = data.article_slug
+    return new Promise(resolve => {
+      axios
+        .delete("/articles/" + slug)
+        .then(response => {
+          if (response.data.success === true) {
+            let articles = context.getters.articles
+            articles.forEach((article, i) => {
+              if (article.slug === slug) {
+                articles.splice(i, 1)
+              }
+            })
+            context.dispatch("setArticles", articles)
+            context.dispatch("unsetArticle", {})
+            resolve(true)
+          } else {
+            resolve(response)
+          }
+        })
+        .catch(err => {
+          resolve(err.response)
+        })
+    })
+  },
+
   deleteArticleTag(context, tag) {
     console.log("Handling action: deleteArticleTag")
     let article = context.getters.article
@@ -257,6 +284,8 @@ export default {
     console.log("Handling action: setArticle")
     if (article.tags.length > 0) {
       article.tags = article.tags.split(",")
+    } else {
+      article.tags = []
     }
     context.commit("setArticle", article);
     let articles = [];
@@ -272,7 +301,11 @@ export default {
 
   setArticles(context, articles) {
     articles.forEach(article => {
-      article.tags = article.tags.split(",")
+      if (article.tags.length > 0) {
+        article.tags = article.tags.split(",")
+      } else {
+        article.tags = []
+      }
     })
     context.commit("setArticles", articles);
   },

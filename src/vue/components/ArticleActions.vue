@@ -68,10 +68,26 @@ export default {
   methods: {
     async deleteArticle() {
       try {
-        await this.$store.dispatch("deleteArticle", {
+        const result = await this.$store.dispatch("deleteArticle", {
           article_slug: this.article.slug
         });
-        this.$router.push("/");
+        if (result === true) {
+          swal({
+            text: "Deleted the article. Going home...",
+            timer: 1000,
+            buttons: false,
+          }).then(() => {
+            this.$router.push("/");
+          })
+        } else {
+          swal({
+            title: "Oops!",
+            text: "Something went wrong whilst trying to delete the article.",
+            icon: "error"
+          });
+          console.error("Failed to delete the article:")
+          console.error(result)
+        }
       } catch (err) {
         console.error(err);
       }
