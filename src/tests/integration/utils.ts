@@ -80,7 +80,13 @@ export async function clearTestArticles() {
   client.release();
 }
 
-export async function createTestComment(overrides: any = {}) {
+export async function createTestComment(overrides: {
+  article_id?: number;
+  author_image?: string;
+  author_id?: number;
+  author_username?: string;
+  body?: string;
+} = {}) {
   let query =
     `INSERT INTO article_comments (article_id, author_image, author_id, author_username, body, created_at, updated_at) VALUES (?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?));`;
   const data = [
@@ -114,7 +120,11 @@ export async function clearTestComments() {
   client.release();
 }
 
-export async function createTestSession(overrides: any = {}) {
+export async function createTestSession(overrides: {
+  user_id?: number;
+  session_one?: string;
+  session_two?: string;
+} = {}) {
   let query =
     `INSERT INTO sessions (user_id, session_one, session_two) VALUES(?, ?, ?);`;
   const data = [
@@ -145,7 +155,13 @@ export async function clearTestSessions() {
   client.release();
 }
 
-export async function createTestUser(overrides: any = {}) {
+export async function createTestUser(overrides: {
+  username?: string;
+  password?: string;
+  email?: string;
+  image?: string;
+  bio?: string;
+} = {}) {
   let query =
     `INSERT INTO users (username, password, email, created_on, last_login, image, bio) VALUES(?, ?, ?, to_timestamp(?), to_timestamp(?), ?, ?);`;
   const data = [
