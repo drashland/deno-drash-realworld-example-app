@@ -11,9 +11,6 @@ on:
 jobs:
 
   tests:
-    strategy:
-      matrix:
-        deno: ["1.1.1"]
 
     runs-on: ubuntu-latest
 
@@ -43,4 +40,4 @@ jobs:
         run: deno fmt --check --unstable --ignore='src/node_modules,src/public,src/vue,src/package.json,src/package-lock.json,src/webpack.config.js'
 
       - name: Linter
-        run: deno lint --unstable
+        run: deno lint --unstable --ignore='src/node_modules,src/public,src/vue,src/package.json,src/package-lock.json,src/webpack.config.js'

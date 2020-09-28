@@ -94,14 +94,14 @@ export class ArticleModel extends BaseModel {
    *
    * If the article is favorited
    */
-  public favorited: boolean = false;
+  public favorited = false;
 
   /**
    * @var numbers [=0]
    *
    * Number of favourites the article has accumulated
    */
-  public favoritesCount: number = 0;
+  public favoritesCount = 0;
 
   /**
    * @var number

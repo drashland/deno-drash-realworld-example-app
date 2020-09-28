@@ -65,7 +65,7 @@ export class ArticlesFavoritesModel extends BaseModel {
   /**
    * TODO(ebebbington) What is this property used for?
    */
-  public query: string = "";
+  public query = "";
 
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - CONSTRCUTOR /////////////////////////////////////////////////
