@@ -42,13 +42,13 @@ class ArticlesResource extends BaseResource {
   public async PUT(): Promise<Drash.Http.Response> {
     console.log("Handling ArticlesResource PUT");
 
-    return await this.updateArticle()
+    return await this.updateArticle();
   }
 
   public async DELETE(): Promise<Drash.Http.Response> {
     console.log("Handling ArticlesResource DELETE");
 
-    return await this.deleteArticle()
+    return await this.deleteArticle();
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -166,15 +166,15 @@ class ArticlesResource extends BaseResource {
     const inputArticle: ArticleEntity = this.request.getBodyParam("article");
 
     let article: ArticleModel = new ArticleModel(
-        inputArticle.author_id,
-        inputArticle.title,
-        inputArticle.description,
-        inputArticle.body,
-        inputArticle.tags,
-        inputArticle.slug,
-        inputArticle.created_at,
-        inputArticle.updated_at,
-        inputArticle.id
+      inputArticle.author_id,
+      inputArticle.title,
+      inputArticle.description,
+      inputArticle.body,
+      inputArticle.tags,
+      inputArticle.slug,
+      inputArticle.created_at,
+      inputArticle.updated_at,
+      inputArticle.id,
     );
     await article.save();
 
@@ -199,22 +199,30 @@ class ArticlesResource extends BaseResource {
     const articleSlug = this.request.getPathParam("slug");
 
     if (!articleSlug) {
-      return this.errorResponse(400, "No article slug was passed in")
+      return this.errorResponse(400, "No article slug was passed in");
     }
 
-    const articleResult: ArticleModel[] | []  = await ArticleModel.where({ slug: articleSlug });
+    const articleResult: ArticleModel[] | [] = await ArticleModel.where(
+      { slug: articleSlug },
+    );
     if (!articleResult.length) {
-      return this.errorResponse(500, "Failed to fetch the article by slug: " + articleSlug)
+      return this.errorResponse(
+        500,
+        "Failed to fetch the article by slug: " + articleSlug,
+      );
     }
 
-    const article: ArticleModel = articleResult[0]
+    const article: ArticleModel = articleResult[0];
     const deleted = await article.delete();
     if (deleted === false) {
-      return this.errorResponse(500, "Failed to delete the article of slug: " + articleSlug)
+      return this.errorResponse(
+        500,
+        "Failed to delete the article of slug: " + articleSlug,
+      );
     }
 
     this.response.body = {
-      success: true
+      success: true,
     };
 
     return this.response;
@@ -238,7 +246,7 @@ class ArticlesResource extends BaseResource {
     const inputArticle: ArticleEntity = this.request.getBodyParam("article");
 
     if (!inputArticle.title) {
-      return this.errorResponse(400, "You must set the article title.")
+      return this.errorResponse(400, "You must set the article title.");
     }
 
     let article: ArticleModel = new ArticleModel(
@@ -246,10 +254,10 @@ class ArticlesResource extends BaseResource {
       inputArticle.title,
       inputArticle.description || "",
       inputArticle.body || "",
-      inputArticle.tags || ""
+      inputArticle.tags || "",
     );
-    console.log('article to save:')
-    console.log(article)
+    console.log("article to save:");
+    console.log(article);
     await article.save();
 
     if (!article) {

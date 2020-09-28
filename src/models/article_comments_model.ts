@@ -1,15 +1,15 @@
 import BaseModel from "./base_model.ts";
-import {ArticleModel} from "./article_model.ts";
+import { ArticleModel } from "./article_model.ts";
 
 export type ArticleCommentEntity = {
   created_at: number;
   id: number;
-  article_id: number
-  body: string
+  article_id: number;
+  body: string;
   updated_at: number;
   author_id: number;
-  author_image: string
-  author_username: string
+  author_image: string;
+  author_username: string;
 };
 
 export type Filters = {
@@ -25,16 +25,18 @@ export type Filters = {
  *
  * @return ArticleModel
  */
-export function createArticleCommentsModelObject(article: ArticleCommentEntity): ArticleCommentsModel {
+export function createArticleCommentsModelObject(
+  article: ArticleCommentEntity,
+): ArticleCommentsModel {
   return new ArticleCommentsModel(
-      article.article_id,
-      article.body,
-      article.author_image,
-      article.author_id,
-      article.author_username,
-      article.created_at,
-      article.updated_at,
-      article.id
+    article.article_id,
+    article.body,
+    article.author_image,
+    article.author_id,
+    article.author_username,
+    article.created_at,
+    article.updated_at,
+    article.id,
   );
 }
 
@@ -85,7 +87,7 @@ export class ArticleCommentsModel extends BaseModel {
    */
   public author_username: string;
 
-  public author_image: string
+  public author_image: string;
 
   /**
    * @var number
@@ -94,7 +96,7 @@ export class ArticleCommentsModel extends BaseModel {
    */
   public updated_at: number;
 
-  public slug: string
+  public slug: string;
 
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - CONSTRCUTOR /////////////////////////////////////////////////
@@ -110,26 +112,28 @@ export class ArticleCommentsModel extends BaseModel {
    * @param number updatedAt=Date
    */
   constructor(
-      articleId: number,
-      body: string,
-      authorImage: string,
-      authorId: number,
-      authorUsername: string,
-      createdAt: number = Date.now(),
-      updatedAt: number = Date.now(),
-      id: number = -1,
-      slug: string = ""
+    articleId: number,
+    body: string,
+    authorImage: string,
+    authorId: number,
+    authorUsername: string,
+    createdAt: number = Date.now(),
+    updatedAt: number = Date.now(),
+    id: number = -1,
+    slug: string = "",
   ) {
     super();
     this.id = id;
     this.article_id = articleId;
     this.body = body;
-    this.author_id = authorId
-    this.author_image = authorImage
-    this.author_username = authorUsername
+    this.author_id = authorId;
+    this.author_image = authorImage;
+    this.author_username = authorUsername;
     this.created_at = createdAt;
     this.updated_at = updatedAt;
-    this.slug = this.id == -1 ? this.createSlug(this.author_id + this.body + this.author_username) : slug;
+    this.slug = this.id == -1
+      ? this.createSlug(this.author_id + this.body + this.author_username)
+      : slug;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -144,10 +148,10 @@ export class ArticleCommentsModel extends BaseModel {
   public async delete(): Promise<boolean> {
     let query = `DELETE FROM article_comments WHERE id = ?`;
     query = this.prepareQuery(
-        query,
-        [
-          String(this.id),
-        ],
+      query,
+      [
+        String(this.id),
+      ],
     );
 
     try {
@@ -173,19 +177,19 @@ export class ArticleCommentsModel extends BaseModel {
     // }
 
     let query = "INSERT INTO article_comments " +
-        " (article_id, author_image, author_id, author_username, body, created_at, updated_at)" +
-        " VALUES (?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?));";
+      " (article_id, author_image, author_id, author_username, body, created_at, updated_at)" +
+      " VALUES (?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?));";
     query = this.prepareQuery(
-        query,
-        [
-          String(this.article_id),
-          this.author_image,
-          this.author_id,
-          this.author_username,
-          this.body,
-          String(Date.now() / 1000.00),
-          String(Date.now() / 1000.00),
-        ],
+      query,
+      [
+        String(this.article_id),
+        this.author_image,
+        this.author_id,
+        this.author_username,
+        this.body,
+        String(Date.now() / 1000.00),
+        String(Date.now() / 1000.00),
+      ],
     );
 
     const client = await BaseModel.connect();
@@ -194,8 +198,10 @@ export class ArticleCommentsModel extends BaseModel {
 
     // @ts-ignore
     // (crookse) We ignore this because this will never return null.
-    const tmp = await ArticleCommentsModel.where({ author_id: this.author_id, body: this.body });
-    return tmp[0]
+    const tmp = await ArticleCommentsModel.where(
+      { author_id: this.author_id, body: this.body },
+    );
+    return tmp[0];
   }
 
   /**
@@ -250,10 +256,10 @@ export class ArticleCommentsModel extends BaseModel {
     client.release();
 
     let results = BaseModel.formatResults(
-        dbResult.rows,
-        dbResult.rowDescription.columns,
+      dbResult.rows,
+      dbResult.rowDescription.columns,
     );
-    return ArticleCommentsModel.constructArticleComments(results)
+    return ArticleCommentsModel.constructArticleComments(results);
   }
 
   /**
@@ -265,7 +271,7 @@ export class ArticleCommentsModel extends BaseModel {
    * @return Promise<ArticleModel[]|[]>
    */
   static async where(
-      fields: any,
+    fields: any,
   ): Promise<ArticleCommentsModel[] | []> {
     let results = await BaseModel.Where("article_comments", fields);
 
@@ -273,7 +279,7 @@ export class ArticleCommentsModel extends BaseModel {
       return [];
     }
 
-    return ArticleCommentsModel.constructArticleComments(results)
+    return ArticleCommentsModel.constructArticleComments(results);
   }
 
   /**
@@ -286,8 +292,8 @@ export class ArticleCommentsModel extends BaseModel {
    * @return Promise<ArticleModel[]|[]>
    */
   static async whereIn(
-      column: string,
-      values: any,
+    column: string,
+    values: any,
   ): Promise<ArticleCommentsModel[] | []> {
     let results = await BaseModel.WhereIn("article_comments", {
       column,
@@ -298,7 +304,7 @@ export class ArticleCommentsModel extends BaseModel {
       return [];
     }
 
-    return ArticleCommentsModel.constructArticleComments(results)
+    return ArticleCommentsModel.constructArticleComments(results);
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -334,11 +340,13 @@ export class ArticleCommentsModel extends BaseModel {
    */
   protected createSlug(title: string): string {
     return title.toLowerCase()
-        .replace(/[^a-zA-Z0-9 ]/g, "")
-        .replace(/\s/g, "-");
+      .replace(/[^a-zA-Z0-9 ]/g, "")
+      .replace(/\s/g, "-");
   }
 
-  protected static constructArticleComments (results: Array<{ [key: string]: string | number | boolean }>): Array<ArticleCommentsModel>|[] {
+  protected static constructArticleComments(
+    results: Array<{ [key: string]: string | number | boolean }>,
+  ): Array<ArticleCommentsModel> | [] {
     const articleComments: Array<ArticleCommentsModel> = [];
     results.forEach((result) => {
       const entity: ArticleCommentEntity = {
@@ -346,15 +354,19 @@ export class ArticleCommentsModel extends BaseModel {
         body: typeof result.body === "string" ? result.body : "",
         author_id: typeof result.author_id === "number" ? result.author_id : 0,
         created_at: typeof result.created_at === "number"
-            ? result.created_at
-            : 0,
-        updated_at: typeof result.updated_at === "number" ? result.updated_at
-            : 0,
-        article_id: typeof result.article_id === "number"
-            ? result.article_id
-            : 0,
-        author_username: typeof result.author_username === "string" ? result.author_username : "",
-        author_image: typeof result.author_image === "string" ? result.author_image : ""
+          ? result.created_at
+          : 0,
+        updated_at: typeof result.updated_at === "number"
+          ? result.updated_at
+          : 0,
+        article_id: typeof result.article_id === "number" ? result.article_id
+        : 0,
+        author_username: typeof result.author_username === "string"
+          ? result.author_username
+          : "",
+        author_image: typeof result.author_image === "string"
+          ? result.author_image
+          : "",
       };
       articleComments.push(createArticleCommentsModelObject(entity));
     });

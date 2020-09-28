@@ -40,7 +40,7 @@ jobs:
         uses: denolib/setup-deno@master
 
       - name: Formatter
-        run: deno fmt --check
+        run: deno fmt --check --unstable --ignore='src/node_modules,src/public,src/vue,src/package.json,src/package-lock.json,src/webpack.config.js'
 
-      #- name: Linter
-      #  run: deno lint --unstable
+      - name: Linter
+        run: deno lint --unstable
