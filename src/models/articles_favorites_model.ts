@@ -1,5 +1,5 @@
 import BaseModel from "./base_model.ts";
-import { QueryResult } from "../deps.ts";
+import type { QueryResult } from "../deps.ts";
 
 export type ArticlesFavoritesEntity = {
   article_id: number;
@@ -68,7 +68,7 @@ export class ArticlesFavoritesModel extends BaseModel {
   public query = "";
 
   //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - CONSTRCUTOR /////////////////////////////////////////////////
+  // FILE MARKER - CONSTRUCTOR /////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -244,7 +244,7 @@ export class ArticlesFavoritesModel extends BaseModel {
    */
   static async whereIn(
     column: string,
-    values: string[] | number[],
+    values: Array<number | string>,
   ): Promise<ArticlesFavoritesModel[] | []> {
     let results = await BaseModel.WhereIn("articles_favorites", {
       column,

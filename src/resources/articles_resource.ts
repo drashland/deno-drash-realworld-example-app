@@ -1,4 +1,4 @@
-import { Drash } from "../deps.ts";
+import type { Drash } from "../deps.ts";
 import BaseResource from "./base_resource.ts";
 import {
   ArticleModel,
@@ -163,7 +163,9 @@ class ArticlesResource extends BaseResource {
    * @return Promise<Drash.Http.Response>
    */
   protected async updateArticle(): Promise<Drash.Http.Response> {
-    const inputArticle: ArticleEntity = this.request.getBodyParam("article");
+    // @ts-ignore Because Drash expects results from getBodyParam to be a string. An issue should probably be made for this
+    const inputArticle: ArticleEntity = this.request.getBodyParam("article") ||
+      "";
 
     let article: ArticleModel = new ArticleModel(
       inputArticle.author_id,
@@ -243,7 +245,9 @@ class ArticlesResource extends BaseResource {
    * @return Promise<Drash.Http.Response>
    */
   protected async createArticle(): Promise<Drash.Http.Response> {
-    const inputArticle: ArticleEntity = this.request.getBodyParam("article");
+    // @ts-ignore Allow this, as drash (i think incorrectly) only expects return vals to be strings
+    const inputArticle: ArticleEntity = this.request.getBodyParam("article") ||
+      "";
 
     if (!inputArticle.title) {
       return this.errorResponse(400, "You must set the article title.");
@@ -283,7 +287,7 @@ class ArticlesResource extends BaseResource {
       );
     }
 
-    const slug = this.request.getPathParam("slug");
+    const slug = this.request.getPathParam("slug") || "";
     const articleResult = await ArticleModel.where({ slug: slug });
 
     if (articleResult.length <= 0) {
@@ -457,7 +461,7 @@ class ArticlesResource extends BaseResource {
       );
     }
 
-    const slug = this.request.getPathParam("slug");
+    const slug = this.request.getPathParam("slug") || "";
 
     const result = await ArticleModel.where({ slug: slug });
     if (result.length <= 0) {

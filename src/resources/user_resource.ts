@@ -18,8 +18,14 @@ export default class UserResource extends BaseResource {
    */
   public async GET() {
     this.response.body = await UserModel.where({
-      username: this.request.getPathParam("username"),
+      username: this.request.getPathParam("username") || "",
     });
+    if (!this.response.body) {
+      return this.errorResponse(
+        400,
+        "Username must exist in the uri",
+      );
+    }
     return this.response;
   }
 
@@ -44,23 +50,23 @@ export default class UserResource extends BaseResource {
     console.log("Handling UserResource POST.");
 
     // Gather data
-    const id = this.request.getBodyParam("id");
+    const id = this.request.getBodyParam("id") || "";
     const username = ValidationService.decodeInput(
-      this.request.getBodyParam("username"),
+      this.request.getBodyParam("username") || "",
     );
     const email = ValidationService.decodeInput(
-      this.request.getBodyParam("email"),
+      this.request.getBodyParam("email") || "",
     );
     const rawPassword = ValidationService.decodeInput(
-      this.request.getBodyParam("password"),
+      this.request.getBodyParam("password") || "",
     );
     const bio = ValidationService.decodeInput(
-      this.request.getBodyParam("bio"),
+      this.request.getBodyParam("bio") || "",
     );
     const image = ValidationService.decodeInput(
-      this.request.getBodyParam("image"),
+      this.request.getBodyParam("image") || "",
     );
-    const token = this.request.getBodyParam("token");
+    const token = this.request.getBodyParam("token") || "";
 
     let result = await UserModel.where({ id: id });
 

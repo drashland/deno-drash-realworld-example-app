@@ -1,6 +1,6 @@
 import BaseModel from "./base_model.ts";
-import { UserEntity, UserModel } from "./user_model.ts";
-import { QueryResult } from "../deps.ts";
+import type { UserEntity, UserModel } from "./user_model.ts";
+import type { QueryResult } from "../deps.ts";
 
 export type ArticleEntity = {
   author?: UserEntity | null;

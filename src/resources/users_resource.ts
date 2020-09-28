@@ -21,13 +21,13 @@ class RegisterResource extends BaseResource {
   public async POST() {
     // Gather data
     const username = ValidationService.decodeInput(
-      this.request.getBodyParam("username"),
+      this.request.getBodyParam("username") || "",
     );
     const email = ValidationService.decodeInput(
-      this.request.getBodyParam("email"),
+      this.request.getBodyParam("email") || "",
     );
     const rawPassword = ValidationService.decodeInput(
-      this.request.getBodyParam("password"),
+      this.request.getBodyParam("password") || "",
     );
 
     console.log("Creating the following user:");

@@ -9,7 +9,7 @@ class ProfilesResource extends BaseResource {
 
   public async GET() {
     console.log("Handling ProfilesResource GET.");
-    const username = this.request.getPathParam("username");
+    const username = this.request.getPathParam("username") || "";
     console.log(`Handling the following user's profile: ${username}.`);
 
     if (!username) {

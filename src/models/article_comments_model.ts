@@ -1,5 +1,5 @@
 import BaseModel from "./base_model.ts";
-import { ArticleModel } from "./article_model.ts";
+import type { ArticleModel } from "./article_model.ts";
 
 export type ArticleCommentEntity = {
   created_at: number;
@@ -291,7 +291,7 @@ export class ArticleCommentsModel extends BaseModel {
    */
   static async whereIn(
     column: string,
-    values: string[],
+    values: Array<string | number>,
   ): Promise<ArticleCommentsModel[] | []> {
     let results = await BaseModel.WhereIn("article_comments", {
       column,

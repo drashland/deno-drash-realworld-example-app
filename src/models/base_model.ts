@@ -1,4 +1,5 @@
-import { Pool, PoolClient, QueryResult, Column } from "../deps.ts";
+import { Pool, PoolClient, Column } from "../deps.ts";
+import type { QueryResult } from "../deps.ts";
 
 export const dbPool = new Pool({
   user: "user",
@@ -117,7 +118,7 @@ export default abstract class BaseModel {
    */
   static async WhereIn(
     table: string,
-    data: { values: string[] | number[]; column: string },
+    data: { values: Array<number | string> | number[]; column: string },
   ): Promise<[] | Array<{ [key: string]: string | number | boolean }>> {
     if (data.values.length <= 0) {
       return [];

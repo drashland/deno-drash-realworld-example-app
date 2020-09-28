@@ -98,16 +98,19 @@ class LoginResource extends BaseResource {
    * @return Promise<Drash.Http.Response>
    */
   protected async logInUser(): Promise<Drash.Http.Response> {
-    const inputUser = this.request.getBodyParam("user");
+    const inputUser = this.request.getBodyParam("user") || "";
 
+    // @ts-ignore Because Drash expects results from getBodyParam to be a string. An issue should probably be made for this
     if (!inputUser.email) {
       return this.errorResponse(422, "Email field required.");
     }
+    // @ts-ignore Because Drash expects results from getBodyParam to be a string. An issue should probably be made for this
     if (!ValidationService.isEmail(inputUser.email)) {
       return this.errorResponse(422, "Email must be a valid email.");
     }
 
     // Convert the user to a real user model object
+    // @ts-ignore Because Drash expects results from getBodyParam to be a string. An issue should probably be made for this
     const result = await UserModel.where({ email: inputUser.email });
 
     if (result.length <= 0) {
@@ -117,7 +120,11 @@ class LoginResource extends BaseResource {
 
     let user = result[0];
 
-    const password = this.request.getBodyParam("user").password;
+    // @ts-ignore Because Drash expects results from getBodyParam to be a string. An issue should probably be made for this
+    const password = this.request.getBodyParam("user")
+      ? // @ts-ignore Because Drash expects results from getBodyParam to be a string. An issue should probably be made for this
+        this.request.getBodyParam("user").password
+      : "";
     if (!password) {
       return this.errorResponse(422, "Password field required.");
     }
