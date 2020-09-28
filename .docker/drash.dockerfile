@@ -8,5 +8,5 @@ RUN apt update -y \
   && npm install -g npm@latest
 
 RUN curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=/usr/local sh -s v1.4.2
-RUN export DENO_INSTALL="/root/.local"
+RUN export DENO_INSTALL="/usr/bin"
 RUN export PATH="$DENO_INSTALL/bin:$PATH"
