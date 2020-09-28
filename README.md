@@ -1,14 +1,10 @@
 # ![Drash Example App](logo.png)
 
-___This respository is still very much under development. Things will change. Things will break. Please take caution when looking at or using the code in this repository.___
+___This repository is still very much under development. Things will change. Things will break. Please take caution when looking at or using the code in this repository.___
 
 ### Drash codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) spec and API.
 
 This real world example application uses Deno, Drash, Vue, webpack, PostgreSQL, and docker-compose.
-
-Requires:
-* Deno v1.1.1
-* Drash v1.0.6
 
 # How to Run
 
