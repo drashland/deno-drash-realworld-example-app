@@ -58,4 +58,6 @@ Email: user32@hotmail.com
 - [Postgres](https://github.com/deno-postgres/deno-postgres) - Postgres driver for the applications database
 - [Bcrypt](https://github.com/jamesbroadberry/deno-bcrypt/tree/master) - Hashing and comparing passwords
 - [Rhum](https://github.com/drashland/rhum) - Testing framework
+- [Dmm](https://github.com/drashland/dmm) - Module Manager for Deno to update our dependencies
+- [Vue-input](https://www.npmjs.com/package/@johmun/vue-tags-input) - Library used to help the display of article tags as 'pills', allowing them to be removed and added like a shopping cart
 
