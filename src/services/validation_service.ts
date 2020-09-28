@@ -51,7 +51,7 @@ export default class ValidationService {
    */
   static async isEmailUnique(email: string): Promise<boolean> {
     const user = await UserModel.where({ email: email });
-    if (user) {
+    if (user.length) {
       return false;
     }
     return true;

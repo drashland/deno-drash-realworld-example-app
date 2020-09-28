@@ -37,7 +37,6 @@ class LoginResource extends BaseResource {
    */
   public async POST() {
     console.log("Handling LoginResource POST.");
-
     const action = this.request.getBodyParam("action");
     if (action == "check_if_user_is_authenticated") {
       return await this.checkIfUserIsAuthenticated();

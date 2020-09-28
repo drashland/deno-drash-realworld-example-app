@@ -7,9 +7,9 @@ import TagsResource from "../../resources/tags_resource.ts";
 import UserResource from "../../resources/user_resource.ts";
 import UsersLoginResource from "../../resources/users_login_resource.ts";
 import UsersResource from "../../resources/users_resource.ts";
-import { ArticleEntity } from "../../models/article_model.ts";
+import type { ArticleEntity } from "../../models/article_model.ts";
 import BaseModel from "../../models/base_model.ts";
-import { QueryResult } from "../../deps.ts";
+import type { QueryResult } from "../../deps.ts";
 import { ArticleCommentEntity } from "../../models/article_comments_model.ts";
 
 // TODO(edward) Add docblocks
@@ -194,7 +194,15 @@ export async function createTestUser(overrides: {
 
 export async function clearTestUsers(username?: string) {
   username = username ? username : "testUsername";
-  const query = `DELETE FROM users WHERE username ='${username}'`;
+  let query = `SELECT * FROM users WHERE username = '${username}'`;
+  const result = await client.query(query);
+  const id = result.rows.length ? result.rows[0][0] : 0;
+  if (id) {
+    query = `DELETE FROM sessions WHERE user_id =  ${id}`;
+    await client.query(query);
+  }
+  query = `DELETE FROM users WHERE username = '${username}'`;
   await client.query(query);
+
   client.release();
 }

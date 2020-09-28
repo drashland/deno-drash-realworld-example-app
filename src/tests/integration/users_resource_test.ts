@@ -36,9 +36,12 @@ Rhum.testPlan("integration/users_resource_test.ts", () => {
 
         const res = await fetch("http://localhost:1447/users", {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             username: "testUsername",
-            email: "test@hotmail.com",
+            email: "abc@hotmail.com",
             password: "TestPassword1",
           }),
         });
