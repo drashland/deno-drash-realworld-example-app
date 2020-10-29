@@ -14,7 +14,7 @@ export type ArticleEntity = {
   slug?: string;
   title: string;
   updated_at: number;
-  tags?: string
+  tags?: string;
 };
 
 export type Filters = {
@@ -261,7 +261,7 @@ export class ArticleModel extends BaseModel {
         this.description,
         this.body,
         String(Date.now()),
-        this.tags
+        this.tags,
       ],
     );
     const client = await BaseModel.connect();
@@ -335,7 +335,7 @@ export class ArticleModel extends BaseModel {
         updated_at: typeof result.updated_at === "number" ? result.updated_at
         : 0,
         tags: typeof result.tags === "string" ? result.tags : "",
-        slug: typeof result.slug === "string" ? result.slug : ""
+        slug: typeof result.slug === "string" ? result.slug : "",
       };
       articles.push(createArticleModelObject(entity));
     });
@@ -381,7 +381,7 @@ export class ArticleModel extends BaseModel {
         updated_at: typeof result.updated_at === "number" ? result.updated_at
         : 0,
         tags: typeof result.tags === "string" ? result.tags : "",
-        slug: typeof result.slug === "string" ? result.slug : ""
+        slug: typeof result.slug === "string" ? result.slug : "",
       };
       articles.push(createArticleModelObject(entity));
     });
@@ -432,7 +432,7 @@ export class ArticleModel extends BaseModel {
         updated_at: typeof result.updated_at === "number" ? result.updated_at
         : 0,
         tags: typeof result.tags === "string" ? result.tags : "",
-        slug: typeof result.slug === "string" ? result.slug : ""
+        slug: typeof result.slug === "string" ? result.slug : "",
       };
       articles.push(createArticleModelObject(entity));
     });
