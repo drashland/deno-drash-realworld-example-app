@@ -37,7 +37,7 @@ jobs:
         uses: denolib/setup-deno@master
 
       - name: Formatter
-        run: deno fmt --check --unstable --ignore='src/public,src/vue,src/package.json,src/webpack.config.js,src/node_modules'
+        run: deno fmt --check --unstable --ignore='src/public,src/vue,src/package.json,src/webpack.config.js'
 #
 #      - name: Linter
-#        run: deno lint --unstable --ignore='src/public,src/vue,src/package.json,src/webpack.config.js,src/node_modules'
+#        run: deno lint --unstable --ignore='src/public,src/vue,src/package.json,src/webpack.config.js'
