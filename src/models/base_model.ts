@@ -1,4 +1,4 @@
-import { Pool, PoolClient, Column } from "../deps.ts";
+import { Column, Pool, PoolClient } from "../deps.ts";
 import type { QueryResult } from "../deps.ts";
 
 export const dbPool = new Pool({

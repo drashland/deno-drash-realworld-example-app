@@ -2,7 +2,7 @@ import Vue from "vue";
 import axios from "axios";
 import { router } from "../../public/js/_app.js";
 import JwtService from "@/common/jwt_service.js";
-import { store } from '../../public/js/_app'
+import { store } from "../../public/js/_app";
 
 const userDefault = {
   created_on: null,
@@ -16,36 +16,36 @@ const userDefault = {
 export default {
   checkIfUserIsAuthenticated(context) {
     console.log("Checking if the user is authenticated.");
-      return new Promise((resolve, reject) => {
-        if (getCookie("drash_sess") && getCookie("drash_sess") != "null") {
-          axios
-            .post("/users/login", {
-              action: "check_if_user_is_authenticated",
-              token: getCookie("drash_sess"),
-            })
-            .then(async (response) => {
-              console.log("User is authenticated.");
-              await context.dispatch("setUser", response.data.user);
-              resolve(true);
-            })
-            .catch((error) => {
-              console.log("User has a session, but it's invalid.");
-              console.log(error.response);
-              context.dispatch("unsetUser");
-              resolve(false);
-            });
-        } else {
-          console.log("User is not authenticated.");
-          context.dispatch("unsetUser");
-          resolve(false)
-        }
-      });
+    return new Promise((resolve, reject) => {
+      if (getCookie("drash_sess") && getCookie("drash_sess") != "null") {
+        axios
+          .post("/users/login", {
+            action: "check_if_user_is_authenticated",
+            token: getCookie("drash_sess"),
+          })
+          .then(async (response) => {
+            console.log("User is authenticated.");
+            await context.dispatch("setUser", response.data.user);
+            resolve(true);
+          })
+          .catch((error) => {
+            console.log("User has a session, but it's invalid.");
+            console.log(error.response);
+            context.dispatch("unsetUser");
+            resolve(false);
+          });
+      } else {
+        console.log("User is not authenticated.");
+        context.dispatch("unsetUser");
+        resolve(false);
+      }
+    });
   },
 
   createArticle(context, article) {
     console.log("Handling action: createArticle");
-    console.log('the article:')
-    console.log(article)
+    console.log("the article:");
+    console.log(article);
     article.author_id = context.getters.user.id;
     return new Promise((resolve) => {
       axios
@@ -66,86 +66,88 @@ export default {
     return new Promise((resolve, reject) => {
       axios
         .post(`/articles/${params.slug}/comments`, {
-          comment: params.comment
+          comment: params.comment,
         })
         .then(async (response) => {
-          const comment = response.data.data
-          context.dispatch("setComment", comment)
-          resolve(response)
+          const comment = response.data.data;
+          context.dispatch("setComment", comment);
+          resolve(response);
         })
         .catch((error) => {
-          console.error("Create article comment unsuccessful")
-          console.error(error)
-          reject({ data: { success: false, message: error.message }})
-        })
-    })
+          console.error("Create article comment unsuccessful");
+          console.error(error);
+          reject({ data: { success: false, message: error.message } });
+        });
+    });
   },
 
   createArticleTag(context, tag) {
-    console.log("Handling action: createArticleTag")
-    const tags = context.getters.tags || []
-    tags.push(tag)
-    context.commit("setTags", tags)
+    console.log("Handling action: createArticleTag");
+    const tags = context.getters.tags || [];
+    tags.push(tag);
+    context.commit("setTags", tags);
   },
 
   deleteArticle(context, data) {
-    console.log("Handling action: deleteArticle")
-    const slug = data.article_slug
-    return new Promise(resolve => {
+    console.log("Handling action: deleteArticle");
+    const slug = data.article_slug;
+    return new Promise((resolve) => {
       axios
         .delete("/articles/" + slug)
-        .then(response => {
+        .then((response) => {
           if (response.data.success === true) {
-            let articles = context.getters.articles
+            let articles = context.getters.articles;
             articles.forEach((article, i) => {
               if (article.slug === slug) {
-                articles.splice(i, 1)
+                articles.splice(i, 1);
               }
-            })
-            context.dispatch("setArticles", articles)
-            context.dispatch("unsetArticle", {})
-            resolve(true)
+            });
+            context.dispatch("setArticles", articles);
+            context.dispatch("unsetArticle", {});
+            resolve(true);
           } else {
-            resolve(response)
+            resolve(response);
           }
         })
-        .catch(err => {
-          resolve(err.response)
-        })
-    })
+        .catch((err) => {
+          resolve(err.response);
+        });
+    });
   },
 
   deleteArticleTag(context, tag) {
-    console.log("Handling action: deleteArticleTag")
-    let article = context.getters.article
-    const tags = article.tags
+    console.log("Handling action: deleteArticleTag");
+    let article = context.getters.article;
+    const tags = article.tags;
     const index = tags.indexOf(tag);
     tags.splice(index, 1);
-    article.tags = tags
-    context.commit("setArticle", article)
+    article.tags = tags;
+    context.commit("setArticle", article);
   },
 
   deleteComment(context, { slug, commentId }) {
-    console.log("Handling action: deleteComment")
-    console.log(slug, commentId)
+    console.log("Handling action: deleteComment");
+    console.log(slug, commentId);
     return new Promise((resolve) => {
       axios
         .delete(`/articles/comment/${commentId}`)
-        .then((response => {
-          let comments = []
-          context.getters.comments.forEach((a, i) => {
-            if (a.id == commentId) {
-              return
-            }
-            comments.push(a)
-          })
-          context.dispatch("setComments", comments)
-          resolve(response)
-        }))
+        .then(
+          ((response) => {
+            let comments = [];
+            context.getters.comments.forEach((a, i) => {
+              if (a.id == commentId) {
+                return;
+              }
+              comments.push(a);
+            });
+            context.dispatch("setComments", comments);
+            resolve(response);
+          }),
+        )
         .catch((err) => {
-          resolve(err.response)
-        })
-    })
+          resolve(err.response);
+        });
+    });
   },
 
   fetchArticle(context, slug) {
@@ -158,7 +160,7 @@ export default {
           },
         })
         .then((response) => {
-          const article = response.data.article
+          const article = response.data.article;
           context.dispatch("setArticle", article);
           resolve(response);
         })
@@ -169,12 +171,12 @@ export default {
   },
 
   fetchArticleComments({ commit }, slug) {
-    console.log("Handling action: fetchArticleComments")
+    console.log("Handling action: fetchArticleComments");
     return new Promise((resolve) => {
       axios
         .get(`/articles/${slug}/comments`)
         .then((response) => {
-          commit("setComments", response.data.data)
+          commit("setComments", response.data.data);
           resolve(response);
         })
         .catch((error) => {
@@ -281,11 +283,11 @@ export default {
   },
 
   setArticle(context, article) {
-    console.log("Handling action: setArticle")
+    console.log("Handling action: setArticle");
     if (article.tags.length > 0) {
-      article.tags = article.tags.split(",")
+      article.tags = article.tags.split(",");
     } else {
-      article.tags = []
+      article.tags = [];
     }
     context.commit("setArticle", article);
     let articles = [];
@@ -300,33 +302,33 @@ export default {
   },
 
   setArticles(context, articles) {
-    articles.forEach(article => {
+    articles.forEach((article) => {
       if (article.tags.length > 0) {
-        article.tags = article.tags.split(",")
+        article.tags = article.tags.split(",");
       } else {
-        article.tags = []
+        article.tags = [];
       }
-    })
+    });
     context.commit("setArticles", articles);
   },
 
   setComment(context, comment) {
-    console.log("Handling action: setComment")
-    context.commit("setComment", comment)
-    let comments = []
-    comments.push(comment)
+    console.log("Handling action: setComment");
+    context.commit("setComment", comment);
+    let comments = [];
+    comments.push(comment);
     if (!context.getters.comments) {
-      context.dispatch("setComments", comments)
+      context.dispatch("setComments", comments);
     } else {
       context.getters.comments.forEach((a, i) => {
-        comments.push(a)
-      })
-      context.dispatch("setComments", comments)
+        comments.push(a);
+      });
+      context.dispatch("setComments", comments);
     }
   },
 
   setComments(context, comments) {
-    context.commit("setComments", comments)
+    context.commit("setComments", comments);
   },
 
   setProfile(context, profile) {
@@ -376,8 +378,8 @@ export default {
   updateArticle(context, article) {
     console.log("Handling action: updateArticle");
     article.author_id = context.getters.user.id;
-    console.log("the article to update:")
-    console.log(article)
+    console.log("the article to update:");
+    console.log(article);
     return new Promise((resolve) => {
       axios
         .put("/articles", {

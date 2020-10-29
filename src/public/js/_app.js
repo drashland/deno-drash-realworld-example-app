@@ -146,13 +146,13 @@ const router = new VueRouter({
 // Ensure we checked auth before each page load.
 router.beforeEach(async (to, from, next) => {
   if (to.path !== "/login" && to.path !== "/register" && to.path !== "/") {
-    const result = await store.dispatch("checkIfUserIsAuthenticated")
+    const result = await store.dispatch("checkIfUserIsAuthenticated");
     if (!result) {
-      router.push("/login")
+      router.push("/login");
     }
-    next()
+    next();
   } else {
-    next()
+    next();
   }
 });
 
@@ -175,7 +175,4 @@ window.app = new Vue({
   },
 });
 
-export {
-  store,
-  router,
-};
+export { router, store };

@@ -69,7 +69,4 @@ const getters = {
   },
 };
 
-export {
-  state,
-  getters,
-};
+export { getters, state };
