@@ -163,9 +163,15 @@ class ArticlesResource extends BaseResource {
    * @return Promise<Drash.Http.Response>
    */
   protected async updateArticle(): Promise<Drash.Http.Response> {
-    // @ts-ignore Because Drash expects results from getBodyParam to be a string. An issue should probably be made for this
-    const inputArticle: ArticleEntity = this.request.getBodyParam("article") ||
-      "";
+    const inputArticle: ArticleEntity|null =
+        this.request.getBodyParam("article") ?
+            (this.request.getBodyParam("article") as ArticleEntity)
+            :
+            null;
+
+    if (inputArticle === null) {
+      return this.errorResponse(400, "Article parameter must be passed in")
+    }
 
     let article: ArticleModel = new ArticleModel(
       inputArticle.author_id,
@@ -245,9 +251,7 @@ class ArticlesResource extends BaseResource {
    * @return Promise<Drash.Http.Response>
    */
   protected async createArticle(): Promise<Drash.Http.Response> {
-    // @ts-ignore Allow this, as drash (i think incorrectly) only expects return vals to be strings
-    const inputArticle: ArticleEntity = this.request.getBodyParam("article") ||
-      "";
+    const inputArticle: ArticleEntity = (this.request.getBodyParam("article")as ArticleEntity);
 
     if (!inputArticle.title) {
       return this.errorResponse(400, "You must set the article title.");

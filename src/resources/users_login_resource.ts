@@ -1,6 +1,6 @@
 import { Drash, bcrypt } from "../deps.ts";
 import BaseResource from "./base_resource.ts";
-import UserModel from "../models/user_model.ts";
+import UserModel, {UserEntity} from "../models/user_model.ts";
 import SessionModel from "../models/session_model.ts";
 import ValidationService from "../services/validation_service.ts";
 
@@ -56,7 +56,7 @@ class LoginResource extends BaseResource {
    */
   protected async checkIfUserIsAuthenticated(): Promise<Drash.Http.Response> {
     console.log("Checking if user has a session.");
-    const sessionValues = this.request.getBodyParam("token");
+    const sessionValues = (this.request.getBodyParam("token") as string);
     if (sessionValues) {
       const sessionValuesSplit = sessionValues.split("|::|");
       const sessionOne = sessionValuesSplit[0];
@@ -97,19 +97,16 @@ class LoginResource extends BaseResource {
    * @return Promise<Drash.Http.Response>
    */
   protected async logInUser(): Promise<Drash.Http.Response> {
-    const inputUser = this.request.getBodyParam("user") || "";
+    const inputUser: UserEntity = (this.request.getBodyParam("user") as UserEntity)
 
-    // @ts-ignore Because Drash expects results from getBodyParam to be a string. An issue should probably be made for this
     if (!inputUser.email) {
       return this.errorResponse(422, "Email field required.");
     }
-    // @ts-ignore Because Drash expects results from getBodyParam to be a string. An issue should probably be made for this
     if (!ValidationService.isEmail(inputUser.email)) {
       return this.errorResponse(422, "Email must be a valid email.");
     }
 
     // Convert the user to a real user model object
-    // @ts-ignore Because Drash expects results from getBodyParam to be a string. An issue should probably be made for this
     const result = await UserModel.where({ email: inputUser.email });
 
     if (result.length <= 0) {
@@ -119,11 +116,7 @@ class LoginResource extends BaseResource {
 
     let user = result[0];
 
-    // @ts-ignore Because Drash expects results from getBodyParam to be a string. An issue should probably be made for this
-    const password = this.request.getBodyParam("user")
-      ? // @ts-ignore Because Drash expects results from getBodyParam to be a string. An issue should probably be made for this
-        this.request.getBodyParam("user").password
-      : "";
+    const password = user.password ? user.password : ""
     if (!password) {
       return this.errorResponse(422, "Password field required.");
     }

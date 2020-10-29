@@ -49,7 +49,7 @@ export default class ArticleCommentsResource extends BaseResource {
 
   public async POST() {
     console.log("Handling ArticleCommentsResource POST.");
-    const comment = this.request.getBodyParam("comment");
+    const comment = (this.request.getBodyParam("comment") as string);
     const slug = this.request.getPathParam("slug") || "";
     console.log("The slug for the article: " + slug);
     // First find an article by that slug. The article should exist.
