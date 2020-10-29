@@ -1,8 +1,8 @@
 import type { Drash } from "../deps.ts";
 import BaseResource from "./base_resource.ts";
 import {
-  ArticleModel,
   ArticleEntity,
+  ArticleModel,
   Filters as ArticleFilters,
 } from "../models/article_model.ts";
 import { ArticlesFavoritesModel } from "../models/articles_favorites_model.ts";

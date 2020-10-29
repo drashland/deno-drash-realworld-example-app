@@ -8,11 +8,11 @@ export default {
   },
 
   setComment(state, comment) {
-    state.comment = comment
+    state.comment = comment;
   },
 
   setComments(state, comments) {
-    state.comments = comments
+    state.comments = comments;
   },
 
   setError(state, errors) {
@@ -28,7 +28,7 @@ export default {
   },
 
   setTags(state, tags) {
-    state.tags = tags
+    state.tags = tags;
   },
 
   setUser(state, user) {
