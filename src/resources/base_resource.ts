@@ -56,10 +56,8 @@ class BaseResource extends Drash.Http.Resource {
       return this.current_user;
     }
 
-    let userId =
-        (this.request.getUrlQueryParam("user_id") as string)
-        ||
-        (this.request.getBodyParam("user_id") as string);
+    let userId = (this.request.getUrlQueryParam("user_id") as string) ||
+      (this.request.getBodyParam("user_id") as string);
 
     if (!userId) {
       return null;

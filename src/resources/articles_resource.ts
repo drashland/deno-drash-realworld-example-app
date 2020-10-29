@@ -163,14 +163,13 @@ class ArticlesResource extends BaseResource {
    * @return Promise<Drash.Http.Response>
    */
   protected async updateArticle(): Promise<Drash.Http.Response> {
-    const inputArticle: ArticleEntity|null =
-        this.request.getBodyParam("article") ?
-            (this.request.getBodyParam("article") as ArticleEntity)
-            :
-            null;
+    const inputArticle: ArticleEntity | null =
+      this.request.getBodyParam("article")
+        ? (this.request.getBodyParam("article") as ArticleEntity)
+        : null;
 
     if (inputArticle === null) {
-      return this.errorResponse(400, "Article parameter must be passed in")
+      return this.errorResponse(400, "Article parameter must be passed in");
     }
 
     let article: ArticleModel = new ArticleModel(
@@ -251,7 +250,8 @@ class ArticlesResource extends BaseResource {
    * @return Promise<Drash.Http.Response>
    */
   protected async createArticle(): Promise<Drash.Http.Response> {
-    const inputArticle: ArticleEntity = (this.request.getBodyParam("article")as ArticleEntity);
+    const inputArticle: ArticleEntity =
+      (this.request.getBodyParam("article") as ArticleEntity);
 
     if (!inputArticle.title) {
       return this.errorResponse(400, "You must set the article title.");

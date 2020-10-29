@@ -50,21 +50,21 @@ export default class UserResource extends BaseResource {
     console.log("Handling UserResource POST.");
 
     // Gather data
-    const id = (this.request.getBodyParam("id") as string|number) || "";
+    const id = (this.request.getBodyParam("id") as string | number) || "";
     const username = ValidationService.decodeInput(
-        (this.request.getBodyParam("username") as string) || "",
+      (this.request.getBodyParam("username") as string) || "",
     );
     const email = ValidationService.decodeInput(
-        (this.request.getBodyParam("email") as string) || "",
+      (this.request.getBodyParam("email") as string) || "",
     );
     const rawPassword = ValidationService.decodeInput(
-        (this.request.getBodyParam("password") as string) || "",
+      (this.request.getBodyParam("password") as string) || "",
     );
     const bio = ValidationService.decodeInput(
-        (this.request.getBodyParam("bio") as string) || "",
+      (this.request.getBodyParam("bio") as string) || "",
     );
     const image = ValidationService.decodeInput(
-        (this.request.getBodyParam("image") as string) || "",
+      (this.request.getBodyParam("image") as string) || "",
     );
     const token = (this.request.getBodyParam("token") as string) || "";
 

@@ -1,6 +1,6 @@
 import { bcrypt, Drash } from "../deps.ts";
 import BaseResource from "./base_resource.ts";
-import UserModel, {UserEntity} from "../models/user_model.ts";
+import UserModel, { UserEntity } from "../models/user_model.ts";
 import SessionModel from "../models/session_model.ts";
 import ValidationService from "../services/validation_service.ts";
 
@@ -97,7 +97,8 @@ class LoginResource extends BaseResource {
    * @return Promise<Drash.Http.Response>
    */
   protected async logInUser(): Promise<Drash.Http.Response> {
-    const inputUser: UserEntity = (this.request.getBodyParam("user") as UserEntity)
+    const inputUser: UserEntity =
+      (this.request.getBodyParam("user") as UserEntity);
 
     if (!inputUser.email) {
       return this.errorResponse(422, "Email field required.");
@@ -116,7 +117,7 @@ class LoginResource extends BaseResource {
 
     let user = result[0];
 
-    const password = user.password ? user.password : ""
+    const password = user.password ? user.password : "";
     if (!password) {
       return this.errorResponse(422, "Password field required.");
     }
