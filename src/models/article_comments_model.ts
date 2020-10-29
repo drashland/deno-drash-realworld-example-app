@@ -196,6 +196,8 @@ export class ArticleCommentsModel extends BaseModel {
     await client.query(query);
     client.release();
 
+    // @ts-ignore
+    // (crookse) We ignore this because this will never return null.
     const tmp = await ArticleCommentsModel.where(
       { author_id: this.author_id, body: this.body },
     );
