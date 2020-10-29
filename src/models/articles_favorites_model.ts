@@ -210,7 +210,7 @@ export class ArticlesFavoritesModel extends BaseModel {
   static async where(
     fields: { [key: string]: string | number },
   ): Promise<ArticlesFavoritesModel[] | []> {
-    let results = await BaseModel.Where("articles_favorites", fields);
+    const results = await BaseModel.Where("articles_favorites", fields);
 
     if (results.length <= 0) {
       return [];
@@ -246,7 +246,7 @@ export class ArticlesFavoritesModel extends BaseModel {
     column: string,
     values: Array<number | string>,
   ): Promise<ArticlesFavoritesModel[] | []> {
-    let results = await BaseModel.WhereIn("articles_favorites", {
+    const results = await BaseModel.WhereIn("articles_favorites", {
       column,
       values,
     });

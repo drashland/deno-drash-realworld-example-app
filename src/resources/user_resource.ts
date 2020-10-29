@@ -68,14 +68,14 @@ export default class UserResource extends BaseResource {
     );
     const token = (this.request.getBodyParam("token") as string) || "";
 
-    let result = await UserModel.where({ id: id });
+    const result = await UserModel.where({ id: id });
 
     if (result.length <= 0) {
       console.log("User not found.");
       return this.errorResponse(404, "Error updating your profile.");
     }
 
-    let user = result[0];
+    const user = result[0];
 
     // Validate
     console.log("Validating inputs.");
@@ -120,7 +120,7 @@ export default class UserResource extends BaseResource {
       );
     }
 
-    let entity = savedUser.toEntity();
+    const entity = savedUser.toEntity();
     // Make sure to pass the user's session token back to them
     entity.token = token;
 

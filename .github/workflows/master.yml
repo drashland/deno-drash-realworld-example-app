@@ -40,4 +40,4 @@ jobs:
         run: deno fmt --check --unstable --ignore='src/public,src/vue,src/package.json,src/webpack.config.js,src/node_modules'
 
       - name: Linter
-        run: deno lint --unstable --ignore='src/public,src/vue,src/package.json,src/webpack.config.js'
+        run: deno lint --unstable --ignore='src/public,src/vue,src/package.json,src/webpack.config.js,src/node_modules'

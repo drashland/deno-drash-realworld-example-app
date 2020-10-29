@@ -67,9 +67,9 @@ class LoginResource extends BaseResource {
           sessionTwo,
         );
         if (session) {
-          let user = await UserModel.where({ "id": session.user_id });
+          const user = await UserModel.where({ "id": session.user_id });
           if (user.length > 0) {
-            let entity = user[0].toEntity();
+            const entity = user[0].toEntity();
             entity.token = `${session.session_one}|::|${session.session_two}`;
             this.response.body = {
               user: entity,
@@ -115,7 +115,7 @@ class LoginResource extends BaseResource {
       return this.errorResponse(422, "Invalid user credentials.");
     }
 
-    let user = result[0];
+    const user = result[0];
 
     const password = user.password ? user.password : "";
     if (!password) {
@@ -140,7 +140,7 @@ class LoginResource extends BaseResource {
       );
     }
 
-    let entity = user.toEntity();
+    const entity = user.toEntity();
     entity.token = `${session.session_one}|::|${session.session_two}`;
 
     this.response.body = {

@@ -72,7 +72,7 @@ class RegisterResource extends BaseResource {
       );
     }
 
-    let entity = user.toEntity();
+    const entity = user.toEntity();
 
     // Create session for user. We return the session values on the user
     // object and the front-end is in charge of setting the values as a

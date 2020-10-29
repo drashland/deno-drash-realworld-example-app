@@ -196,8 +196,7 @@ export class ArticleCommentsModel extends BaseModel {
     await client.query(query);
     client.release();
 
-    // @ts-ignore
-    // (crookse) We ignore this because this will never return null.
+    // @ts-ignore (crookse) We ignore this because this will never return null.
     const tmp = await ArticleCommentsModel.where(
       { author_id: this.author_id, body: this.body },
     );
@@ -255,7 +254,7 @@ export class ArticleCommentsModel extends BaseModel {
     const dbResult = await client.query(query);
     client.release();
 
-    let results = BaseModel.formatResults(
+    const results = BaseModel.formatResults(
       dbResult.rows,
       dbResult.rowDescription.columns,
     );
@@ -273,7 +272,7 @@ export class ArticleCommentsModel extends BaseModel {
   static async where(
     fields: { [key: string]: string | number },
   ): Promise<ArticleCommentsModel[] | []> {
-    let results = await BaseModel.Where("article_comments", fields);
+    const results = await BaseModel.Where("article_comments", fields);
 
     if (results.length <= 0) {
       return [];
@@ -295,7 +294,7 @@ export class ArticleCommentsModel extends BaseModel {
     column: string,
     values: Array<string | number>,
   ): Promise<ArticleCommentsModel[] | []> {
-    let results = await BaseModel.WhereIn("article_comments", {
+    const results = await BaseModel.WhereIn("article_comments", {
       column,
       values,
     });

@@ -241,7 +241,7 @@ export class UserModel extends BaseModel {
   static async where(
     fields: { [key: string]: string | number },
   ): Promise<UserModel[] | []> {
-    let results = await BaseModel.Where("users", fields);
+    const results = await BaseModel.Where("users", fields);
 
     if (results.length <= 0) {
       return [];
@@ -267,7 +267,7 @@ export class UserModel extends BaseModel {
     column: string,
     values: string[] | number[],
   ): Promise<UserModel[] | []> {
-    let results = await BaseModel.WhereIn("users", {
+    const results = await BaseModel.WhereIn("users", {
       column,
       values,
     });

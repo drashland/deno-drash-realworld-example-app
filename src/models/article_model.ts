@@ -305,7 +305,7 @@ export class ArticleModel extends BaseModel {
       return [];
     }
 
-    let results = BaseModel.formatResults(
+    const results = BaseModel.formatResults(
       dbResult.rows,
       dbResult.rowDescription.columns,
     );
@@ -353,7 +353,7 @@ export class ArticleModel extends BaseModel {
   static async where(
     fields: { [key: string]: string | number },
   ): Promise<ArticleModel[] | []> {
-    let results = await BaseModel.Where("articles", fields);
+    const results = await BaseModel.Where("articles", fields);
 
     if (results.length <= 0) {
       return [];
@@ -401,7 +401,7 @@ export class ArticleModel extends BaseModel {
     column: string,
     values: string[] | number[],
   ): Promise<ArticleModel[] | []> {
-    let results = await BaseModel.WhereIn("articles", {
+    const results = await BaseModel.WhereIn("articles", {
       column,
       values,
     });

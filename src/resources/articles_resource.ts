@@ -68,7 +68,7 @@ class ArticlesResource extends BaseResource {
     authorIds: number[],
     entities: ArticleEntity[],
   ): Promise<ArticleEntity[]> {
-    let authors: UserModel[] = await UserModel.whereIn("id", authorIds);
+    const authors: UserModel[] = await UserModel.whereIn("id", authorIds);
 
     entities.map((entity: ArticleEntity) => {
       authors.forEach((user: UserModel) => {
@@ -130,7 +130,7 @@ class ArticlesResource extends BaseResource {
     articleIds: number[],
     entities: ArticleEntity[],
   ): Promise<ArticleEntity[]> {
-    let favs: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
+    const favs: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
       .whereIn("article_id", articleIds);
 
     entities.map((entity: ArticleEntity) => {
@@ -172,7 +172,7 @@ class ArticlesResource extends BaseResource {
       return this.errorResponse(400, "Article parameter must be passed in");
     }
 
-    let article: ArticleModel = new ArticleModel(
+    const article: ArticleModel = new ArticleModel(
       inputArticle.author_id,
       inputArticle.title,
       inputArticle.description,
@@ -257,7 +257,7 @@ class ArticlesResource extends BaseResource {
       return this.errorResponse(400, "You must set the article title.");
     }
 
-    let article: ArticleModel = new ArticleModel(
+    const article: ArticleModel = new ArticleModel(
       inputArticle.author_id,
       inputArticle.title,
       inputArticle.description || "",
@@ -301,7 +301,7 @@ class ArticlesResource extends BaseResource {
       );
     }
 
-    let article = articleResult[0];
+    const article = articleResult[0];
 
     const userResult = await UserModel.where({ id: article.author_id });
     if (userResult.length <= 0) {
@@ -313,10 +313,10 @@ class ArticlesResource extends BaseResource {
 
     const user = userResult[0];
 
-    let entity: ArticleEntity = article.toEntity();
+    const entity: ArticleEntity = article.toEntity();
     entity.author = user.toEntity();
 
-    let favs = await ArticlesFavoritesModel
+    const favs = await ArticlesFavoritesModel
       .where({ article_id: article.id });
     if (favs) {
       favs.forEach((favorite: ArticlesFavoritesModel) => {
@@ -358,8 +358,8 @@ class ArticlesResource extends BaseResource {
     const articles: ArticleModel[] = await ArticleModel
       .all(await this.getQueryFilters());
 
-    let articleIds: number[] = [];
-    let authorIds: number[] = [];
+    const articleIds: number[] = [];
+    const authorIds: number[] = [];
 
     let entities: ArticleEntity[] = articles.map((article: ArticleModel) => {
       if (authorIds.indexOf(article.author_id) === -1) {
@@ -403,15 +403,15 @@ class ArticlesResource extends BaseResource {
       return entities;
     }
 
-    let results = await UserModel.where({ username: username });
+    const results = await UserModel.where({ username: username });
 
     if (results.length <= 0) {
       return entities;
     }
 
-    let user = results[0];
+    const user = results[0];
 
-    let filtered: ArticleEntity[] = [];
+    const filtered: ArticleEntity[] = [];
 
     entities.forEach((entity: ArticleEntity) => {
       favs.forEach((favorite: ArticlesFavoritesModel) => {
@@ -439,7 +439,7 @@ class ArticlesResource extends BaseResource {
     const author = this.request.getUrlQueryParam("author");
     const offset = this.request.getUrlQueryParam("offset");
 
-    let filters: ArticleFilters = {};
+    const filters: ArticleFilters = {};
 
     if (author) {
       const authorUser = await UserModel.where({ username: author });
@@ -472,7 +472,7 @@ class ArticlesResource extends BaseResource {
       return this.errorResponse(404, `Article with slug "${slug}" not found.`);
     }
 
-    let article = result[0];
+    const article = result[0];
 
     let favorite;
 

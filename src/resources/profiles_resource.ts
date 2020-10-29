@@ -26,12 +26,12 @@ class ProfilesResource extends BaseResource {
       profile: null,
     };
 
-    let result = await UserModel.where({ username: username });
+    const result = await UserModel.where({ username: username });
     if (result.length <= 0) {
       return this.errorResponse(404, "Profile not found.");
     }
 
-    let entity = result[0].toEntity();
+    const entity = result[0].toEntity();
     this.response.body = {
       profile: entity,
     };
