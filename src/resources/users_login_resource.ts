@@ -121,7 +121,9 @@ class LoginResource extends BaseResource {
     if (!rawPassword) {
       return this.errorResponse(422, "Password field required.");
     }
-    if (!(await ValidationService.isPasswordCorrect(rawPassword, user.password))) {
+    if (
+      !(await ValidationService.isPasswordCorrect(rawPassword, user.password))
+    ) {
       console.log("Passwords do not match.");
       return this.errorResponse(422, "Invalid user credentials.");
     }

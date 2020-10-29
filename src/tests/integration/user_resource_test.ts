@@ -1,5 +1,5 @@
 import { Rhum } from "../deps.ts";
-import {clearTestUsers, createServerObject, createTestUser} from "./utils.ts";
+import { clearTestUsers, createServerObject, createTestUser } from "./utils.ts";
 
 const server = createServerObject();
 
