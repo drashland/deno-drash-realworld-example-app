@@ -36,6 +36,7 @@ Navigate to `localhost:1667`
 - [ ] Web socket?
 - [ ] Database model representations
 - [x] Vue (built with webpack using Vue Single File Components)
+- [ ] Cypress
 
 # Frontend login
 
@@ -58,4 +59,5 @@ Email: user32@hotmail.com
 - [Postgres](https://github.com/deno-postgres/deno-postgres) - Postgres driver for the applications database
 - [Bcrypt](https://github.com/jamesbroadberry/deno-bcrypt/tree/master) - Hashing and comparing passwords
 - [Rhum](https://github.com/drashland/rhum) - Testing framework
+- [Cypress](https://cypress.io/) - Browser testing framework
 
