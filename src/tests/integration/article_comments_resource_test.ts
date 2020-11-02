@@ -20,7 +20,13 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
 
         // create an article and comment inside the db
         const article = await createTestArticle();
-        await createTestComment({ article_id: article.id });
+        const id = typeof article.id === "boolean" ? 0 : Number(article.id);
+        if (!id) {
+          throw new Error(
+            "article.id should be defined, maybe you query to add an article screwed up somewhere",
+          );
+        }
+        await createTestComment({ article_id: id });
 
         // make request
         const res = await fetch(
@@ -190,7 +196,13 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
 
         // create an article and comment inside the db
         const article = await createTestArticle();
-        const comment = await createTestComment({ article_id: article.id });
+        const id = typeof article.id === "boolean" ? 0 : Number(article.id);
+        if (!id) {
+          throw new Error(
+            "article.id should be defined, maybe you query to add an article screwed up somewhere",
+          );
+        }
+        const comment = await createTestComment({ article_id: id });
         const session = await createTestSession();
 
         // make request

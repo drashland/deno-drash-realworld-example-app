@@ -1,6 +1,6 @@
 import BaseModel from "./base_model.ts";
-import { UserEntity, UserModel } from "./user_model.ts";
-import { QueryResult } from "../deps.ts";
+import type { UserEntity, UserModel } from "./user_model.ts";
+import type { QueryResult } from "../deps.ts";
 
 export type ArticleEntity = {
   author?: UserEntity | null;
@@ -94,14 +94,14 @@ export class ArticleModel extends BaseModel {
    *
    * If the article is favorited
    */
-  public favorited: boolean = false;
+  public favorited = false;
 
   /**
    * @var numbers [=0]
    *
    * Number of favourites the article has accumulated
    */
-  public favoritesCount: number = 0;
+  public favoritesCount = 0;
 
   /**
    * @var number
@@ -305,7 +305,7 @@ export class ArticleModel extends BaseModel {
       return [];
     }
 
-    let results = BaseModel.formatResults(
+    const results = BaseModel.formatResults(
       dbResult.rows,
       dbResult.rowDescription.columns,
     );
@@ -353,7 +353,7 @@ export class ArticleModel extends BaseModel {
   static async where(
     fields: { [key: string]: string | number },
   ): Promise<ArticleModel[] | []> {
-    let results = await BaseModel.Where("articles", fields);
+    const results = await BaseModel.Where("articles", fields);
 
     if (results.length <= 0) {
       return [];
@@ -401,7 +401,7 @@ export class ArticleModel extends BaseModel {
     column: string,
     values: string[] | number[],
   ): Promise<ArticleModel[] | []> {
-    let results = await BaseModel.WhereIn("articles", {
+    const results = await BaseModel.WhereIn("articles", {
       column,
       values,
     });

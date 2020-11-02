@@ -7,9 +7,9 @@ import TagsResource from "../../resources/tags_resource.ts";
 import UserResource from "../../resources/user_resource.ts";
 import UsersLoginResource from "../../resources/users_login_resource.ts";
 import UsersResource from "../../resources/users_resource.ts";
-import { ArticleEntity } from "../../models/article_model.ts";
+import type { ArticleEntity } from "../../models/article_model.ts";
 import BaseModel from "../../models/base_model.ts";
-import { QueryResult } from "../../deps.ts";
+import type { QueryResult } from "../../deps.ts";
 import { ArticleCommentEntity } from "../../models/article_comments_model.ts";
 
 // TODO(edward) Add docblocks
@@ -80,7 +80,13 @@ export async function clearTestArticles() {
   client.release();
 }
 
-export async function createTestComment(overrides: any = {}) {
+export async function createTestComment(overrides: {
+  article_id?: number;
+  author_image?: string;
+  author_id?: number;
+  author_username?: string;
+  body?: string;
+} = {}) {
   let query =
     `INSERT INTO article_comments (article_id, author_image, author_id, author_username, body, created_at, updated_at) VALUES (?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?));`;
   const data = [
@@ -114,7 +120,11 @@ export async function clearTestComments() {
   client.release();
 }
 
-export async function createTestSession(overrides: any = {}) {
+export async function createTestSession(overrides: {
+  user_id?: number;
+  session_one?: string;
+  session_two?: string;
+} = {}) {
   let query =
     `INSERT INTO sessions (user_id, session_one, session_two) VALUES(?, ?, ?);`;
   const data = [
@@ -145,7 +155,13 @@ export async function clearTestSessions() {
   client.release();
 }
 
-export async function createTestUser(overrides: any = {}) {
+export async function createTestUser(overrides: {
+  username?: string;
+  password?: string;
+  email?: string;
+  image?: string;
+  bio?: string;
+} = {}) {
   let query =
     `INSERT INTO users (username, password, email, created_on, last_login, image, bio) VALUES(?, ?, ?, to_timestamp(?), to_timestamp(?), ?, ?);`;
   const data = [
@@ -178,7 +194,15 @@ export async function createTestUser(overrides: any = {}) {
 
 export async function clearTestUsers(username?: string) {
   username = username ? username : "testUsername";
-  const query = `DELETE FROM users WHERE username ='${username}'`;
+  let query = `SELECT * FROM users WHERE username = '${username}'`;
+  const result = await client.query(query);
+  const id = result.rows.length ? result.rows[0][0] : 0;
+  if (id) {
+    query = `DELETE FROM sessions WHERE user_id =  ${id}`;
+    await client.query(query);
+  }
+  query = `DELETE FROM users WHERE username = '${username}'`;
   await client.query(query);
+
   client.release();
 }

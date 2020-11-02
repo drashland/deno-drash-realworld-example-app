@@ -12,7 +12,7 @@ export default class ArticleCommentsResource extends BaseResource {
   ];
 
   public async GET() {
-    const slug = this.request.getPathParam("slug");
+    const slug = this.request.getPathParam("slug") || "";
     const articles = await ArticleModel.where({ slug });
     if (!articles.length) {
       console.error("No article was found with the slug of: " + slug);
@@ -49,8 +49,8 @@ export default class ArticleCommentsResource extends BaseResource {
 
   public async POST() {
     console.log("Handling ArticleCommentsResource POST.");
-    const comment = this.request.getBodyParam("comment");
-    const slug = this.request.getPathParam("slug");
+    const comment = (this.request.getBodyParam("comment") as string);
+    const slug = this.request.getPathParam("slug") || "";
     console.log("The slug for the article: " + slug);
     // First find an article by that slug. The article should exist.
     const articles = await ArticleModel.where({ slug });
@@ -103,11 +103,11 @@ export default class ArticleCommentsResource extends BaseResource {
     }
 
     // Make sure they are the author of the comment
-    const commentId = this.request.getPathParam("id");
+    const commentId = this.request.getPathParam("id") || "";
     console.log("going to get comments");
     const comments = await ArticleCommentsModel.where({ author_id: user.id });
     const isTheirComment = comments.filter((comment) => {
-      return comment.id == commentId;
+      return comment.id == Number(commentId);
     }).length >= 0;
     if (!isTheirComment) {
       return this.errorResponse(403, "You are unauthorised to do this action.");
@@ -121,9 +121,9 @@ export default class ArticleCommentsResource extends BaseResource {
       ", ",
       0,
       0,
-      commentId,
+      Number(commentId),
     );
-    articleCommentsModel.id = commentId;
+    articleCommentsModel.id = Number(commentId);
     const deleted = await articleCommentsModel.delete();
 
     this.response.body = {
