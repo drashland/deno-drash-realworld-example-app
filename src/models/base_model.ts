@@ -1,6 +1,8 @@
 import { Column, Pool, PoolClient } from "../deps.ts";
 import type { QueryResult } from "../deps.ts";
 
+type FormattedResults = [] | Array<{ [key: string]: string | number | boolean }>
+
 export const dbPool = new Pool({
   user: "user",
   password: "userpassword",
@@ -47,10 +49,10 @@ export default abstract class BaseModel {
    * @example
    * BaseModel.formatResults([[1, 'ed'], [2, 'john']], [{name: 'id', ...}, {name: 'name', ...}]);
    */
-  static formatResults(
+  private static formatResults(
     rows: Array<string[]>,
     columns: Column[],
-  ): [] | Array<{ [key: string]: string | number | boolean }> {
+  ): FormattedResults {
     if (!rows.length) {
       return [];
     }
@@ -89,18 +91,11 @@ export default abstract class BaseModel {
       clauses.push(`${field} = '${value}'`);
     }
     query += clauses.join(" AND ");
-
-    const client = await BaseModel.connect();
-    const dbResult: QueryResult = await client.query(query);
-    client.release();
+    const dbResult = await BaseModel.query(query);
     if (dbResult.rowCount! < 1) {
       return [];
     }
-
-    return BaseModel.formatResults(
-      dbResult.rows,
-      dbResult.rowDescription.columns,
-    );
+    return dbResult.rows
   }
 
   /**
@@ -116,7 +111,7 @@ export default abstract class BaseModel {
    *
    * @return Promise<any> Empty array if no data was found
    */
-  static async WhereIn(
+  public static async WhereIn(
     table: string,
     data: { values: Array<number | string> | number[]; column: string },
   ): Promise<[] | Array<{ [key: string]: string | number | boolean }>> {
@@ -127,18 +122,11 @@ export default abstract class BaseModel {
     const query = `SELECT * FROM ${table} ` +
       ` WHERE ${data.column} ` +
       ` IN (${data.values.join(",")})`;
-
-    const client = await BaseModel.connect();
-    const dbResult: QueryResult = await client.query(query);
-    client.release();
-    if (dbResult.rowCount! < 1) {
+    const dbResult = await BaseModel.query(query);
+    if (dbResult.rowCount < 1) {
       return [];
     }
-
-    return BaseModel.formatResults(
-      dbResult.rows,
-      dbResult.rowDescription.columns,
-    );
+    return dbResult.rows
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -147,40 +135,52 @@ export default abstract class BaseModel {
 
   /**
    * @description
-   *     Prepares a query to insert dynamic data into, similar to what PHP would
-   *     do.  The query doesn't have to have "?", if it doesn't, method will
-   *     return the original query string
+   * Responsible for running all the queries
    *
    * @param string query
-   *     The db query string. Required.
-   * @param string[] [data]
-   *     Array of strings to update each placeholder
+   *     The query, with dollar signs in place of values if needed
+   * @param unknown[] args
+   *     If parameterising the query (using dollar signs), each item in this array will be associated with a dollar sign
    *
    * @example
-   * const query = "SELECT * FROM users WHERE name = ? AND username = ?"
-   * const data = ["Edward", "Ed2020"]; // note first index is for 1st placeholder, 2nd index is for 2nd placeholder and so on
+   * const query = "SELECT * FROM users WHERE name = $1 AND username = $2"
+   * const data = ["My name", "My username"];
+   * await query(query, data)
+   * // or if query does not use parameters:
+   * await query(query)
    *
-   * @return string
-   *     The query with the placeholders replaced with the data
+   * @returns An object containing:
+   *     - An array of the formatted results: `[{id: ..., ...}, { ... }]
+   *     - The row count
+   *     - If there was an error thrown
    */
-  protected prepareQuery(query: string, data?: Array<string | number>): string {
-    if (!data || !data.length) {
-      return query;
+  public static async query(query: string, ...args: unknown[]): Promise<{ rows: FormattedResults, rowCount: number, error?: boolean}> {
+    try {
+      const client = await BaseModel.connect();
+      const dbResult = args && args.length ? await client.query(query, ...args) : await client.query(query)
+      await client.release();
+      const rowCount = dbResult.rowCount as number
+      if (dbResult.rows.length) {
+        const formattedResults = BaseModel.formatResults(
+            dbResult.rows,
+            dbResult.rowDescription.columns
+        );
+        return {
+          rows: formattedResults,
+          rowCount
+        }
+      }
+      return {
+        rows: [],
+        rowCount: 0
+      }
+    } catch (err) {
+      console.error(err)
+      return {
+        rows: [],
+        rowCount: 0,
+        error: true
+      }
     }
-    // First create an array item for each placeholder
-    const occurrences = query.split("?");
-    if (occurrences[occurrences.length - 1] === "") { // for when last item is ""
-      occurrences.splice(occurrences.length - 1);
-    }
-    // Replace each item with itself but passed in data instead of the placeholder
-    data.forEach((val, i) => {
-      occurrences[i] = occurrences[i] + "'" + data[i] + "'";
-    });
-    // re construct the string
-    let prepared = "";
-    occurrences.forEach((val, i) => {
-      prepared += occurrences[i];
-    });
-    return prepared;
   }
 }

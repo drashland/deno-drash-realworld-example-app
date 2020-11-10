@@ -58,7 +58,7 @@ Rhum.testPlan("integration/users_login_resource_test.ts", () => {
       Rhum.asserts.assertEquals(res.status, 200);
       // TODO(any) Asserts `body` and assert all the data was correctly saved
 
-      await server.close();
+      server.close();
     });
   });
 });

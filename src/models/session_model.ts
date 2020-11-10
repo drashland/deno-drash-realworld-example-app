@@ -102,20 +102,14 @@ export class SessionModel extends BaseModel {
     sessionTwo: string,
   ): Promise<SessionModel | null> {
     const query = "SELECT * FROM sessions " +
-      `WHERE session_one = '${sessionOne}' AND session_two = '${sessionTwo}' ` +
+      `WHERE session_one = $1 AND session_two = $2 ` +
       "LIMIT 1;";
-    const client = await BaseModel.connect();
-    const dbResult: QueryResult = await client.query(query);
+    const dbResult = await BaseModel.query(query, sessionOne, sessionTwo);
     if (dbResult.rowCount! < 1) {
       return null;
     }
-    client.release();
-    const sessionResult = BaseModel.formatResults(
-      dbResult.rows,
-      dbResult.rowDescription.columns,
-    );
-    const session = sessionResult[0];
-    if (sessionResult && sessionResult.length > 0) {
+    const session = dbResult.rows[0];
+    if (session) {
       // (ebebbington) Because we currently dont have a way to assign the entity type to `session` (and it work,
       // as it would error because that type isn't the return value of `formatResults`)
       const sessionEntity: SessionModelEntity = {
@@ -149,19 +143,11 @@ export class SessionModel extends BaseModel {
 
     let query = "INSERT INTO sessions " +
       " (user_id, session_one, session_two)" +
-      " VALUES (?, ?, ?);";
-    query = this.prepareQuery(
-      query,
-      [
-        String(this.user_id),
+      " VALUES ($1, $2, $3);";
+    const dbResult = await BaseModel.query(query, String(this.user_id),
         this.session_one,
-        this.session_two,
-      ],
-    );
-    const client = await BaseModel.connect();
-    const dbResult: QueryResult = await client.query(query);
-    client.release();
-    if (dbResult.rowCount! < 1) {
+        this.session_two);
+    if (dbResult.rowCount < 1) {
       return null;
     }
 

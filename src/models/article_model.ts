@@ -179,23 +179,9 @@ export class ArticleModel extends BaseModel {
    * @return Promise<boolean>
    */
   public async delete(): Promise<boolean> {
-    let query = `DELETE FROM articles WHERE id = ?`;
-    query = this.prepareQuery(
-      query,
-      [
-        String(this.id),
-      ],
-    );
-
-    try {
-      const client = await BaseModel.connect();
-      const dbResult: QueryResult = await client.query(query);
-      client.release();
-      if (dbResult.rowCount! < 1) {
-        return false;
-      }
-    } catch (error) {
-      console.log(error);
+    const query = `DELETE FROM articles WHERE id = $1`;
+    const dbResult = await BaseModel.query(query, String(this.id));
+    if (dbResult.rowCount < 1) {
       return false;
     }
     return true;
@@ -212,13 +198,11 @@ export class ArticleModel extends BaseModel {
       return this.update();
     }
 
-    // TODO(ebebbington) Dont allow duplicate aerticles, because the slug is just the article name
-    let query = "INSERT INTO articles " +
+    // TODO(ebebbington) Dont allow duplicate articles, because the slug is just the article name
+    const query = "INSERT INTO articles " +
       " (author_id, title, description, body, slug, created_at, updated_at, tags)" +
-      " VALUES (?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?), ?);";
-    query = this.prepareQuery(
-      query,
-      [
+      " VALUES ($1, $2, $3, $4, $5, to_timestamp($6), to_timestamp($7), $8);";
+    const dbResult = await BaseModel.query(query,
         String(this.author_id),
         this.title,
         this.description,
@@ -227,13 +211,8 @@ export class ArticleModel extends BaseModel {
         String(Date.now() / 1000.00),
         String(Date.now() / 1000.00),
         this.tags,
-      ],
     );
-
-    const client = await BaseModel.connect();
-    const dbResult: QueryResult = await client.query(query);
-    client.release();
-    if (dbResult!.rowCount! < 1) {
+    if (dbResult.rowCount < 1) {
       return [];
     }
 
@@ -251,25 +230,17 @@ export class ArticleModel extends BaseModel {
    * @return Promise<ArticleModel|[]> The updated article, else [] if it failed to update
    */
   public async update(): Promise<ArticleModel | []> {
-    let query = "UPDATE articles SET " +
-      "title = ?, description = ?, body = ?, updated_at = to_timestamp(?), tags = ? " +
+    const query = "UPDATE articles SET " +
+      "title = $1, description = $2, body = $3, updated_at = to_timestamp($4), tags = $5 " +
       `WHERE id = '${this.id}';`;
-    query = this.prepareQuery(
-      query,
-      [
-        this.title,
+    const dbResult = await BaseModel.query(query, this.title,
         this.description,
         this.body,
         String(Date.now()),
-        this.tags,
-      ],
-    );
-    const client = await BaseModel.connect();
-    const dbResult: QueryResult = await client.query(query);
+        this.tags,);
     if (dbResult.rowCount! < 1) {
       return [];
     }
-    client.release();
 
     // (crookse) We ignore this because this will never return null.
     const updatedResult = await ArticleModel.where({ id: this.id });
@@ -298,23 +269,15 @@ export class ArticleModel extends BaseModel {
     if (filters.offset) {
       query += ` OFFSET ${filters.offset} `;
     }
-    const client = await BaseModel.connect();
-    const dbResult: QueryResult = await client.query(query);
-    client.release();
+    const dbResult = await BaseModel.query(query);
     if (dbResult.rowCount! < 1) {
       return [];
     }
-
-    const results = BaseModel.formatResults(
-      dbResult.rows,
-      dbResult.rowDescription.columns,
-    );
-
-    if (results.length === 0) {
+    if (dbResult.rows.length === 0) {
       return [];
     }
     const articles: Array<ArticleModel> = [];
-    results.forEach((result) => {
+    dbResult.rows.forEach((result) => {
       const entity: ArticleEntity = {
         id: typeof result.id === "number" ? result.id : 0,
         body: typeof result.body === "string" ? result.body : "",
