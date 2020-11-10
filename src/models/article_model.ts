@@ -318,7 +318,9 @@ export class ArticleModel extends BaseModel {
       const entity: ArticleEntity = {
         id: typeof result.id === "number" ? result.id : 0,
         body: typeof result.body === "string" ? result.body : "",
-        "author_id": typeof result.author_id === "number" ? result.author_id : 0,
+        "author_id": typeof result.author_id === "number"
+          ? result.author_id
+          : 0,
         "created_at": typeof result.created_at === "number"
           ? result.created_at
           : 0,
@@ -332,8 +334,9 @@ export class ArticleModel extends BaseModel {
           ? result.favoritesCount
           : 0,
         title: typeof result.title === "string" ? result.title : "",
-        "updated_at": typeof result.updated_at === "number" ? result.updated_at
-        : 0,
+        "updated_at": typeof result.updated_at === "number"
+          ? result.updated_at
+          : 0,
         tags: typeof result.tags === "string" ? result.tags : "",
         slug: typeof result.slug === "string" ? result.slug : "",
       };
@@ -364,7 +367,9 @@ export class ArticleModel extends BaseModel {
       const entity: ArticleEntity = {
         id: typeof result.id === "number" ? result.id : 0,
         body: typeof result.body === "string" ? result.body : "",
-        "author_id": typeof result.author_id === "number" ? result.author_id : 0,
+        "author_id": typeof result.author_id === "number"
+          ? result.author_id
+          : 0,
         "created_at": typeof result.created_at === "number"
           ? result.created_at
           : 0,
@@ -378,8 +383,9 @@ export class ArticleModel extends BaseModel {
           ? result.favoritesCount
           : 0,
         title: typeof result.title === "string" ? result.title : "",
-        "updated_at": typeof result.updated_at === "number" ? result.updated_at
-        : 0,
+        "updated_at": typeof result.updated_at === "number"
+          ? result.updated_at
+          : 0,
         tags: typeof result.tags === "string" ? result.tags : "",
         slug: typeof result.slug === "string" ? result.slug : "",
       };
@@ -415,7 +421,9 @@ export class ArticleModel extends BaseModel {
       const entity: ArticleEntity = {
         id: typeof result.id === "number" ? result.id : 0,
         body: typeof result.body === "string" ? result.body : "",
-        "author_id": typeof result.author_id === "number" ? result.author_id : 0,
+        "author_id": typeof result.author_id === "number"
+          ? result.author_id
+          : 0,
         "created_at": typeof result.created_at === "number"
           ? result.created_at
           : 0,
@@ -429,8 +437,9 @@ export class ArticleModel extends BaseModel {
           ? result.favoritesCount
           : 0,
         title: typeof result.title === "string" ? result.title : "",
-        "updated_at": typeof result.updated_at === "number" ? result.updated_at
-        : 0,
+        "updated_at": typeof result.updated_at === "number"
+          ? result.updated_at
+          : 0,
         tags: typeof result.tags === "string" ? result.tags : "",
         slug: typeof result.slug === "string" ? result.slug : "",
       };
