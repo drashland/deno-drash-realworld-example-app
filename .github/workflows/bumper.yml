@@ -13,10 +13,18 @@ jobs:
       - name: Install Deno
         uses: denolib/setup-deno@v2
 
-      - name: Update Dependencies
+      - name: Install Node
+        uses: actions/setup-node@v2-beta
+
+      - name: Update Deno Dependencies
         run: |
           cd src
           deno run --allow-net --allow-read --allow-write https://deno.land/x/dmm/mod.ts update
+
+      - name: Update Node Dependencies
+        run: |
+          cd src
+          npm update
 
       - name: Update Test Dependencies
         run: |
