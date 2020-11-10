@@ -221,11 +221,11 @@ export class ArticlesFavoritesModel extends BaseModel {
     const articleFavorites: Array<ArticlesFavoritesModel> = [];
     results.forEach((result) => {
       const entity: ArticlesFavoritesEntity = {
-        article_id: typeof result.article_id === "number"
+        "article_id": typeof result.article_id === "number"
           ? result.article_id
           : 0,
         id: typeof result.id === "number" ? result.id : 0,
-        user_id: typeof result.user_id === "number" ? result.user_id : 0,
+        "user_id": typeof result.user_id === "number" ? result.user_id : 0,
         value: typeof result.value === "boolean" ? result.value : false,
       };
       articleFavorites.push(createArticlesFavoritesModelObject(entity));
@@ -258,10 +258,10 @@ export class ArticlesFavoritesModel extends BaseModel {
     const articles: Array<ArticlesFavoritesModel> = [];
     results.forEach((result) => {
       const entity: ArticlesFavoritesEntity = {
-        article_id: typeof result.article_id === "number"
+        "article_id": typeof result.article_id === "number"
           ? result.article_id
           : 0,
-        user_id: typeof result.user_id === "number" ? result.user_id : 0,
+        "user_id": typeof result.user_id === "number" ? result.user_id : 0,
         value: typeof result.value === "boolean" ? result.value : false,
         id: typeof result.id === "number" ? result.id : 0,
       };
