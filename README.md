@@ -8,7 +8,6 @@ This real world example application uses Deno, Drash, Vue, Webpack, PostgreSQL, 
 
 ```
 $ docker-compose build && docker-compose up -d
-$ cd src
 ```
 
 Navigate to `localhost:1667`
