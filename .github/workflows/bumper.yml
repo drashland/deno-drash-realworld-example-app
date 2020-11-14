@@ -13,18 +13,26 @@ jobs:
       - name: Install Deno
         uses: denolib/setup-deno@v2
 
-      - name: Update Dependencies
+      - name: Install Node
+        uses: actions/setup-node@v2-beta
+
+      - name: Update Deno Dependencies
         run: |
           cd src
           deno run --allow-net --allow-read --allow-write https://deno.land/x/dmm/mod.ts update
 
-      - name: Update Test Dependencies
+      - name: Update Deno Test Dependencies
         run: |
           cd src/tests
           deno run --allow-net --allow-read --allow-write https://deno.land/x/dmm/mod.ts update
 
-      - name: Update Dockerfile
-        run: deno run --allow-all console/bumper.ts
+      - name: Update Node Dependencies
+        run: |
+          cd src
+          npm update
+
+      - name: Update Version Strings Not Covered By dmm/npm
+        run: deno run --allow-all console/bumper_ci_service.ts
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v2
