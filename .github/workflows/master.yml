@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install Deno v${{ matrix.deno }}
+      - name: Install Deno
         uses: denolib/setup-deno@master
 
       - name: Formatter
