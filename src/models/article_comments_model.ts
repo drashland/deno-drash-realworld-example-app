@@ -351,19 +351,22 @@ export class ArticleCommentsModel extends BaseModel {
       const entity: ArticleCommentEntity = {
         id: typeof result.id === "number" ? result.id : 0,
         body: typeof result.body === "string" ? result.body : "",
-        author_id: typeof result.author_id === "number" ? result.author_id : 0,
-        created_at: typeof result.created_at === "number"
+        "author_id": typeof result.author_id === "number"
+          ? result.author_id
+          : 0,
+        "created_at": typeof result.created_at === "number"
           ? result.created_at
           : 0,
-        updated_at: typeof result.updated_at === "number"
+        "updated_at": typeof result.updated_at === "number"
           ? result.updated_at
           : 0,
-        article_id: typeof result.article_id === "number" ? result.article_id
-        : 0,
-        author_username: typeof result.author_username === "string"
+        "article_id": typeof result.article_id === "number"
+          ? result.article_id
+          : 0,
+        "author_username": typeof result.author_username === "string"
           ? result.author_username
           : "",
-        author_image: typeof result.author_image === "string"
+        "author_image": typeof result.author_image === "string"
           ? result.author_image
           : "",
       };
