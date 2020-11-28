@@ -58,80 +58,84 @@ import Article from "@/routes/Article.vue";
 import ArticleEdit from "@/routes/ArticleEdit.vue";
 import NotFound from "@/routes/404.vue";
 
+const routesDef = [
+  {
+    path: "/",
+    component: Home,
+    children: [
+      {
+        path: "",
+        name: "home",
+        component: HomeGlobal,
+      },
+      {
+        path: "my-feed",
+        name: "home-my-feed",
+        component: HomeMyFeed,
+      },
+      {
+        path: "tag/:tag",
+        name: "home-tag",
+        component: HomeTag,
+      },
+    ],
+  },
+  {
+    name: "login",
+    path: "/login",
+    component: Login,
+  },
+  {
+    name: "register",
+    path: "/register",
+    component: Register,
+  },
+  {
+    name: "settings",
+    path: "/settings",
+    protected: true,
+    component: Settings,
+  },
+  // Handle child routes with a default, by giving the name to the
+  // child.
+  // SO: https://github.com/vuejs/vue-router/issues/777
+  {
+    path: "/@:username",
+    protected: true,
+    component: Profile,
+    children: [
+      {
+        path: "",
+        name: "profile",
+        component: ProfileArticles,
+      },
+      {
+        name: "profile-favorites",
+        path: "favorites",
+        component: ProfileFavorited,
+      },
+    ],
+  },
+  {
+    name: "article",
+    path: "/articles/:slug",
+    component: Article,
+    props: true,
+  },
+  {
+    name: "article-edit",
+    protected: true,
+    path: "/editor/:slug?",
+    props: true,
+    component: ArticleEdit,
+  },
+  {
+    path: "*",
+    component: NotFound,
+  },
+];
 const router = new VueRouter({
-  routes: [
-    {
-      path: "/",
-      component: Home,
-      children: [
-        {
-          path: "",
-          name: "home",
-          component: HomeGlobal,
-        },
-        {
-          path: "my-feed",
-          name: "home-my-feed",
-          component: HomeMyFeed,
-        },
-        {
-          path: "tag/:tag",
-          name: "home-tag",
-          component: HomeTag,
-        },
-      ],
-    },
-    {
-      name: "login",
-      path: "/login",
-      component: Login,
-    },
-    {
-      name: "register",
-      path: "/register",
-      component: Register,
-    },
-    {
-      name: "settings",
-      path: "/settings",
-      component: Settings,
-    },
-    // Handle child routes with a default, by giving the name to the
-    // child.
-    // SO: https://github.com/vuejs/vue-router/issues/777
-    {
-      path: "/@:username",
-      component: Profile,
-      children: [
-        {
-          path: "",
-          name: "profile",
-          component: ProfileArticles,
-        },
-        {
-          name: "profile-favorites",
-          path: "favorites",
-          component: ProfileFavorited,
-        },
-      ],
-    },
-    {
-      name: "article",
-      path: "/articles/:slug",
-      component: Article,
-      props: true,
-    },
-    {
-      name: "article-edit",
-      path: "/editor/:slug?",
-      props: true,
-      component: ArticleEdit,
-    },
-    {
-      path: "*",
-      component: NotFound,
-    },
-  ],
+  routes: routesDef,
   scrollBehavior(to, from, savedPosition) {
     // Make "#" anchor links work as expected
     if (to.hash) {
@@ -144,11 +148,23 @@ const router = new VueRouter({
 });
 
 // Ensure we checked auth before each page load.
+// router.beforeEach(async (to, from, next) => {
+//   const x = routesDef.filter((x) => x.path !== "/" && x.path !== "*").find((e) => to.path.match(new RegExp(e.path)));
+//   console.log("===>>>", x, to.path);
+//   const result = await store.dispatch("checkIfUserIsAuthenticated");
+//   // if (to.path.match(/\/(@.*\/.*|settings|editor|my-feed)/g)) {
+//   if (!result) {
+//     router.push("/login");
+//   }
+//   next();
+//   // } else {
+//   //   next();
+//   // }
+// });
+
 router.beforeEach(async (to, from, next) => {
-  const result = await store.dispatch("checkIfUserIsAuthenticated");
   if (to.path !== "/login" && to.path !== "/register" && to.path !== "/") {
     const result = await store.dispatch("checkIfUserIsAuthenticated");
-
     if (!result) {
       router.push("/login");
     }
@@ -156,6 +172,10 @@ router.beforeEach(async (to, from, next) => {
   } else {
     next();
   }
+  next();
+  // } else {
+  //   next();
+  // }
 });
 
 //
