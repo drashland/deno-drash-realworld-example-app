@@ -145,7 +145,7 @@ export class SessionModel extends BaseModel {
       " VALUES ($1, $2, $3);";
     const dbResult = await BaseModel.query(
       query,
-      String(this.user_id),
+      this.user_id,
       this.session_one,
       this.session_two,
     );

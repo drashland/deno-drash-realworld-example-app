@@ -179,7 +179,7 @@ export class ArticleModel extends BaseModel {
    */
   public async delete(): Promise<boolean> {
     const query = `DELETE FROM articles WHERE id = $1`;
-    const dbResult = await BaseModel.query(query, String(this.id));
+    const dbResult = await BaseModel.query(query, this.id);
     if (dbResult.rowCount < 1) {
       return false;
     }
@@ -203,13 +203,13 @@ export class ArticleModel extends BaseModel {
       " VALUES ($1, $2, $3, $4, $5, to_timestamp($6), to_timestamp($7), $8);";
     const dbResult = await BaseModel.query(
       query,
-      String(this.author_id),
+      this.author_id,
       this.title,
       this.description,
       this.body,
       this.createSlug(this.title),
-      String(Date.now() / 1000.00),
-      String(Date.now() / 1000.00),
+      Date.now() / 1000.00,
+      Date.now() / 1000.00,
       this.tags,
     );
     if (dbResult.rowCount < 1) {
@@ -238,7 +238,7 @@ export class ArticleModel extends BaseModel {
       this.title,
       this.description,
       this.body,
-      String(Date.now()),
+      Date.now(),
       this.tags,
     );
     if (dbResult.rowCount! < 1) {

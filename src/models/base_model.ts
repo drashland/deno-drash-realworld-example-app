@@ -41,7 +41,11 @@ export default abstract class BaseModel {
     const clauses: string[] = [];
     for (const field in fields) {
       const value = fields[field];
-      clauses.push(`${field} = '${value}'`);
+      if (typeof value === "number") {
+        clauses.push(`${field} = ${value}`);
+      } else {
+        clauses.push(`${field} = '${value}'`);
+      }
     }
     query += clauses.join(" AND ");
     const dbResult = await BaseModel.query(query);
@@ -108,18 +112,10 @@ export default abstract class BaseModel {
     ...args: Array<string | number>
   ): Promise<{ rows: KeyedRow[]; rowCount: number; error?: boolean }> {
     try {
-      query = query.replace(/\$[0-9]/g, "?param?");
-      if (args && args.length) {
-        for (let i = 0, j = 1; i < args.length; i++, j++) {
-          if (typeof args[i] === "number") {
-            query = query.replace(`?param?`, args[i] as string);
-          } else if (typeof args[i] === "string") {
-            query = query.replace(`?param?`, `'${args[i]}'`);
-          }
-        }
-      }
       const db = await BaseModel.getDb();
-      const dbResult = await db.query(query);
+      const dbResult = args && args.length
+        ? await db.query(query, args)
+        : await db.query(query);
       BaseModel.closeDb(db);
       return {
         rows: dbResult.rows,

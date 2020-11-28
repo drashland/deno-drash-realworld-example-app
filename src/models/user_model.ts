@@ -131,7 +131,7 @@ export class UserModel extends BaseModel {
    */
   public async delete(): Promise<boolean> {
     const query = `DELETE FROM users WHERE id = $1`;
-    const dbResult = await BaseModel.query(query, String(this.id));
+    const dbResult = await BaseModel.query(query, this.id);
     if (dbResult.rowCount! < 1) {
       return false;
     }

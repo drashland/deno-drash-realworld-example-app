@@ -169,13 +169,13 @@ export class ArticleCommentsModel extends BaseModel {
       "INSERT INTO article_comments (article_id, author_image, author_id, author_username, body, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, to_timestamp($6), to_timestamp($7));";
     await BaseModel.query(
       query,
-      String(this.article_id),
+      this.article_id,
       this.author_image,
       this.author_id,
       this.author_username,
       this.body,
-      String(Date.now() / 1000.00),
-      String(Date.now() / 1000.00),
+      Date.now() / 1000.00,
+      Date.now() / 1000.00,
     );
 
     // @ts-ignore (crookse) We ignore this because this will never return null.
