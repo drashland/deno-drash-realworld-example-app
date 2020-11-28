@@ -1,24 +1,23 @@
 //import { db } from "../db.ts"
 
-import { KeyedRow } from "../deps.ts"
-import {connectPg, PgConn} from "../deps.ts";
+import { KeyedRow } from "../deps.ts";
+import { connectPg, PgConn } from "../deps.ts";
 
 export default abstract class BaseModel {
-
-  private static async getDb (): Promise<PgConn> {
+  private static async getDb(): Promise<PgConn> {
     const db: PgConn = await connectPg({
       username: "user",
       password: "userpassword",
       database: "realworld",
       hostname: "realworld_postgres",
       port: 5432,
-      sslMode: "disable"
+      sslMode: "disable",
     });
-    return db
+    return db;
   }
 
-  private static closeDb (db: PgConn) {
-    db.close()
+  private static closeDb(db: PgConn) {
+    db.close();
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -49,7 +48,7 @@ export default abstract class BaseModel {
     if (dbResult.rowCount! < 1) {
       return [];
     }
-    return dbResult.rows
+    return dbResult.rows;
   }
 
   /**
@@ -80,7 +79,7 @@ export default abstract class BaseModel {
     if (dbResult.rowCount < 1) {
       return [];
     }
-    return dbResult.rows
+    return dbResult.rows;
   }
 
   /**
@@ -104,32 +103,35 @@ export default abstract class BaseModel {
    *     - The row count
    *     - If there was an error thrown
    */
-  public static async query(query: string, ...args: Array<string | number>): Promise<{ rows: KeyedRow[], rowCount: number, error?: boolean}> {
+  public static async query(
+    query: string,
+    ...args: Array<string | number>
+  ): Promise<{ rows: KeyedRow[]; rowCount: number; error?: boolean }> {
     try {
-      query = query.replace(/\$[0-9]/g, "?param?")
+      query = query.replace(/\$[0-9]/g, "?param?");
       if (args && args.length) {
         for (let i = 0, j = 1; i < args.length; i++, j++) {
           if (typeof args[i] === "number") {
-            query = query.replace(`?param?`, args[i] as string)
+            query = query.replace(`?param?`, args[i] as string);
           } else if (typeof args[i] === "string") {
-            query = query.replace(`?param?`, `'${args[i]}'`)
+            query = query.replace(`?param?`, `'${args[i]}'`);
           }
         }
       }
-      const db = await BaseModel.getDb()
-      const dbResult = await db.query(query)
-      BaseModel.closeDb(db)
+      const db = await BaseModel.getDb();
+      const dbResult = await db.query(query);
+      BaseModel.closeDb(db);
       return {
         rows: dbResult.rows,
-        rowCount: dbResult.completionInfo.numAffectedRows || 0
-      }
+        rowCount: dbResult.completionInfo.numAffectedRows || 0,
+      };
     } catch (err) {
-      console.error(err)
+      console.error(err);
       return {
         rows: [],
         rowCount: 0,
-        error: true
-      }
+        error: true,
+      };
     }
   }
 }

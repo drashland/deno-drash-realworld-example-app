@@ -201,15 +201,16 @@ export class ArticleModel extends BaseModel {
     const query = "INSERT INTO articles " +
       " (author_id, title, description, body, slug, created_at, updated_at, tags)" +
       " VALUES ($1, $2, $3, $4, $5, to_timestamp($6), to_timestamp($7), $8);";
-    const dbResult = await BaseModel.query(query,
-        String(this.author_id),
-        this.title,
-        this.description,
-        this.body,
-        this.createSlug(this.title),
-        String(Date.now() / 1000.00),
-        String(Date.now() / 1000.00),
-        this.tags,
+    const dbResult = await BaseModel.query(
+      query,
+      String(this.author_id),
+      this.title,
+      this.description,
+      this.body,
+      this.createSlug(this.title),
+      String(Date.now() / 1000.00),
+      String(Date.now() / 1000.00),
+      this.tags,
     );
     if (dbResult.rowCount < 1) {
       return [];
@@ -232,11 +233,14 @@ export class ArticleModel extends BaseModel {
     const query = "UPDATE articles SET " +
       "title = $1, description = $2, body = $3, updated_at = to_timestamp($4), tags = $5 " +
       `WHERE id = '${this.id}';`;
-    const dbResult = await BaseModel.query(query, this.title,
-        this.description,
-        this.body,
-        String(Date.now()),
-        this.tags,);
+    const dbResult = await BaseModel.query(
+      query,
+      this.title,
+      this.description,
+      this.body,
+      String(Date.now()),
+      this.tags,
+    );
     if (dbResult.rowCount! < 1) {
       return [];
     }

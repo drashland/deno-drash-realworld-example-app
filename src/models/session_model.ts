@@ -143,16 +143,22 @@ export class SessionModel extends BaseModel {
     const query = "INSERT INTO sessions" +
       " (user_id, session_one, session_two)" +
       " VALUES ($1, $2, $3);";
-    const dbResult = await BaseModel.query(query, String(this.user_id),
-        this.session_one,
-        this.session_two);
+    const dbResult = await BaseModel.query(
+      query,
+      String(this.user_id),
+      this.session_one,
+      this.session_two,
+    );
     if (dbResult.rowCount < 1) {
       return null;
     }
 
     // (crookse) We ignore this because getUserSession() can return null if the
     // session is not found. However, in this case, it will never be null.
-    return await SessionModel.getUserSession(this.session_one, this.session_two);
+    return await SessionModel.getUserSession(
+      this.session_one,
+      this.session_two,
+    );
   }
 }
 

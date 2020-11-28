@@ -118,12 +118,14 @@ export class ArticlesFavoritesModel extends BaseModel {
       return this.update();
     }
 
-     const query = "INSERT INTO articles_favorites " +
+    const query = "INSERT INTO articles_favorites " +
       " (article_id, user_id, value)" +
       " VALUES ($1, $2, $3);";
-    const dbResult = await BaseModel.query(query, String(this.article_id),
-        String(this.user_id),
-        String(this.value)
+    const dbResult = await BaseModel.query(
+      query,
+      String(this.article_id),
+      String(this.user_id),
+      String(this.value),
     );
     if (dbResult.rowCount! < 1) {
       return null;

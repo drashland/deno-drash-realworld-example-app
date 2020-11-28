@@ -149,7 +149,7 @@ export class ArticleCommentsModel extends BaseModel {
     const query = `DELETE FROM article_comments WHERE id = $1`;
     const dbResult = await BaseModel.query(query, this.id);
     if (dbResult.error || dbResult.rowCount === 0) {
-      return false
+      return false;
     }
     return true;
   }
@@ -165,15 +165,17 @@ export class ArticleCommentsModel extends BaseModel {
     //   return this.update();
     // }
 
-    const query = "INSERT INTO article_comments (article_id, author_image, author_id, author_username, body, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, to_timestamp($6), to_timestamp($7));";
-    await BaseModel.query(query,
-        String(this.article_id),
-        this.author_image,
-        this.author_id,
-        this.author_username,
-        this.body,
-        String(Date.now() / 1000.00),
-        String(Date.now() / 1000.00)
+    const query =
+      "INSERT INTO article_comments (article_id, author_image, author_id, author_username, body, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, to_timestamp($6), to_timestamp($7));";
+    await BaseModel.query(
+      query,
+      String(this.article_id),
+      this.author_image,
+      this.author_id,
+      this.author_username,
+      this.body,
+      String(Date.now() / 1000.00),
+      String(Date.now() / 1000.00),
     );
 
     // @ts-ignore (crookse) We ignore this because this will never return null.

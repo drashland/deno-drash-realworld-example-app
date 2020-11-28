@@ -149,8 +149,16 @@ export class UserModel extends BaseModel {
       return this.update();
     }
 
-    const query = "INSERT INTO users (username, email, password, bio, image) VALUES ($1, $2, $3, $4, $5);";
-    const dbResult = await BaseModel.query(query, this.username, this.email, this.password, this.bio, this.image);
+    const query =
+      "INSERT INTO users (username, email, password, bio, image) VALUES ($1, $2, $3, $4, $5);";
+    const dbResult = await BaseModel.query(
+      query,
+      this.username,
+      this.email,
+      this.password,
+      this.bio,
+      this.image,
+    );
     if (dbResult.rowCount < 1) {
       return null;
     }
@@ -172,12 +180,14 @@ export class UserModel extends BaseModel {
     const query = "UPDATE users SET " +
       "username = $1, password = $2, email = $3, bio = $4, image = $5 " +
       `WHERE id = $6;`;
-    const dbResult = await BaseModel.query(query,  this.username,
-        this.password,
-        this.email,
-        this.bio,
-        this.image,
-        this.id
+    const dbResult = await BaseModel.query(
+      query,
+      this.username,
+      this.password,
+      this.email,
+      this.bio,
+      this.image,
+      this.id,
     );
     if (dbResult.rowCount! < 1) {
       return null;
