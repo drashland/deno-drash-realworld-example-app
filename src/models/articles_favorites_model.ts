@@ -146,7 +146,7 @@ export class ArticlesFavoritesModel extends BaseModel {
    * @return Promise<ArticlesFavoritesModel|null> Null if the query failed to update
    */
   public async update(): Promise<ArticlesFavoritesModel | null> {
-    let query = "UPDATE articles_favorites SET value = $1 WHERE id = $2;";
+    const query = "UPDATE articles_favorites SET value = $1 WHERE id = $2;";
     const dbResult = await BaseModel.query(query, String(this.value), this.id);
     if (dbResult.rowCount < 1) {
       return null;

@@ -6,7 +6,7 @@ class HomeResource extends BaseResource {
     "/",
   ];
 
-  public async GET() {
+  public GET() {
     this.response.headers.set("Content-Type", "text/html");
     this.response.body = this.response.render(
       "/index.html",
