@@ -15,22 +15,24 @@ export default class UserService {
    *       - No session exists with the "drash_sess" cookie
    *       - No user was found with that session
    */
-  static async getLoggedInUser(cookieValue: string): Promise<UserModel|boolean> {
-    const sessionCookie = cookieValue
+  static async getLoggedInUser(
+    cookieValue: string,
+  ): Promise<UserModel | boolean> {
+    const sessionCookie = cookieValue;
     if (!sessionCookie) {
-      return false
+      return false;
     }
     const sessionOne = sessionCookie.split("|::|")[0];
     const sessionTwo = sessionCookie.split("|::|")[1];
-    const session = await SessionModel.getUserSession(sessionOne, sessionTwo)
+    const session = await SessionModel.getUserSession(sessionOne, sessionTwo);
     if (!session) {
-      return false
+      return false;
     }
     const userId = session.user_id;
-    const user = await UserModel.where({ id: userId })
+    const user = await UserModel.where({ id: userId });
     if (!user.length) {
-      return false
+      return false;
     }
-    return user[0]
+    return user[0];
   }
 }

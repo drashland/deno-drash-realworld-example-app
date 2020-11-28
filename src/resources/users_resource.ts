@@ -1,4 +1,4 @@
-import { Drash, bcrypt } from "../deps.ts";
+import { bcrypt, Drash } from "../deps.ts";
 import BaseResource from "./base_resource.ts";
 import UserModel from "../models/user_model.ts";
 import SessionModel from "../models/session_model.ts";
@@ -21,13 +21,13 @@ class RegisterResource extends BaseResource {
   public async POST() {
     // Gather data
     const username = ValidationService.decodeInput(
-      this.request.getBodyParam("username"),
+      (this.request.getBodyParam("username") as string) || "",
     );
     const email = ValidationService.decodeInput(
-      this.request.getBodyParam("email"),
+      (this.request.getBodyParam("email") as string) || "",
     );
     const rawPassword = ValidationService.decodeInput(
-      this.request.getBodyParam("password"),
+      (this.request.getBodyParam("password") as string) || "",
     );
 
     console.log("Creating the following user:");
@@ -72,7 +72,7 @@ class RegisterResource extends BaseResource {
       );
     }
 
-    let entity = user.toEntity();
+    const entity = user.toEntity();
 
     // Create session for user. We return the session values on the user
     // object and the front-end is in charge of setting the values as a

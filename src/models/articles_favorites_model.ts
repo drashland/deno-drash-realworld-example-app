@@ -1,5 +1,5 @@
 import BaseModel from "./base_model.ts";
-import { QueryResult } from "../deps.ts";
+import type { QueryResult } from "../deps.ts";
 
 export type ArticlesFavoritesEntity = {
   article_id: number;
@@ -65,10 +65,10 @@ export class ArticlesFavoritesModel extends BaseModel {
   /**
    * TODO(ebebbington) What is this property used for?
    */
-  public query: string = "";
+  public query = "";
 
   //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - CONSTRCUTOR /////////////////////////////////////////////////
+  // FILE MARKER - CONSTRUCTOR /////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -210,7 +210,7 @@ export class ArticlesFavoritesModel extends BaseModel {
   static async where(
     fields: { [key: string]: string | number },
   ): Promise<ArticlesFavoritesModel[] | []> {
-    let results = await BaseModel.Where("articles_favorites", fields);
+    const results = await BaseModel.Where("articles_favorites", fields);
 
     if (results.length <= 0) {
       return [];
@@ -221,11 +221,11 @@ export class ArticlesFavoritesModel extends BaseModel {
     const articleFavorites: Array<ArticlesFavoritesModel> = [];
     results.forEach((result) => {
       const entity: ArticlesFavoritesEntity = {
-        article_id: typeof result.article_id === "number"
+        "article_id": typeof result.article_id === "number"
           ? result.article_id
           : 0,
         id: typeof result.id === "number" ? result.id : 0,
-        user_id: typeof result.user_id === "number" ? result.user_id : 0,
+        "user_id": typeof result.user_id === "number" ? result.user_id : 0,
         value: typeof result.value === "boolean" ? result.value : false,
       };
       articleFavorites.push(createArticlesFavoritesModelObject(entity));
@@ -244,9 +244,9 @@ export class ArticlesFavoritesModel extends BaseModel {
    */
   static async whereIn(
     column: string,
-    values: string[] | number[],
+    values: Array<number | string>,
   ): Promise<ArticlesFavoritesModel[] | []> {
-    let results = await BaseModel.WhereIn("articles_favorites", {
+    const results = await BaseModel.WhereIn("articles_favorites", {
       column,
       values,
     });
@@ -258,10 +258,10 @@ export class ArticlesFavoritesModel extends BaseModel {
     const articles: Array<ArticlesFavoritesModel> = [];
     results.forEach((result) => {
       const entity: ArticlesFavoritesEntity = {
-        article_id: typeof result.article_id === "number"
+        "article_id": typeof result.article_id === "number"
           ? result.article_id
           : 0,
-        user_id: typeof result.user_id === "number" ? result.user_id : 0,
+        "user_id": typeof result.user_id === "number" ? result.user_id : 0,
         value: typeof result.value === "boolean" ? result.value : false,
         id: typeof result.id === "number" ? result.id : 0,
       };

@@ -1,5 +1,5 @@
-import {Rhum} from "../deps.ts";
-import {clearTestUsers, createServerObject, createTestUser} from "./utils.ts";
+import { Rhum } from "../deps.ts";
+import { clearTestUsers, createServerObject, createTestUser } from "./utils.ts";
 
 const server = createServerObject();
 
@@ -40,23 +40,27 @@ Rhum.testPlan("integration/users_login_resource_test.ts", () => {
 
       const res = await fetch("http://localhost:1447/users/login", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           user: {
             email: "test@hotmail.com",
-            password: "TestPassword1"
-          }
-        })
-      })
-      const body = await res.json()
+            password: "TestPassword1",
+          },
+        }),
+      });
+
+      const body = await res.json();
 
       await clearTestUsers();
 
       Rhum.asserts.assertEquals(res.status, 200);
       // TODO(any) Asserts `body` and assert all the data was correctly saved
 
-      await server.close()
-    })
-  })
+      await server.close();
+    });
+  });
 });
 
 Rhum.run();

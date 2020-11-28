@@ -1,4 +1,4 @@
-import { Drash, bcrypt } from "../deps.ts";
+import { bcrypt, Drash } from "../deps.ts";
 import BaseResource from "./base_resource.ts";
 import UserModel from "../models/user_model.ts";
 import ValidationService from "../services/validation_service.ts";
@@ -18,8 +18,14 @@ export default class UserResource extends BaseResource {
    */
   public async GET() {
     this.response.body = await UserModel.where({
-      username: this.request.getPathParam("username"),
+      username: this.request.getPathParam("username") || "",
     });
+    if (!this.response.body) {
+      return this.errorResponse(
+        400,
+        "Username must exist in the uri",
+      );
+    }
     return this.response;
   }
 
@@ -44,32 +50,32 @@ export default class UserResource extends BaseResource {
     console.log("Handling UserResource POST.");
 
     // Gather data
-    const id = this.request.getBodyParam("id");
+    const id = (this.request.getBodyParam("id") as string | number) || "";
     const username = ValidationService.decodeInput(
-      this.request.getBodyParam("username"),
+      (this.request.getBodyParam("username") as string) || "",
     );
     const email = ValidationService.decodeInput(
-      this.request.getBodyParam("email"),
+      (this.request.getBodyParam("email") as string) || "",
     );
     const rawPassword = ValidationService.decodeInput(
-      this.request.getBodyParam("password"),
+      (this.request.getBodyParam("password") as string) || "",
     );
     const bio = ValidationService.decodeInput(
-      this.request.getBodyParam("bio"),
+      (this.request.getBodyParam("bio") as string) || "",
     );
     const image = ValidationService.decodeInput(
-      this.request.getBodyParam("image"),
+      (this.request.getBodyParam("image") as string) || "",
     );
-    const token = this.request.getBodyParam("token");
+    const token = (this.request.getBodyParam("token") as string) || "";
 
-    let result = await UserModel.where({ id: id });
+    const result = await UserModel.where({ id: id });
 
     if (result.length <= 0) {
       console.log("User not found.");
       return this.errorResponse(404, "Error updating your profile.");
     }
 
-    let user = result[0];
+    const user = result[0];
 
     // Validate
     console.log("Validating inputs.");
@@ -114,7 +120,7 @@ export default class UserResource extends BaseResource {
       );
     }
 
-    let entity = savedUser.toEntity();
+    const entity = savedUser.toEntity();
     // Make sure to pass the user's session token back to them
     entity.token = token;
 

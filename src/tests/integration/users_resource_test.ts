@@ -1,5 +1,5 @@
-import {Rhum} from "../deps.ts";
-import {clearTestUsers, createServerObject} from "./utils.ts";
+import { Rhum } from "../deps.ts";
+import { clearTestUsers, createServerObject } from "./utils.ts";
 
 const server = createServerObject();
 
@@ -29,29 +29,35 @@ Rhum.testPlan("integration/users_resource_test.ts", () => {
     // Rhum.testCase("Responds with 422 when password is not strong when passed in to register", ()  => {
     //   // TODO(any Assert response status and body
     // })
-    Rhum.testCase("Responds with 200 on a successful registration", async () => {
-      await server.run({ hostname: "localhost", port: 1447})
+    Rhum.testCase(
+      "Responds with 200 on a successful registration",
+      async () => {
+        await server.run({ hostname: "localhost", port: 1447 });
 
-      const res = await fetch("http://localhost:1447/users", {
-        method: "POST",
-        body: JSON.stringify({
-          username: "testUsername",
-          email: "test@hotmail.com",
-          password: "TestPassword1"
-        })
-      })
-      const body = await res.json()
+        const res = await fetch("http://localhost:1447/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: "testUsername",
+            email: "abc@hotmail.com",
+            password: "TestPassword1",
+          }),
+        });
+        const body = await res.json();
 
-      // TODO(any) assert user was correctly saved in db, along with the session
+        // TODO(any) assert user was correctly saved in db, along with the session
 
-      await clearTestUsers("testUsername");
+        await clearTestUsers("testUsername");
 
-      Rhum.asserts.assertEquals(res.status, 200)
-      // TODO(any) Assert `body`
+        Rhum.asserts.assertEquals(res.status, 200);
+        // TODO(any) Assert `body`
 
-      await server.close()
-    })
-  })
+        await server.close();
+      },
+    );
+  });
 });
 
 Rhum.run();

@@ -147,6 +147,8 @@ const router = new VueRouter({
 router.beforeEach(async (to, from, next) => {
   const result = await store.dispatch("checkIfUserIsAuthenticated");
   if (to.path !== "/login" && to.path !== "/register" && to.path !== "/") {
+    const result = await store.dispatch("checkIfUserIsAuthenticated");
+
     if (!result) {
       router.push("/login");
     }
@@ -175,4 +177,4 @@ window.app = new Vue({
   },
 });
 
-export { store, router };
+export { router, store };

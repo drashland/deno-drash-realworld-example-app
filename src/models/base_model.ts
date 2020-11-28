@@ -1,4 +1,5 @@
-import { Pool, PoolClient, QueryResult, Column } from "../deps.ts";
+import { Column, Pool, PoolClient } from "../deps.ts";
+import type { QueryResult } from "../deps.ts";
 
 export const dbPool = new Pool({
   user: "user",
@@ -56,9 +57,9 @@ export default abstract class BaseModel {
     const columnNames: string[] = columns.map((column) => {
       return column.name;
     });
-    let newResult: Array<{ [key: string]: string }> = [];
+    const newResult: Array<{ [key: string]: string }> = [];
     rows.forEach((row, rowIndex) => {
-      let rowData: { [key: string]: string } = {};
+      const rowData: { [key: string]: string } = {};
       row.forEach((rVal, rIndex) => {
         const columnName: string = columnNames[rIndex];
         rowData[columnName] = row[rIndex];
@@ -82,9 +83,9 @@ export default abstract class BaseModel {
     fields: { [key: string]: string | number },
   ): Promise<[] | Array<{ [key: string]: string | number | boolean }>> {
     let query = `SELECT * FROM ${table} WHERE `;
-    let clauses: string[] = [];
-    for (let field in fields) {
-      let value = fields[field];
+    const clauses: string[] = [];
+    for (const field in fields) {
+      const value = fields[field];
       clauses.push(`${field} = '${value}'`);
     }
     query += clauses.join(" AND ");
@@ -117,13 +118,13 @@ export default abstract class BaseModel {
    */
   static async WhereIn(
     table: string,
-    data: { values: string[] | number[]; column: string },
+    data: { values: Array<number | string> | number[]; column: string },
   ): Promise<[] | Array<{ [key: string]: string | number | boolean }>> {
     if (data.values.length <= 0) {
       return [];
     }
 
-    let query = `SELECT * FROM ${table} ` +
+    const query = `SELECT * FROM ${table} ` +
       ` WHERE ${data.column} ` +
       ` IN (${data.values.join(",")})`;
 
@@ -162,12 +163,12 @@ export default abstract class BaseModel {
    * @return string
    *     The query with the placeholders replaced with the data
    */
-  protected prepareQuery(query: string, data?: Array<string|number>): string {
+  protected prepareQuery(query: string, data?: Array<string | number>): string {
     if (!data || !data.length) {
       return query;
     }
     // First create an array item for each placeholder
-    let occurrences = query.split("?");
+    const occurrences = query.split("?");
     if (occurrences[occurrences.length - 1] === "") { // for when last item is ""
       occurrences.splice(occurrences.length - 1);
     }

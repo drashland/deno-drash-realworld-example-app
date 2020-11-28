@@ -1,7 +1,7 @@
 import { Rhum } from "../deps.ts";
-import {clearTestUsers, createServerObject, createTestUser} from "./utils.ts";
+import { clearTestUsers, createServerObject, createTestUser } from "./utils.ts";
 
-const server = createServerObject()
+const server = createServerObject();
 
 Rhum.testPlan("integration/profiles_resource_test.ts", () => {
   Rhum.testSuite("GET /profiles/:username", () => {
@@ -18,17 +18,19 @@ Rhum.testPlan("integration/profiles_resource_test.ts", () => {
 
       const user = await createTestUser();
 
-      const res  = await fetch(`http://localhost:1447/profiles/${user.username}`)
-      const body  = await res.json()
+      const res = await fetch(
+        `http://localhost:1447/profiles/${user.username}`,
+      );
+      const body = await res.json();
 
       await clearTestUsers();
 
-      Rhum.asserts.assertEquals(res.status, 200)
+      Rhum.asserts.assertEquals(res.status, 200);
       Rhum.asserts.assertEquals(body.profile.username, "testUsername");
 
-      await server.close()
-    })
-  })
+      await server.close();
+    });
+  });
 });
 
 Rhum.run();

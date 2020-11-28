@@ -1,6 +1,6 @@
-import { Drash, bcrypt } from "../deps.ts";
+import { bcrypt, Drash } from "../deps.ts";
 import BaseResource from "./base_resource.ts";
-import UserModel from "../models/user_model.ts";
+import UserModel, { UserEntity } from "../models/user_model.ts";
 import SessionModel from "../models/session_model.ts";
 import ValidationService from "../services/validation_service.ts";
 
@@ -37,7 +37,6 @@ class LoginResource extends BaseResource {
    */
   public async POST() {
     console.log("Handling LoginResource POST.");
-
     const action = this.request.getBodyParam("action");
     if (action == "check_if_user_is_authenticated") {
       return await this.checkIfUserIsAuthenticated();
@@ -57,7 +56,7 @@ class LoginResource extends BaseResource {
    */
   protected async checkIfUserIsAuthenticated(): Promise<Drash.Http.Response> {
     console.log("Checking if user has a session.");
-    const sessionValues = this.request.getBodyParam("token");
+    const sessionValues = (this.request.getBodyParam("token") as string);
     if (sessionValues) {
       const sessionValuesSplit = sessionValues.split("|::|");
       const sessionOne = sessionValuesSplit[0];
@@ -68,9 +67,9 @@ class LoginResource extends BaseResource {
           sessionTwo,
         );
         if (session) {
-          let user = await UserModel.where({ "id": session.user_id });
+          const user = await UserModel.where({ "id": session.user_id });
           if (user.length > 0) {
-            let entity = user[0].toEntity();
+            const entity = user[0].toEntity();
             entity.token = `${session.session_one}|::|${session.session_two}`;
             this.response.body = {
               user: entity,
@@ -98,7 +97,8 @@ class LoginResource extends BaseResource {
    * @return Promise<Drash.Http.Response>
    */
   protected async logInUser(): Promise<Drash.Http.Response> {
-    const inputUser = this.request.getBodyParam("user");
+    const inputUser: UserEntity =
+      (this.request.getBodyParam("user") as UserEntity);
 
     if (!inputUser.email) {
       return this.errorResponse(422, "Email field required.");
@@ -115,13 +115,15 @@ class LoginResource extends BaseResource {
       return this.errorResponse(422, "Invalid user credentials.");
     }
 
-    let user = result[0];
+    const user = result[0];
 
-    const password = this.request.getBodyParam("user").password;
-    if (!password) {
+    const rawPassword = inputUser.password ? inputUser.password : "";
+    if (!rawPassword) {
       return this.errorResponse(422, "Password field required.");
     }
-    if (!(await ValidationService.isPasswordCorrect(password, user.password))) {
+    if (
+      !(await ValidationService.isPasswordCorrect(rawPassword, user.password))
+    ) {
       console.log("Passwords do not match.");
       return this.errorResponse(422, "Invalid user credentials.");
     }
@@ -140,7 +142,7 @@ class LoginResource extends BaseResource {
       );
     }
 
-    let entity = user.toEntity();
+    const entity = user.toEntity();
     entity.token = `${session.session_one}|::|${session.session_two}`;
 
     this.response.body = {

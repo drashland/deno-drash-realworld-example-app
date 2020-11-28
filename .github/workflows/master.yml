@@ -11,9 +11,6 @@ on:
 jobs:
 
   tests:
-    strategy:
-      matrix:
-        deno: ["1.1.1"]
 
     runs-on: ubuntu-latest
 
@@ -36,11 +33,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install Deno v${{ matrix.deno }}
+      - name: Install Deno
         uses: denolib/setup-deno@master
 
       - name: Formatter
-        run: deno fmt --check
+        run: deno fmt --check --unstable --ignore='src/public,src/vue,src/package.json,src/webpack.config.js'
 
-      #- name: Linter
-      #  run: deno lint --unstable
+      - name: Linter
+        run: deno lint --unstable --ignore='src/public,src/vue,src/package.json,src/webpack.config.js'

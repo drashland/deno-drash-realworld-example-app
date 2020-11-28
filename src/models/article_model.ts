@@ -1,6 +1,6 @@
 import BaseModel from "./base_model.ts";
-import { UserEntity, UserModel } from "./user_model.ts";
-import { QueryResult } from "../deps.ts";
+import type { UserEntity, UserModel } from "./user_model.ts";
+import type { QueryResult } from "../deps.ts";
 
 export type ArticleEntity = {
   author?: UserEntity | null;
@@ -14,7 +14,7 @@ export type ArticleEntity = {
   slug?: string;
   title: string;
   updated_at: number;
-  tags?: string
+  tags?: string;
 };
 
 export type Filters = {
@@ -94,14 +94,14 @@ export class ArticleModel extends BaseModel {
    *
    * If the article is favorited
    */
-  public favorited: boolean = false;
+  public favorited = false;
 
   /**
    * @var numbers [=0]
    *
    * Number of favourites the article has accumulated
    */
-  public favoritesCount: number = 0;
+  public favoritesCount = 0;
 
   /**
    * @var number
@@ -261,7 +261,7 @@ export class ArticleModel extends BaseModel {
         this.description,
         this.body,
         String(Date.now()),
-        this.tags
+        this.tags,
       ],
     );
     const client = await BaseModel.connect();
@@ -305,7 +305,7 @@ export class ArticleModel extends BaseModel {
       return [];
     }
 
-    let results = BaseModel.formatResults(
+    const results = BaseModel.formatResults(
       dbResult.rows,
       dbResult.rowDescription.columns,
     );
@@ -318,8 +318,10 @@ export class ArticleModel extends BaseModel {
       const entity: ArticleEntity = {
         id: typeof result.id === "number" ? result.id : 0,
         body: typeof result.body === "string" ? result.body : "",
-        author_id: typeof result.author_id === "number" ? result.author_id : 0,
-        created_at: typeof result.created_at === "number"
+        "author_id": typeof result.author_id === "number"
+          ? result.author_id
+          : 0,
+        "created_at": typeof result.created_at === "number"
           ? result.created_at
           : 0,
         description: typeof result.description === "string"
@@ -332,10 +334,11 @@ export class ArticleModel extends BaseModel {
           ? result.favoritesCount
           : 0,
         title: typeof result.title === "string" ? result.title : "",
-        updated_at: typeof result.updated_at === "number" ? result.updated_at
-        : 0,
+        "updated_at": typeof result.updated_at === "number"
+          ? result.updated_at
+          : 0,
         tags: typeof result.tags === "string" ? result.tags : "",
-        slug: typeof result.slug === "string" ? result.slug : ""
+        slug: typeof result.slug === "string" ? result.slug : "",
       };
       articles.push(createArticleModelObject(entity));
     });
@@ -353,7 +356,7 @@ export class ArticleModel extends BaseModel {
   static async where(
     fields: { [key: string]: string | number },
   ): Promise<ArticleModel[] | []> {
-    let results = await BaseModel.Where("articles", fields);
+    const results = await BaseModel.Where("articles", fields);
 
     if (results.length <= 0) {
       return [];
@@ -364,8 +367,10 @@ export class ArticleModel extends BaseModel {
       const entity: ArticleEntity = {
         id: typeof result.id === "number" ? result.id : 0,
         body: typeof result.body === "string" ? result.body : "",
-        author_id: typeof result.author_id === "number" ? result.author_id : 0,
-        created_at: typeof result.created_at === "number"
+        "author_id": typeof result.author_id === "number"
+          ? result.author_id
+          : 0,
+        "created_at": typeof result.created_at === "number"
           ? result.created_at
           : 0,
         description: typeof result.description === "string"
@@ -378,10 +383,11 @@ export class ArticleModel extends BaseModel {
           ? result.favoritesCount
           : 0,
         title: typeof result.title === "string" ? result.title : "",
-        updated_at: typeof result.updated_at === "number" ? result.updated_at
-        : 0,
+        "updated_at": typeof result.updated_at === "number"
+          ? result.updated_at
+          : 0,
         tags: typeof result.tags === "string" ? result.tags : "",
-        slug: typeof result.slug === "string" ? result.slug : ""
+        slug: typeof result.slug === "string" ? result.slug : "",
       };
       articles.push(createArticleModelObject(entity));
     });
@@ -401,7 +407,7 @@ export class ArticleModel extends BaseModel {
     column: string,
     values: string[] | number[],
   ): Promise<ArticleModel[] | []> {
-    let results = await BaseModel.WhereIn("articles", {
+    const results = await BaseModel.WhereIn("articles", {
       column,
       values,
     });
@@ -415,8 +421,10 @@ export class ArticleModel extends BaseModel {
       const entity: ArticleEntity = {
         id: typeof result.id === "number" ? result.id : 0,
         body: typeof result.body === "string" ? result.body : "",
-        author_id: typeof result.author_id === "number" ? result.author_id : 0,
-        created_at: typeof result.created_at === "number"
+        "author_id": typeof result.author_id === "number"
+          ? result.author_id
+          : 0,
+        "created_at": typeof result.created_at === "number"
           ? result.created_at
           : 0,
         description: typeof result.description === "string"
@@ -429,10 +437,11 @@ export class ArticleModel extends BaseModel {
           ? result.favoritesCount
           : 0,
         title: typeof result.title === "string" ? result.title : "",
-        updated_at: typeof result.updated_at === "number" ? result.updated_at
-        : 0,
+        "updated_at": typeof result.updated_at === "number"
+          ? result.updated_at
+          : 0,
         tags: typeof result.tags === "string" ? result.tags : "",
-        slug: typeof result.slug === "string" ? result.slug : ""
+        slug: typeof result.slug === "string" ? result.slug : "",
       };
       articles.push(createArticleModelObject(entity));
     });

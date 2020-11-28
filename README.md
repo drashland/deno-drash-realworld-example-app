@@ -1,22 +1,13 @@
 # ![Drash Example App](logo.png)
 
-___This respository is still very much under development. Things will change. Things will break. Please take caution when looking at or using the code in this repository.___
-
 ### Drash codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) spec and API.
 
-This real world example application uses Deno, Drash, Vue, webpack, PostgreSQL, and docker-compose.
-
-Requires:
-* Deno v1.1.1
-* Drash v1.0.6
+This real world example application uses Deno, Drash, Vue, Webpack, PostgreSQL, and docker-compose.
 
 # How to Run
 
 ```
 $ docker-compose build && docker-compose up -d
-$ cd src
-$ npm install
-$ npm run webpack
 ```
 
 Navigate to `localhost:1667`
@@ -34,8 +25,9 @@ Navigate to `localhost:1667`
 - [ ] Redis?
 - [ ] API container?
 - [ ] Web socket?
-- [ ] Database model representations
+- [x] Database model representations
 - [x] Vue (built with webpack using Vue Single File Components)
+- [ ] Cypress
 
 # Frontend login
 
@@ -58,4 +50,7 @@ Email: user32@hotmail.com
 - [Postgres](https://github.com/deno-postgres/deno-postgres) - Postgres driver for the applications database
 - [Bcrypt](https://github.com/jamesbroadberry/deno-bcrypt/tree/master) - Hashing and comparing passwords
 - [Rhum](https://github.com/drashland/rhum) - Testing framework
+- [Dmm](https://github.com/drashland/dmm) - Module Manager for Deno to update our dependencies
+- [Vue-input](https://www.npmjs.com/package/@johmun/vue-tags-input) - Library used to help the display of article tags as 'pills', allowing them to be removed and added like a shopping cart
+- [Cypress](https://cypress.io/) - Browser testing framework
 
