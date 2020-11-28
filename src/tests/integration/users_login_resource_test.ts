@@ -32,11 +32,12 @@ Rhum.testPlan("integration/users_login_resource_test.ts", () => {
     //   // TODO(any Assert response status and body
     // })
     Rhum.testCase("Responds with 200 on a successful POST", async () => {
-      await clearTestUsers();
+      const server = createServerObject();
+      await server.run({ hostname: "localhost", port: 1447 })
 
       await createTestUser();
 
-      const res = await fetch("http://realworld_drash:1667/users/login", {
+      const res = await fetch("http://localhost:1447/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,7 +52,10 @@ Rhum.testPlan("integration/users_login_resource_test.ts", () => {
 
       const body = await res.json();
 
+
       await clearTestUsers();
+
+      server.close()
 
       Rhum.asserts.assertEquals(res.status, 200);
       // TODO(any) Asserts `body` and assert all the data was correctly saved
