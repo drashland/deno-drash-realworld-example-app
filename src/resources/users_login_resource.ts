@@ -3,8 +3,6 @@ import BaseResource from "./base_resource.ts";
 import UserModel, { UserEntity } from "../models/user_model.ts";
 import SessionModel from "../models/session_model.ts";
 import ValidationService from "../services/validation_service.ts";
-import {QueryResult} from "../deps.ts";
-import BaseModel from "../models/base_model.ts";
 
 class LoginResource extends BaseResource {
   static paths = [

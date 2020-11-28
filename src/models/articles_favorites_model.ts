@@ -1,5 +1,4 @@
 import BaseModel from "./base_model.ts";
-import type { QueryResult } from "../deps.ts";
 
 export type ArticlesFavoritesEntity = {
   article_id: number;

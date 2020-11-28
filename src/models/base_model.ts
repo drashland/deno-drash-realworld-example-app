@@ -1,75 +1,29 @@
-import { Column, Pool, PoolClient } from "../deps.ts";
-import type { QueryResult } from "../deps.ts";
+//import { db } from "../db.ts"
 
-type FormattedResults = [] | Array<{ [key: string]: string | number | boolean }>
-
-export const dbPool = new Pool({
-  user: "user",
-  password: "userpassword",
-  database: "realworld",
-  hostname: "realworld_postgres",
-  port: 5432,
-}, 50);
+import { KeyedRow } from "../deps.ts"
+import {connectPg, PgConn} from "../deps.ts";
 
 export default abstract class BaseModel {
-  //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
 
-  /**
-   * @description
-   * Connects to a pool of the db and returns the connection object
-   *
-   * @return Promise<PoolClient>
-   */
-  static async connect(): Promise<PoolClient> {
-    return await dbPool.connect();
+  private static async getDb (): Promise<PgConn> {
+    const db: PgConn = await connectPg({
+      username: "user",
+      password: "userpassword",
+      database: "realworld",
+      hostname: "realworld_postgres",
+      port: 5432,
+      sslMode: "disable"
+    });
+    return db
+  }
+
+  private static closeDb (db: PgConn) {
+    db.close()
   }
 
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * @description
-   *     Uses the data received from the database table and the column names to
-   *     format the result into key value pairs.
-   *
-   * @param Array<string[]> rows
-   *     An array of the rows from the table, each containing column values.
-   * @param Column[] columns
-   *     Array of objects, each object holding column data. Used the get the
-   *     column name.
-   *
-   * @return []|[{[key: string]: string}]
-   *     Empty array of no db rows, else array of rows as key value pairs.
-   *     For example:
-   *         [{ name: "ed"}, {name: "eric}]
-   *
-   * @example
-   * BaseModel.formatResults([[1, 'ed'], [2, 'john']], [{name: 'id', ...}, {name: 'name', ...}]);
-   */
-  private static formatResults(
-    rows: Array<string[]>,
-    columns: Column[],
-  ): FormattedResults {
-    if (!rows.length) {
-      return [];
-    }
-    const columnNames: string[] = columns.map((column) => {
-      return column.name;
-    });
-    const newResult: Array<{ [key: string]: string }> = [];
-    rows.forEach((row, rowIndex) => {
-      const rowData: { [key: string]: string } = {};
-      row.forEach((rVal, rIndex) => {
-        const columnName: string = columnNames[rIndex];
-        rowData[columnName] = row[rIndex];
-      });
-      newResult.push(rowData);
-    });
-    return newResult;
-  }
 
   /**
    * @description
@@ -129,10 +83,6 @@ export default abstract class BaseModel {
     return dbResult.rows
   }
 
-  //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - METHODS - PROTECTED /////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-
   /**
    * @description
    * Responsible for running all the queries
@@ -154,25 +104,24 @@ export default abstract class BaseModel {
    *     - The row count
    *     - If there was an error thrown
    */
-  public static async query(query: string, ...args: unknown[]): Promise<{ rows: FormattedResults, rowCount: number, error?: boolean}> {
+  public static async query(query: string, ...args: Array<string | number>): Promise<{ rows: KeyedRow[], rowCount: number, error?: boolean}> {
     try {
-      const client = await BaseModel.connect();
-      const dbResult = args && args.length ? await client.query(query, ...args) : await client.query(query)
-      await client.release();
-      const rowCount = dbResult.rowCount as number
-      if (dbResult.rows.length) {
-        const formattedResults = BaseModel.formatResults(
-            dbResult.rows,
-            dbResult.rowDescription.columns
-        );
-        return {
-          rows: formattedResults,
-          rowCount
+      query = query.replace(/\$[0-9]/g, "?param?")
+      if (args && args.length) {
+        for (let i = 0, j = 1; i < args.length; i++, j++) {
+          if (typeof args[i] === "number") {
+            query = query.replace(`?param?`, args[i] as string)
+          } else if (typeof args[i] === "string") {
+            query = query.replace(`?param?`, `'${args[i]}'`)
+          }
         }
       }
+      const db = await BaseModel.getDb()
+      const dbResult = await db.query(query)
+      BaseModel.closeDb(db)
       return {
-        rows: [],
-        rowCount: rowCount
+        rows: dbResult.rows,
+        rowCount: dbResult.completionInfo.numAffectedRows || 0
       }
     } catch (err) {
       console.error(err)

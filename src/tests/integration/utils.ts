@@ -9,8 +9,6 @@ import UsersLoginResource from "../../resources/users_login_resource.ts";
 import UsersResource from "../../resources/users_resource.ts";
 import type { ArticleEntity } from "../../models/article_model.ts";
 import BaseModel from "../../models/base_model.ts";
-import type { QueryResult } from "../../deps.ts";
-import { ArticleCommentEntity } from "../../models/article_comments_model.ts";
 
 // TODO(edward) Add docblocks
 
@@ -123,7 +121,7 @@ export async function createTestUser(overrides: {
   bio?: string;
 } = {}) {
   const query =
-    `INSERT INTO users (username, password, email, created_on, last_login, image, bio) VALUES($1, $2, $3, to_timestamp($4), to_timestamp($5), $6, $7);`;
+    `INSERT INTO users (username, password, email, created_on, last_login, image, bio) VALUES ($1, $2, $3, to_timestamp($4), to_timestamp($5), $6, $7);`;
   await BaseModel.query(query, overrides && overrides.username ? overrides.username : "testUsername",
       overrides && overrides.password
           ? await bcrypt.hash(overrides.password)
@@ -133,7 +131,7 @@ export async function createTestUser(overrides: {
       String(Date.now() / 100.00),
       overrides && overrides.image ? overrides.image
           : "https://static.productionready.io/images/smiley-cyrus.jpg",
-      overrides && overrides.bio ? overrides.bio : "Test bio",);
+      overrides && overrides.bio ? overrides.bio : "Test bio");
   const username = overrides && overrides.username
     ? overrides.username
     : "testUsername";
@@ -148,9 +146,8 @@ export async function clearTestUsers(username?: string) {
   let query = `SELECT * FROM users WHERE username = '${username}'`;
   const result = await BaseModel.query(query);
   const id = result.rows.length ? result.rows[0]["id"] : 0;
-  console.log('clearing test user. Here is idd: ' + id)
   if (id) {
-    query = `DELETE FROM sessions WHERE user_id =  ${id}`;
+    query = `DELETE FROM sessions WHERE user_id = ${id}`;
     await BaseModel.query(query);
   }
   await BaseModel.query(`DELETE FROM users WHERE username = '${username}'`);

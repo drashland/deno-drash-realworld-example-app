@@ -50,11 +50,11 @@ Rhum.testPlan("integration/users_login_resource_test.ts", () => {
       });
 
       const body = await res.json();
-      console.log(body)
+
+      await clearTestUsers();
 
       Rhum.asserts.assertEquals(res.status, 200);
       // TODO(any) Asserts `body` and assert all the data was correctly saved
-
     });
   });
 });

@@ -1,5 +1,4 @@
 import BaseModel from "./base_model.ts";
-import type { QueryResult } from "../deps.ts";
 
 export type UserEntity = {
   bio?: string;
