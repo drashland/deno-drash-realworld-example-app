@@ -141,7 +141,7 @@ export class SessionModel extends BaseModel {
       throw new Error("Session record already exists.");
     }
 
-    let query = "INSERT INTO sessions " +
+    const query = "INSERT INTO sessions" +
       " (user_id, session_one, session_two)" +
       " VALUES ($1, $2, $3);";
     const dbResult = await BaseModel.query(query, String(this.user_id),
@@ -153,7 +153,7 @@ export class SessionModel extends BaseModel {
 
     // (crookse) We ignore this because getUserSession() can return null if the
     // session is not found. However, in this case, it will never be null.
-    return SessionModel.getUserSession(this.session_one, this.session_two);
+    return await SessionModel.getUserSession(this.session_one, this.session_two);
   }
 }
 

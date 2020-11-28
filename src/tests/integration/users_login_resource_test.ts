@@ -1,8 +1,6 @@
 import { Rhum } from "../deps.ts";
 import { clearTestUsers, createServerObject, createTestUser } from "./utils.ts";
 
-const server = createServerObject();
-
 Rhum.testPlan("integration/users_login_resource_test.ts", () => {
   Rhum.testSuite("POST /users/login", () => {
     // TODO(any) Not completing for the v1 release as it isn't needed, but nice to have
@@ -34,11 +32,11 @@ Rhum.testPlan("integration/users_login_resource_test.ts", () => {
     //   // TODO(any Assert response status and body
     // })
     Rhum.testCase("Responds with 200 on a successful POST", async () => {
-      await server.run({ hostname: "localhost", port: 1447 });
+      await clearTestUsers();
 
       await createTestUser();
 
-      const res = await fetch("http://localhost:1447/users/login", {
+      const res = await fetch("http://realworld_drash:1667/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,13 +50,11 @@ Rhum.testPlan("integration/users_login_resource_test.ts", () => {
       });
 
       const body = await res.json();
-
-      await clearTestUsers();
+      console.log(body)
 
       Rhum.asserts.assertEquals(res.status, 200);
       // TODO(any) Asserts `body` and assert all the data was correctly saved
 
-      server.close();
     });
   });
 });

@@ -172,7 +172,7 @@ export default abstract class BaseModel {
       }
       return {
         rows: [],
-        rowCount: 0
+        rowCount: rowCount
       }
     } catch (err) {
       console.error(err)
