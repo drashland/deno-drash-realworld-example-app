@@ -113,14 +113,14 @@ export class SessionModel extends BaseModel {
       // (ebebbington) Because we currently dont have a way to assign the entity type to `session` (and it work,
       // as it would error because that type isn't the return value of `formatResults`)
       const sessionEntity: SessionModelEntity = {
-        session_one: typeof session.session_one === "string"
+        "session_one": typeof session.session_one === "string"
           ? session.session_one
           : "",
-        session_two: typeof session.session_two === "string"
+        "session_two": typeof session.session_two === "string"
           ? session.session_two
           : "",
         id: typeof session.id === "number" ? session.id : 0,
-        user_id: typeof session.user_id === "number" ? session.user_id : 0,
+        "user_id": typeof session.user_id === "number" ? session.user_id : 0,
       };
       return createSessionModel(sessionEntity);
     }
