@@ -72,6 +72,7 @@ const routesDef = [
         path: "my-feed",
         name: "home-my-feed",
         component: HomeMyFeed,
+        protected: true,
       },
       {
         path: "tag/:tag",
@@ -148,26 +149,36 @@ const router = new VueRouter({
 });
 
 // Ensure we checked auth before each page load.
-// router.beforeEach(async (to, from, next) => {
-//   const x = routesDef.filter((x) => x.path !== "/" && x.path !== "*").find((e) => to.path.match(new RegExp(e.path)));
-//   console.log("===>>>", x, to.path);
-//   const result = await store.dispatch("checkIfUserIsAuthenticated");
-//   // if (to.path.match(/\/(@.*\/.*|settings|editor|my-feed)/g)) {
-//   if (!result) {
-//     router.push("/login");
-//   }
-//   next();
-//   // } else {
-//   //   next();
-//   // }
-// });
-
 router.beforeEach(async (to, from, next) => {
-  if (to.path !== "/login" && to.path !== "/register" && to.path !== "/") {
-    const result = await store.dispatch("checkIfUserIsAuthenticated");
-    if (!result) {
-      router.push("/login");
-    }
+  const protectedRoutesRegex = [
+    ...new Set( //Set to remove duplicates
+      routesDef
+        .filter((rdf) => rdf.protected) //filter just the protected paths
+        .map((r) => r.path.replace(/:([a-zA-Z0-9]*)/g, "[a-zA-Z0-9]*")) // map from route string to regex to match
+        .concat(
+          routesDef
+            .map(
+              (rd) =>
+                !rd.children
+                  ? []
+                  : rd.children
+                      .filter((rdf) => rdf.protected) // filter just the protected paths from children paths
+                      .map((c) => rd.path + (c.path ? "/" : "") + c.path.replace(/:([a-zA-Z0-9]*)/g, "[a-zA-Z0-9]*")) // matp from route to string regex to match concactanating the parent path
+            )
+            .reduce((a, b) => a.concat(b)) // concat base routes with children routes
+            .map((rt) => rt.replace(/\/\/+/g, "/")) // remove duplcated slashes
+        )
+    ),
+  ]
+    .sort((x, y) => x.split("/").length - y.split("/").length)
+    .reverse(); // sort from the more specific route to more generic
+
+  console.log(protectedRoutesRegex);
+
+  const result = await store.dispatch("checkIfUserIsAuthenticated");
+  if (!result && protectedRoutesRegex.find((prr) => to.path.match(new RegExp(prr)))) {
+    router.push("/login");
+
     next();
   } else {
     next();
@@ -177,6 +188,22 @@ router.beforeEach(async (to, from, next) => {
   //   next();
   // }
 });
+
+// router.beforeEach(async (to, from, next) => {
+//   if (to.path !== "/login" && to.path !== "/register" && to.path !== "/") {
+//     const result = await store.dispatch("checkIfUserIsAuthenticated");
+//     if (!result) {
+//       router.push("/login");
+//     }
+//     next();
+//   } else {
+//     next();
+//   }
+//   next();
+//   // } else {
+//   //   next();
+//   // }
+// });
 
 //
 // Vue app initialization
