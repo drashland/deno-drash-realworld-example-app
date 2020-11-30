@@ -150,33 +150,43 @@ const router = new VueRouter({
 
 // Ensure we checked auth before each page load.
 router.beforeEach(async (to, from, next) => {
-  const protectedRoutesRegex = [
-    ...new Set( //Set to remove duplicates
-      routesDef
-        .filter((rdf) => rdf.protected) //filter just the protected paths
-        .map((r) => r.path.replace(/:([a-zA-Z0-9]*)/g, "[a-zA-Z0-9]*")) // map from route string to regex to match
-        .concat(
-          routesDef
-            .map(
-              (rd) =>
-                !rd.children
-                  ? []
-                  : rd.children
-                      .filter((rdf) => rdf.protected) // filter just the protected paths from children paths
-                      .map((c) => rd.path + (c.path ? "/" : "") + c.path.replace(/:([a-zA-Z0-9]*)/g, "[a-zA-Z0-9]*")) // matp from route to string regex to match concactanating the parent path
-            )
-            .reduce((a, b) => a.concat(b)) // concat base routes with children routes
-            .map((rt) => rt.replace(/\/\/+/g, "/")) // remove duplcated slashes
-        )
-    ),
-  ]
-    .sort((x, y) => x.split("/").length - y.split("/").length)
-    .reverse(); // sort from the more specific route to more generic
+  // 1) filter just the protected routes because we need to check whether de user is logged in
+  //    just in protected routes
+  const protectedRoutes = routesDef.filter((rdf) => rdf.protected);
 
-  console.log(protectedRoutesRegex);
+  // 2) map from route path string to regex to use to match with the "to.path"
+  const basePathsRoutesRegex = protectedRoutes.map((r) => r.path.replace(/:([a-zA-Z0-9]*)/g, "[a-zA-Z0-9]*"));
+
+  // 3) filter just the protected paths from children paths and like in 2), map from route path string to regex to use to match,
+  // but adding the base path as prefix. In this `map` the result will be and array of arrays (children for each base path)
+  const childrenProtectedRoutesRegexArrs = routesDef.map(
+    (rd) =>
+      !rd.children
+        ? []
+        : rd.children
+            .filter((rdf) => rdf.protected) // filter just the protected routes
+            .map((c) => rd.path + (c.path ? "/" : "") + c.path.replace(/:([a-zA-Z0-9]*)/g, "[a-zA-Z0-9]*")) // map the regex adding the base path as prefix
+  );
+
+  // 4) concat all the children base paths intro a single array
+  const childrenProtectedRoutesRegex = childrenProtectedRoutesRegexArrs.reduce((a, b) => a.concat(b));
+
+  // 5) concat the base path regex with the children path regex
+  const allPathsRegex = basePathsRoutesRegex.concat(childrenProtectedRoutesRegex);
+
+  // 6) Put the result in a Set to have unique values
+  const allPathsRegexUnique = [...new Set(allPathsRegex)];
+
+  // 7) Remove duplicated slashes
+  const allPathsRegexUniqueSlashesSanitized = allPathsRegexUnique.map((rt) => rt.replace(/\/\/+/g, "/"));
+
+  // 8) Sort from the more specific rule to the more generic
+  const orderedPathsRegex = allPathsRegexUniqueSlashesSanitized.sort((x, y) => x.split("/").length - y.split("/").length).reverse();
+
+  console.log(orderedPathsRegex);
 
   const result = await store.dispatch("checkIfUserIsAuthenticated");
-  if (!result && protectedRoutesRegex.find((prr) => to.path.match(new RegExp(prr)))) {
+  if (!result && orderedPathsRegex.find((prr) => to.path.match(new RegExp(prr)))) {
     router.push("/login");
 
     next();
