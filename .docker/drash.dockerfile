@@ -11,9 +11,6 @@ RUN curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=/usr/local 
 RUN export DENO_INSTALL="/usr/bin"
 RUN export PATH="$DENO_INSTALL/bin:$PATH"
 
-RUN echo "#!/bin/bash" > "/root/startup.sh"
-RUN echo "deno run --allow-net --allow-read --watch --unstable app.ts &" >> "/root/startup.sh"
-RUN echo "npm i && npm run webpack-watch" >> "/root/startup.sh"
-RUN chmod +x "/root/startup.sh"
-RUN ls -lah /root
-ENTRYPOINT [ "/root/startup.sh" ]
+COPY ./.docker/drash-entrypoint.sh /drash-entrypoint.sh
+RUN chmod +x /drash-entrypoint.sh
+ENTRYPOINT ["/drash-entrypoint.sh"]
