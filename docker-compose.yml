@@ -1,7 +1,6 @@
-version: '3'
+version: "3"
 
 services:
-
   apache:
     container_name: realworld_apache
     build:
@@ -40,7 +39,6 @@ services:
     working_dir: /var/www/src
     ports:
       - "1667:1667"
-    command: bash -c "npm i && npm run webpack && deno run --allow-net --allow-read --unstable app.ts"
     networks:
       - drash-app-network
 

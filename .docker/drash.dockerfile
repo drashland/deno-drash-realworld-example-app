@@ -7,6 +7,10 @@ RUN apt update -y \
   && apt install -y --no-install-recommends npm \
   && npm install -g npm@latest
 
-RUN curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=/usr/local sh -s v1.5.1
+RUN curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=/usr/local sh -s v1.5.4
 RUN export DENO_INSTALL="/usr/bin"
 RUN export PATH="$DENO_INSTALL/bin:$PATH"
+
+COPY ./.docker/drash-entrypoint.sh /drash-entrypoint.sh
+RUN chmod +x /drash-entrypoint.sh
+ENTRYPOINT ["/drash-entrypoint.sh"]
