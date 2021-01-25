@@ -1,4 +1,4 @@
-import { Drash } from "./deps.ts";
+import {Drash, Tengine} from "./deps.ts";
 
 // Resources
 import ArticleCommentsResource from "./resources/article_comments_resource.ts";
@@ -28,8 +28,6 @@ const server = new Drash.Http.Server({
     UsersResource,
   ],
   static_paths: ["/public"],
-  views_path: "./public/views",
-  template_engine: true,
 });
 
 server.run({
