@@ -2,7 +2,7 @@ import { bcrypt, Drash } from "../../deps.ts";
 import type { ArticleEntity } from "../../models/article_model.ts";
 import BaseModel from "../../models/base_model.ts";
 import type { QueryResult } from "../../deps.ts";
-import {server} from "../../server.ts";
+import { server } from "../../server.ts";
 
 // TODO(edward) Add docblocks
 

@@ -1,4 +1,4 @@
-import {Drash} from "./deps.ts";
+import { Drash } from "./deps.ts";
 import ArticleCommentsResource from "./resources/article_comments_resource.ts";
 import ArticlesResource from "./resources/articles_resource.ts";
 import HomeResource from "./resources/home_resource.ts";

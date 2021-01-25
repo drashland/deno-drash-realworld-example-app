@@ -1,6 +1,6 @@
 import { Drash } from "../deps.ts";
 import BaseResource from "./base_resource.ts";
-import {tengine} from "../middlewares/tengine.ts";
+import { tengine } from "../middlewares/tengine.ts";
 
 class HomeResource extends BaseResource {
   static paths = [
@@ -9,7 +9,7 @@ class HomeResource extends BaseResource {
 
   @Drash.Http.Middleware({
     before_request: [tengine],
-    after_request: []
+    after_request: [],
   })
   public async GET() {
     this.response.headers.set("Content-Type", "text/html");
