@@ -9,13 +9,13 @@ Rhum.testPlan("tests/unit/base_model_test.ts", () => {
       const query = "UPDATE users SET " +
         "username = $1, password = $2, email = $3, bio = $4, image = $5 " +
         `WHERE id = $6;`;
-      const args = [
+      const args: Array<string | number> = [
         "test username",
         "test password",
         "test email",
         "' WHERE id = '1'; UPDATE users SET username = 'test",
         "test image",
-        user.id,
+        user.id as number,
       ];
       const dbResult = await BaseModel.query(query, ...args);
       Rhum.asserts.assertEquals(dbResult.rowCount, 1);

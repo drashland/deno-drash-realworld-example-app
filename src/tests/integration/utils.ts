@@ -106,7 +106,7 @@ export async function createTestUser(overrides: {
   email?: string;
   image?: string;
   bio?: string;
-} = {}) {
+} = {}): Promise<Record<string, unknown>> {
   const query =
     `INSERT INTO users (username, password, email, created_on, last_login, image, bio) VALUES ($1, $2, $3, to_timestamp($4), to_timestamp($5), $6, $7);`;
   await BaseModel.query(

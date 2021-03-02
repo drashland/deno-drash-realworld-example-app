@@ -1,10 +1,12 @@
-import { connectPg, PgConn } from "./deps.ts";
+import { PostgresClient } from "./deps.ts";
 
-export const db: PgConn = await connectPg({
-  username: "user",
+export const db = new PostgresClient({
+  user: "user",
   password: "userpassword",
   database: "realworld",
   hostname: "realworld_postgres",
   port: 5432,
-  sslMode: "disable",
+  tls: {
+    enforce: false,
+  },
 });

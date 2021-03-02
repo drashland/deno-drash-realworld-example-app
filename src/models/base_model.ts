@@ -1,23 +1,25 @@
 //import { db } from "../db.ts"
 
-import { KeyedRow } from "../deps.ts";
-import { connectPg, PgConn } from "../deps.ts";
+import {PostgresClient} from "../deps.ts";
 
 export default abstract class BaseModel {
-  private static async getDb(): Promise<PgConn> {
-    const db: PgConn = await connectPg({
-      username: "user",
+  private static async getDb(): Promise<PostgresClient> {
+    const db = new PostgresClient({
+      user: "user",
       password: "userpassword",
       database: "realworld",
       hostname: "realworld_postgres",
       port: 5432,
-      sslMode: "disable",
+      tls: {
+        enforce: false,
+      },
     });
+    await db.connect()
     return db;
   }
 
-  private static closeDb(db: PgConn) {
-    db.close();
+  private static async closeDb(db: PostgresClient): Promise<void> {
+    await db.end();
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -36,7 +38,7 @@ export default abstract class BaseModel {
   protected static async Where(
     table: string,
     fields: { [key: string]: string | number },
-  ): Promise<[] | Array<{ [key: string]: string | number | boolean }>> {
+  ): Promise<[] | Record<string, unknown>[]> {
     let query = `SELECT * FROM ${table} WHERE `;
     const clauses: string[] = [];
     for (const field in fields) {
@@ -71,7 +73,7 @@ export default abstract class BaseModel {
   public static async WhereIn(
     table: string,
     data: { values: Array<number | string> | number[]; column: string },
-  ): Promise<[] | Array<{ [key: string]: string | number | boolean }>> {
+  ): Promise<[] | Record<string, unknown>[]> {
     if (data.values.length <= 0) {
       return [];
     }
@@ -110,16 +112,16 @@ export default abstract class BaseModel {
   public static async query(
     query: string,
     ...args: Array<string | number>
-  ): Promise<{ rows: KeyedRow[]; rowCount: number; error?: boolean }> {
+  ): Promise<{ rows: Record<string, unknown>[]; rowCount: number; error?: boolean }> {
     try {
       const db = await BaseModel.getDb();
       const dbResult = args && args.length
-        ? await db.query(query, args)
-        : await db.query(query);
-      BaseModel.closeDb(db);
+        ? await db.queryObject(query, ...args)
+        : await db.queryObject(query);
+      await BaseModel.closeDb(db);
       return {
         rows: dbResult.rows,
-        rowCount: dbResult.completionInfo.numAffectedRows || 0,
+        rowCount: dbResult.rowCount ?? 0,
       };
     } catch (err) {
       console.error(err);

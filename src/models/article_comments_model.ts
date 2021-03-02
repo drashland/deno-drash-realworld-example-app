@@ -319,7 +319,7 @@ export class ArticleCommentsModel extends BaseModel {
   }
 
   protected static constructArticleComments(
-    results: Array<{ [key: string]: string | number | boolean }>,
+    results: Record<string, unknown>[],
   ): Array<ArticleCommentsModel> | [] {
     const articleComments: Array<ArticleCommentsModel> = [];
     results.forEach((result) => {
