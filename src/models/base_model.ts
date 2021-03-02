@@ -1,6 +1,6 @@
 //import { db } from "../db.ts"
 
-import {PostgresClient} from "../deps.ts";
+import { PostgresClient } from "../deps.ts";
 
 export default abstract class BaseModel {
   private static async getDb(): Promise<PostgresClient> {
@@ -14,7 +14,7 @@ export default abstract class BaseModel {
         enforce: false,
       },
     });
-    await db.connect()
+    await db.connect();
     return db;
   }
 
@@ -112,7 +112,9 @@ export default abstract class BaseModel {
   public static async query(
     query: string,
     ...args: Array<string | number>
-  ): Promise<{ rows: Record<string, unknown>[]; rowCount: number; error?: boolean }> {
+  ): Promise<
+    { rows: Record<string, unknown>[]; rowCount: number; error?: boolean }
+  > {
     try {
       const db = await BaseModel.getDb();
       const dbResult = args && args.length
