@@ -3,8 +3,10 @@ import type { UserEntity, UserModel } from "./user_model.ts";
 
 export type ArticleEntity = {
   author?: UserEntity | null;
+  // deno-lint-ignore camelcase
   author_id: number;
   body: string;
+  // deno-lint-ignore camelcase
   created_at: number;
   description: string;
   favorited: boolean;
@@ -12,6 +14,7 @@ export type ArticleEntity = {
   id?: number;
   slug?: string;
   title: string;
+  // deno-lint-ignore camelcase
   updated_at: number;
   tags?: string;
 };

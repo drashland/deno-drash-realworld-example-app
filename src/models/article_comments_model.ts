@@ -2,13 +2,19 @@ import BaseModel from "./base_model.ts";
 import type { ArticleModel } from "./article_model.ts";
 
 export type ArticleCommentEntity = {
+  // deno-lint-ignore camelcase
   created_at: number;
   id: number;
+  // deno-lint-ignore camelcase
   article_id: number;
   body: string;
+  // deno-lint-ignore camelcase
   updated_at: number;
+  // deno-lint-ignore camelcase
   author_id: number;
+  // deno-lint-ignore camelcase
   author_image: string;
+  // deno-lint-ignore camelcase
   author_username: string;
 };
 

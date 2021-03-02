@@ -1,7 +1,9 @@
 import BaseModel from "./base_model.ts";
 
 export type ArticlesFavoritesEntity = {
+  // deno-lint-ignore camelcase
   article_id: number;
+  // deno-lint-ignore camelcase
   user_id: number;
   id?: number;
   value: boolean;

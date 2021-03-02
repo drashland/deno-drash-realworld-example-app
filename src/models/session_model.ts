@@ -1,9 +1,12 @@
 import BaseModel from "./base_model.ts";
 
 interface SessionModelEntity {
+  // deno-lint-ignore camelcase
   session_one: string;
+  // deno-lint-ignore camelcase
   session_two: string;
   id: number;
+  // deno-lint-ignore camelcase
   user_id: number;
 }
 
