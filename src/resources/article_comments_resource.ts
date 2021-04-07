@@ -103,7 +103,7 @@ export default class ArticleCommentsResource extends BaseResource {
     }
 
     // Make sure they are the author of the comment
-    const commentId = this.request.getPathParam("id") || "";
+    const commentId = Number(this.request.getPathParam("id")) || 0;
     console.log("going to get comments");
     const comments = await ArticleCommentsModel.where({ author_id: user.id });
     const isTheirComment = comments.filter((comment) => {
@@ -121,7 +121,7 @@ export default class ArticleCommentsResource extends BaseResource {
       ", ",
       0,
       0,
-      Number(commentId),
+      commentId,
     );
     articleCommentsModel.id = Number(commentId);
     const deleted = await articleCommentsModel.delete();

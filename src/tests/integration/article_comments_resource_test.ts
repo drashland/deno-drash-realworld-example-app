@@ -47,7 +47,7 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
           "Test Username",
         );
 
-        await server.close();
+        server.close();
       },
     );
     // TODO(any) Not completing for the v1 release as it isn't needed, but nice to have
