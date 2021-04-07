@@ -10,7 +10,7 @@ Rhum.testPlan("integration/home_resource_test.ts", () => {
       const res = await fetch("http://localhost:1447");
       const text = await res.text();
       Rhum.asserts.assertEquals(res.status, 200);
-      await server.close();
+      server.close();
     });
   });
 });

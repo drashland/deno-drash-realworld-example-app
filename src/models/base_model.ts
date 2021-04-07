@@ -1,73 +1,30 @@
-import { Column, Pool, PoolClient } from "../deps.ts";
-import type { QueryResult } from "../deps.ts";
+//import { db } from "../db.ts"
 
-export const dbPool = new Pool({
-  user: "user",
-  password: "userpassword",
-  database: "realworld",
-  hostname: "realworld_postgres",
-  port: 5432,
-}, 50);
+import { PostgresClient } from "../deps.ts";
 
 export default abstract class BaseModel {
-  //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
+  private static async getDb(): Promise<PostgresClient> {
+    const db = new PostgresClient({
+      user: "user",
+      password: "userpassword",
+      database: "realworld",
+      hostname: "realworld_postgres",
+      port: 5432,
+      tls: {
+        enforce: false,
+      },
+    });
+    await db.connect();
+    return db;
+  }
 
-  /**
-   * @description
-   * Connects to a pool of the db and returns the connection object
-   *
-   * @return Promise<PoolClient>
-   */
-  static async connect(): Promise<PoolClient> {
-    return await dbPool.connect();
+  private static async closeDb(db: PostgresClient): Promise<void> {
+    await db.end();
   }
 
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * @description
-   *     Uses the data received from the database table and the column names to
-   *     format the result into key value pairs.
-   *
-   * @param Array<string[]> rows
-   *     An array of the rows from the table, each containing column values.
-   * @param Column[] columns
-   *     Array of objects, each object holding column data. Used the get the
-   *     column name.
-   *
-   * @return []|[{[key: string]: string}]
-   *     Empty array of no db rows, else array of rows as key value pairs.
-   *     For example:
-   *         [{ name: "ed"}, {name: "eric}]
-   *
-   * @example
-   * BaseModel.formatResults([[1, 'ed'], [2, 'john']], [{name: 'id', ...}, {name: 'name', ...}]);
-   */
-  static formatResults(
-    rows: Array<string[]>,
-    columns: Column[],
-  ): [] | Array<{ [key: string]: string | number | boolean }> {
-    if (!rows.length) {
-      return [];
-    }
-    const columnNames: string[] = columns.map((column) => {
-      return column.name;
-    });
-    const newResult: Array<{ [key: string]: string }> = [];
-    rows.forEach((row, rowIndex) => {
-      const rowData: { [key: string]: string } = {};
-      row.forEach((rVal, rIndex) => {
-        const columnName: string = columnNames[rIndex];
-        rowData[columnName] = row[rIndex];
-      });
-      newResult.push(rowData);
-    });
-    return newResult;
-  }
 
   /**
    * @description
@@ -81,26 +38,23 @@ export default abstract class BaseModel {
   protected static async Where(
     table: string,
     fields: { [key: string]: string | number },
-  ): Promise<[] | Array<{ [key: string]: string | number | boolean }>> {
+  ): Promise<[] | Record<string, unknown>[]> {
     let query = `SELECT * FROM ${table} WHERE `;
     const clauses: string[] = [];
     for (const field in fields) {
       const value = fields[field];
-      clauses.push(`${field} = '${value}'`);
+      if (typeof value === "number") {
+        clauses.push(`${field} = ${value}`);
+      } else {
+        clauses.push(`${field} = '${value}'`);
+      }
     }
     query += clauses.join(" AND ");
-
-    const client = await BaseModel.connect();
-    const dbResult: QueryResult = await client.query(query);
-    client.release();
+    const dbResult = await BaseModel.query(query);
     if (dbResult.rowCount! < 1) {
       return [];
     }
-
-    return BaseModel.formatResults(
-      dbResult.rows,
-      dbResult.rowDescription.columns,
-    );
+    return dbResult.rows;
   }
 
   /**
@@ -116,10 +70,10 @@ export default abstract class BaseModel {
    *
    * @return Promise<any> Empty array if no data was found
    */
-  static async WhereIn(
+  public static async WhereIn(
     table: string,
     data: { values: Array<number | string> | number[]; column: string },
-  ): Promise<[] | Array<{ [key: string]: string | number | boolean }>> {
+  ): Promise<[] | Record<string, unknown>[]> {
     if (data.values.length <= 0) {
       return [];
     }
@@ -127,60 +81,57 @@ export default abstract class BaseModel {
     const query = `SELECT * FROM ${table} ` +
       ` WHERE ${data.column} ` +
       ` IN (${data.values.join(",")})`;
-
-    const client = await BaseModel.connect();
-    const dbResult: QueryResult = await client.query(query);
-    client.release();
-    if (dbResult.rowCount! < 1) {
+    const dbResult = await BaseModel.query(query);
+    if (dbResult.rowCount < 1) {
       return [];
     }
-
-    return BaseModel.formatResults(
-      dbResult.rows,
-      dbResult.rowDescription.columns,
-    );
+    return dbResult.rows;
   }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - METHODS - PROTECTED /////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
 
   /**
    * @description
-   *     Prepares a query to insert dynamic data into, similar to what PHP would
-   *     do.  The query doesn't have to have "?", if it doesn't, method will
-   *     return the original query string
+   * Responsible for running all the queries
    *
    * @param string query
-   *     The db query string. Required.
-   * @param string[] [data]
-   *     Array of strings to update each placeholder
+   *     The query, with dollar signs in place of values if needed
+   * @param unknown[] args
+   *     If parameterising the query (using dollar signs), each item in this array will be associated with a dollar sign
    *
    * @example
-   * const query = "SELECT * FROM users WHERE name = ? AND username = ?"
-   * const data = ["Edward", "Ed2020"]; // note first index is for 1st placeholder, 2nd index is for 2nd placeholder and so on
+   * const query = "SELECT * FROM users WHERE name = $1 AND username = $2"
+   * const data = ["My name", "My username"];
+   * await query(query, data)
+   * // or if query does not use parameters:
+   * await query(query)
    *
-   * @return string
-   *     The query with the placeholders replaced with the data
+   * @returns An object containing:
+   *     - An array of the formatted results: `[{id: ..., ...}, { ... }]
+   *     - The row count
+   *     - If there was an error thrown
    */
-  protected prepareQuery(query: string, data?: Array<string | number>): string {
-    if (!data || !data.length) {
-      return query;
+  public static async query(
+    query: string,
+    ...args: Array<string | number>
+  ): Promise<
+    { rows: Record<string, unknown>[]; rowCount: number; error?: boolean }
+  > {
+    try {
+      const db = await BaseModel.getDb();
+      const dbResult = args && args.length
+        ? await db.queryObject(query, ...args)
+        : await db.queryObject(query);
+      await BaseModel.closeDb(db);
+      return {
+        rows: dbResult.rows,
+        rowCount: dbResult.rowCount ?? 0,
+      };
+    } catch (err) {
+      console.error(err);
+      return {
+        rows: [],
+        rowCount: 0,
+        error: true,
+      };
     }
-    // First create an array item for each placeholder
-    const occurrences = query.split("?");
-    if (occurrences[occurrences.length - 1] === "") { // for when last item is ""
-      occurrences.splice(occurrences.length - 1);
-    }
-    // Replace each item with itself but passed in data instead of the placeholder
-    data.forEach((val, i) => {
-      occurrences[i] = occurrences[i] + "'" + data[i] + "'";
-    });
-    // re construct the string
-    let prepared = "";
-    occurrences.forEach((val, i) => {
-      prepared += occurrences[i];
-    });
-    return prepared;
   }
 }
