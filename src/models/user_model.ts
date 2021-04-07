@@ -1,5 +1,4 @@
 import BaseModel from "./base_model.ts";
-import type { QueryResult } from "../deps.ts";
 
 export type UserEntity = {
   bio?: string;
@@ -131,23 +130,9 @@ export class UserModel extends BaseModel {
    * @return Promise<boolean> False if the query failed to delete
    */
   public async delete(): Promise<boolean> {
-    let query = `DELETE FROM users WHERE id = ?`;
-    query = this.prepareQuery(
-      query,
-      [
-        String(this.id),
-      ],
-    );
-
-    try {
-      const client = await BaseModel.connect();
-      const dbResult: QueryResult = await client.query(query);
-      client.release();
-      if (dbResult.rowCount! < 1) {
-        return false;
-      }
-    } catch (error) {
-      console.log(error);
+    const query = `DELETE FROM users WHERE id = $1`;
+    const dbResult = await BaseModel.query(query, this.id);
+    if (dbResult.rowCount! < 1) {
       return false;
     }
     return true;
@@ -164,24 +149,17 @@ export class UserModel extends BaseModel {
       return this.update();
     }
 
-    let query = "INSERT INTO users " +
-      " (username, email, password, bio, image)" +
-      " VALUES (?, ?, ?, ?, ?);";
-    query = this.prepareQuery(
+    const query =
+      "INSERT INTO users (username, email, password, bio, image) VALUES ($1, $2, $3, $4, $5);";
+    const dbResult = await BaseModel.query(
       query,
-      [
-        this.username,
-        this.email,
-        this.password,
-        this.bio,
-        this.image,
-      ],
+      this.username,
+      this.email,
+      this.password,
+      this.bio,
+      this.image,
     );
-
-    const client = await BaseModel.connect();
-    const dbResult: QueryResult = await client.query(query);
-    client.release();
-    if (dbResult.rowCount! < 1) {
+    if (dbResult.rowCount < 1) {
       return null;
     }
 
@@ -199,22 +177,18 @@ export class UserModel extends BaseModel {
    * @return Promise<UserModel|null> False if no results were found
    */
   public async update(): Promise<UserModel | null> {
-    let query = "UPDATE users SET " +
-      "username = ?, password = ?, email = ?, bio = ?, image = ? " +
-      `WHERE id = '${this.id}';`;
-    query = this.prepareQuery(
+    const query = "UPDATE users SET " +
+      "username = $1, password = $2, email = $3, bio = $4, image = $5 " +
+      `WHERE id = $6;`;
+    const dbResult = await BaseModel.query(
       query,
-      [
-        this.username,
-        this.password,
-        this.email,
-        this.bio,
-        this.image,
-      ],
+      this.username,
+      this.password,
+      this.email,
+      this.bio,
+      this.image,
+      this.id,
     );
-    const client = await BaseModel.connect();
-    const dbResult: QueryResult = await client.query(query);
-    client.release();
     if (dbResult.rowCount! < 1) {
       return null;
     }

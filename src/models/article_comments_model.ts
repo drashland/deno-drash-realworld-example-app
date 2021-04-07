@@ -2,13 +2,19 @@ import BaseModel from "./base_model.ts";
 import type { ArticleModel } from "./article_model.ts";
 
 export type ArticleCommentEntity = {
+  // deno-lint-ignore camelcase
   created_at: number;
   id: number;
+  // deno-lint-ignore camelcase
   article_id: number;
   body: string;
+  // deno-lint-ignore camelcase
   updated_at: number;
+  // deno-lint-ignore camelcase
   author_id: number;
+  // deno-lint-ignore camelcase
   author_image: string;
+  // deno-lint-ignore camelcase
   author_username: string;
 };
 
@@ -146,20 +152,9 @@ export class ArticleCommentsModel extends BaseModel {
    * @return Promise<boolean>
    */
   public async delete(): Promise<boolean> {
-    let query = `DELETE FROM article_comments WHERE id = ?`;
-    query = this.prepareQuery(
-      query,
-      [
-        String(this.id),
-      ],
-    );
-
-    try {
-      const client = await BaseModel.connect();
-      await client.query(query);
-      client.release();
-    } catch (error) {
-      console.log(error);
+    const query = `DELETE FROM article_comments WHERE id = $1`;
+    const dbResult = await BaseModel.query(query, this.id);
+    if (dbResult.error || dbResult.rowCount === 0) {
       return false;
     }
     return true;
@@ -176,25 +171,18 @@ export class ArticleCommentsModel extends BaseModel {
     //   return this.update();
     // }
 
-    let query = "INSERT INTO article_comments " +
-      " (article_id, author_image, author_id, author_username, body, created_at, updated_at)" +
-      " VALUES (?, ?, ?, ?, ?, to_timestamp(?), to_timestamp(?));";
-    query = this.prepareQuery(
+    const query =
+      "INSERT INTO article_comments (article_id, author_image, author_id, author_username, body, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, to_timestamp($6), to_timestamp($7));";
+    await BaseModel.query(
       query,
-      [
-        String(this.article_id),
-        this.author_image,
-        this.author_id,
-        this.author_username,
-        this.body,
-        String(Date.now() / 1000.00),
-        String(Date.now() / 1000.00),
-      ],
+      this.article_id,
+      this.author_image,
+      this.author_id,
+      this.author_username,
+      this.body,
+      Date.now() / 1000.00,
+      Date.now() / 1000.00,
     );
-
-    const client = await BaseModel.connect();
-    await client.query(query);
-    client.release();
 
     // @ts-ignore (crookse) We ignore this because this will never return null.
     const tmp = await ArticleCommentsModel.where(
@@ -250,15 +238,8 @@ export class ArticleCommentsModel extends BaseModel {
     if (filters.offset) {
       query += ` OFFSET ${filters.offset} `;
     }
-    const client = await BaseModel.connect();
-    const dbResult = await client.query(query);
-    client.release();
-
-    const results = BaseModel.formatResults(
-      dbResult.rows,
-      dbResult.rowDescription.columns,
-    );
-    return ArticleCommentsModel.constructArticleComments(results);
+    const dbResult = await BaseModel.query(query);
+    return ArticleCommentsModel.constructArticleComments(dbResult.rows);
   }
 
   /**
@@ -344,7 +325,7 @@ export class ArticleCommentsModel extends BaseModel {
   }
 
   protected static constructArticleComments(
-    results: Array<{ [key: string]: string | number | boolean }>,
+    results: Record<string, unknown>[],
   ): Array<ArticleCommentsModel> | [] {
     const articleComments: Array<ArticleCommentsModel> = [];
     results.forEach((result) => {
