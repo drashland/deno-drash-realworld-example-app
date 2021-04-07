@@ -1,10 +1,12 @@
 import BaseModel from "./base_model.ts";
-import type { QueryResult } from "../deps.ts";
 
 interface SessionModelEntity {
+  // deno-lint-ignore camelcase
   session_one: string;
+  // deno-lint-ignore camelcase
   session_two: string;
   id: number;
+  // deno-lint-ignore camelcase
   user_id: number;
 }
 
@@ -102,20 +104,14 @@ export class SessionModel extends BaseModel {
     sessionTwo: string,
   ): Promise<SessionModel | null> {
     const query = "SELECT * FROM sessions " +
-      `WHERE session_one = '${sessionOne}' AND session_two = '${sessionTwo}' ` +
+      `WHERE session_one = $1 AND session_two = $2 ` +
       "LIMIT 1;";
-    const client = await BaseModel.connect();
-    const dbResult: QueryResult = await client.query(query);
+    const dbResult = await BaseModel.query(query, sessionOne, sessionTwo);
     if (dbResult.rowCount! < 1) {
       return null;
     }
-    client.release();
-    const sessionResult = BaseModel.formatResults(
-      dbResult.rows,
-      dbResult.rowDescription.columns,
-    );
-    const session = sessionResult[0];
-    if (sessionResult && sessionResult.length > 0) {
+    const session = dbResult.rows[0];
+    if (session) {
       // (ebebbington) Because we currently dont have a way to assign the entity type to `session` (and it work,
       // as it would error because that type isn't the return value of `formatResults`)
       const sessionEntity: SessionModelEntity = {
@@ -147,27 +143,25 @@ export class SessionModel extends BaseModel {
       throw new Error("Session record already exists.");
     }
 
-    let query = "INSERT INTO sessions " +
+    const query = "INSERT INTO sessions" +
       " (user_id, session_one, session_two)" +
-      " VALUES (?, ?, ?);";
-    query = this.prepareQuery(
+      " VALUES ($1, $2, $3);";
+    const dbResult = await BaseModel.query(
       query,
-      [
-        String(this.user_id),
-        this.session_one,
-        this.session_two,
-      ],
+      this.user_id,
+      this.session_one,
+      this.session_two,
     );
-    const client = await BaseModel.connect();
-    const dbResult: QueryResult = await client.query(query);
-    client.release();
-    if (dbResult.rowCount! < 1) {
+    if (dbResult.rowCount < 1) {
       return null;
     }
 
     // (crookse) We ignore this because getUserSession() can return null if the
     // session is not found. However, in this case, it will never be null.
-    return SessionModel.getUserSession(this.session_one, this.session_two);
+    return await SessionModel.getUserSession(
+      this.session_one,
+      this.session_two,
+    );
   }
 }
 
