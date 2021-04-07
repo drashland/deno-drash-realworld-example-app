@@ -1,8 +1,9 @@
 import BaseModel from "./base_model.ts";
-import type { QueryResult } from "../deps.ts";
 
 export type ArticlesFavoritesEntity = {
+  // deno-lint-ignore camelcase
   article_id: number;
+  // deno-lint-ignore camelcase
   user_id: number;
   id?: number;
   value: boolean;
@@ -100,23 +101,9 @@ export class ArticlesFavoritesModel extends BaseModel {
    * @return Promise<boolean>
    */
   public async delete(): Promise<boolean> {
-    let query = `DELETE FROM articles WHERE id = ?`;
-    query = this.prepareQuery(
-      query,
-      [
-        String(this.id),
-      ],
-    );
-
-    try {
-      const client = await BaseModel.connect();
-      const dbResult: QueryResult = await client.query(query);
-      client.release();
-      if (dbResult.rowCount! < 1) {
-        return false;
-      }
-    } catch (error) {
-      console.log(error);
+    const query = `DELETE FROM articles WHERE id = $1`;
+    const dbResult = await BaseModel.query(query, this.id);
+    if (!dbResult || (dbResult && dbResult.rowCount! < 1)) {
       return false;
     }
     return true;
@@ -133,21 +120,15 @@ export class ArticlesFavoritesModel extends BaseModel {
       return this.update();
     }
 
-    let query = "INSERT INTO articles_favorites " +
+    const query = "INSERT INTO articles_favorites " +
       " (article_id, user_id, value)" +
-      " VALUES (?, ?, ?);";
-    query = this.prepareQuery(
+      " VALUES ($1, $2, $3);";
+    const dbResult = await BaseModel.query(
       query,
-      [
-        String(this.article_id),
-        String(this.user_id),
-        String(this.value),
-      ],
+      this.article_id,
+      this.user_id,
+      String(this.value),
     );
-
-    const client = await BaseModel.connect();
-    const dbResult: QueryResult = await client.query(query);
-    client.release();
     if (dbResult.rowCount! < 1) {
       return null;
     }
@@ -167,22 +148,10 @@ export class ArticlesFavoritesModel extends BaseModel {
    * @return Promise<ArticlesFavoritesModel|null> Null if the query failed to update
    */
   public async update(): Promise<ArticlesFavoritesModel | null> {
-    let query = "UPDATE articles_favorites SET " +
-      "value = ? " +
-      `WHERE id = '${this.id}';`;
-    query = this.prepareQuery(
-      query,
-      [
-        String(this.value),
-      ],
-    );
-    const client = await BaseModel.connect();
-    const dbResult: QueryResult = await client.query(query);
-    client.release();
-    if (dbResult !== undefined) {
-      if (dbResult.rowCount! < 1) {
-        return null;
-      }
+    const query = "UPDATE articles_favorites SET value = $1 WHERE id = $2;";
+    const dbResult = await BaseModel.query(query, String(this.value), this.id);
+    if (dbResult.rowCount < 1) {
+      return null;
     }
 
     // (crookse) We ignore this because this will never return null.

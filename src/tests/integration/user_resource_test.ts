@@ -18,7 +18,7 @@ Rhum.testPlan("integration/users_resource_test.ts", () => {
       Rhum.asserts.assertEquals(res.status, 200);
       // TODO(any) Assert `body`
 
-      await server.close();
+      server.close();
     });
   });
   Rhum.testSuite("POST /user", () => {
