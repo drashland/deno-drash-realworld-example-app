@@ -19,7 +19,7 @@
     "mime-types": "^2.1.22",
     "node-sass": "^4.13.1",
     "prismjs": "^1.23.0",
-    "pug": "^2.0.3",
+    "pug": "^3.0.1",
     "pug-plain-loader": "^1.0.0",
     "sass-loader": "^7.1.0",
     "scss-loader": "0.0.1",
