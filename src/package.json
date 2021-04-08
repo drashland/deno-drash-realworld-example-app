@@ -12,7 +12,7 @@
     "braces": ">=2.3.1",
     "css-loader": "^2.1.0",
     "date-fns": "^2.14.0",
-    "elliptic": "^6.5.3",
+    "elliptic": "^6.5.4",
     "kind-of": ">=6.0.3",
     "lodash": "^4.17.20",
     "markdown-it": "^8.4.2",
