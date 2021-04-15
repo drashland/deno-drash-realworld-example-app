@@ -1,4 +1,3 @@
-import { Drash } from "../deps.ts";
 import BaseResource from "./base_resource.ts";
 import UserModel from "../models/user_model.ts";
 

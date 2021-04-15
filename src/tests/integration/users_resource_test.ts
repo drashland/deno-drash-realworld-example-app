@@ -45,14 +45,14 @@ Rhum.testPlan("integration/users_resource_test.ts", () => {
             password: "TestPassword1",
           }),
         });
-        const body = await res.json();
+        await res.json();
 
         // TODO(any) assert user was correctly saved in db, along with the session
 
         await clearTestUsers("testUsername");
 
         Rhum.asserts.assertEquals(res.status, 200);
-        // TODO(any) Assert `body`
+        // TODO(any) Assert res `body`
 
         server.close();
       },

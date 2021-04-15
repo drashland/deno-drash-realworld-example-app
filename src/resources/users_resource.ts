@@ -1,4 +1,4 @@
-import { bcrypt, Drash } from "../deps.ts";
+import { bcrypt } from "../deps.ts";
 import BaseResource from "./base_resource.ts";
 import UserModel from "../models/user_model.ts";
 import SessionModel from "../models/session_model.ts";
