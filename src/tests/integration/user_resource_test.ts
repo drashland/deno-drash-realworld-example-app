@@ -11,12 +11,12 @@ Rhum.testPlan("integration/users_resource_test.ts", () => {
       await createTestUser();
 
       const res = await fetch("http://localhost:1447/user/testUsername");
-      const body = await res.json();
+      await res.json();
 
       await clearTestUsers();
 
       Rhum.asserts.assertEquals(res.status, 200);
-      // TODO(any) Assert `body`
+      // TODO(any) Assert `body` (result from await res.json())
 
       server.close();
     });

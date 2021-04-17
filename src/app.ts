@@ -1,7 +1,4 @@
 // Middleware
-import AuthMiddleware from "./middlewares/auth_middleware.ts";
-import LogMiddleware from "./middlewares/log_middleware.ts";
-
 import { server } from "./server.ts";
 
 server.run({

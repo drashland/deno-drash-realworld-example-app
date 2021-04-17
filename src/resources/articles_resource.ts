@@ -437,7 +437,7 @@ class ArticlesResource extends BaseResource {
    */
   protected async getQueryFilters(): Promise<ArticleFilters> {
     const author = this.request.getUrlQueryParam("author");
-    const offset = this.request.getUrlQueryParam("offset");
+    //const offset = this.request.getUrlQueryParam("offset");
 
     const filters: ArticleFilters = {};
 

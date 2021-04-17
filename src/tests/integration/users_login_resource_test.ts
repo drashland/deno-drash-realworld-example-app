@@ -50,7 +50,7 @@ Rhum.testPlan("integration/users_login_resource_test.ts", () => {
         }),
       });
 
-      const body = await res.json();
+      await res.json();
 
       await clearTestUsers();
 

@@ -1,4 +1,3 @@
-import { Drash } from "../deps.ts";
 import { ArticleModel } from "../models/article_model.ts";
 import { ArticleCommentsModel } from "../models/article_comments_model.ts";
 import UserService from "../services/user_service.ts";
@@ -124,7 +123,7 @@ export default class ArticleCommentsResource extends BaseResource {
       commentId,
     );
     articleCommentsModel.id = Number(commentId);
-    const deleted = await articleCommentsModel.delete();
+    await articleCommentsModel.delete();
 
     this.response.body = {
       message: "Deleted the comment",
