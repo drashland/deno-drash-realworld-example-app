@@ -262,14 +262,16 @@ export class UserModel extends BaseModel {
     //@ts-ignore Nothing we can do about this.. the createUserModelObject expect
     // a user object type, but there's no way to type it like that the return type of whereIn can't be user
     return results.map((result) => {
-      return createUserModelObject(result as {
-        username: string;
-        password: string;
-        email: string;
-        bio: string;
-        image: string;
-        id: number;
-      });
+      return createUserModelObject(
+        result as {
+          username: string;
+          password: string;
+          email: string;
+          bio: string;
+          image: string;
+          id: number;
+        },
+      );
     });
   }
 
