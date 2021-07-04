@@ -122,7 +122,7 @@ export default abstract class BaseModel {
         : await db.queryObject(query);
       await BaseModel.closeDb(db);
       return {
-        rows: dbResult.rows,
+        rows: dbResult.rows as Record<string, unknown>[],
         rowCount: dbResult.rowCount ?? 0,
       };
     } catch (err) {
