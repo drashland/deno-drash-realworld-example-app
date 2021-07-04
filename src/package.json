@@ -18,7 +18,7 @@
     "markdown-it": "^8.4.2",
     "mime-types": "^2.1.22",
     "node-sass": "^4.13.1",
-    "prismjs": "^1.23.0",
+    "prismjs": "^1.24.0",
     "pug": "^3.0.1",
     "pug-plain-loader": "^1.0.0",
     "sass-loader": "^7.1.0",
