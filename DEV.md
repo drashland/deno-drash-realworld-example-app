@@ -14,6 +14,13 @@ $ psql -U user
 # select * from users;
 ```
 
+Or use the commmand `make db` and enter password:
+```shell script
+$ make db
+password: userpassword
+# select * from users;
+```
+
 # Make a DB Data Dump (Update the DB)
 
 The postgres container uses a dump file to seed the database - this file is at
