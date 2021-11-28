@@ -1,10 +1,7 @@
 // Middleware
 import { server } from "./server.ts";
 
-server.run({
-  hostname: "realworld_drash",
-  port: 1667,
-});
+server.run();
 
 console.log("Drash server running on realworld_drash:1667");
 console.log(

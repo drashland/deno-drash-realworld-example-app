@@ -5,7 +5,7 @@ import SessionModel from "../models/session_model.ts";
 import ValidationService from "../services/validation_service.ts";
 
 class LoginResource extends BaseResource {
-  static paths = [
+  paths = [
     "/users/login",
   ];
 
@@ -35,14 +35,14 @@ class LoginResource extends BaseResource {
    *        user: null
    *      }
    */
-  public async POST() {
+  public async POST(request: Drash.Request, response: Drash.Response) {
     console.log("Handling LoginResource POST.");
-    const action = this.request.getBodyParam("action");
+    const action = request.bodyParam("action");
     if (action == "check_if_user_is_authenticated") {
-      return await this.checkIfUserIsAuthenticated();
+      return await this.checkIfUserIsAuthenticated(request, response);
     }
 
-    return await this.logInUser();
+    return await this.logInUser(request, response);
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -54,9 +54,12 @@ class LoginResource extends BaseResource {
    *
    * @return Promise<Drash.Http.Response>
    */
-  protected async checkIfUserIsAuthenticated(): Promise<Drash.Http.Response> {
+  protected async checkIfUserIsAuthenticated(
+    request: Drash.Request,
+    response: Drash.Response,
+  ) {
     console.log("Checking if user has a session.");
-    const sessionValues = (this.request.getBodyParam("token") as string);
+    const sessionValues = (request.bodyParam("token") as string);
     if (sessionValues) {
       const sessionValuesSplit = sessionValues.split("|::|");
       const sessionOne = sessionValuesSplit[0];
@@ -71,24 +74,22 @@ class LoginResource extends BaseResource {
           if (user.length > 0) {
             const entity = user[0].toEntity();
             entity.token = `${session.session_one}|::|${session.session_two}`;
-            this.response.body = {
-              user: entity,
-            };
             console.log("User has an active session.");
-            return this.response;
+            return response.json({
+              user: entity,
+            });
           }
         }
       }
     }
 
     console.log("User's session is invalid or has expired.");
-    this.response.status_code = 401;
-    this.response.body = {
+    response.status = 401;
+    return response.json({
       errors: {
         body: ["Invalid session."],
       },
-    };
-    return this.response;
+    });
   }
 
   /**
@@ -96,15 +97,14 @@ class LoginResource extends BaseResource {
    *
    * @return Promise<Drash.Http.Response>
    */
-  protected async logInUser(): Promise<Drash.Http.Response> {
-    const inputUser: UserEntity =
-      (this.request.getBodyParam("user") as UserEntity);
+  protected async logInUser(request: Drash.Request, response: Drash.Response) {
+    const inputUser: UserEntity = (request.bodyParam("user") as UserEntity);
 
     if (!inputUser.email) {
-      return this.errorResponse(422, "Email field required.");
+      return this.errorResponse(422, "Email field required.", response);
     }
     if (!ValidationService.isEmail(inputUser.email)) {
-      return this.errorResponse(422, "Email must be a valid email.");
+      return this.errorResponse(422, "Email must be a valid email.", response);
     }
 
     // Convert the user to a real user model object
@@ -112,20 +112,20 @@ class LoginResource extends BaseResource {
 
     if (result.length <= 0) {
       console.log("User not found.");
-      return this.errorResponse(422, "Invalid user credentials.");
+      return this.errorResponse(422, "Invalid user credentials.", response);
     }
 
     const user = result[0];
 
     const rawPassword = inputUser.password ? inputUser.password : "";
     if (!rawPassword) {
-      return this.errorResponse(422, "Password field required.");
+      return this.errorResponse(422, "Password field required.", response);
     }
     if (
       !(await ValidationService.isPasswordCorrect(rawPassword, user.password))
     ) {
       console.log("Passwords do not match.");
-      return this.errorResponse(422, "Invalid user credentials.");
+      return this.errorResponse(422, "Invalid user credentials.", response);
     }
 
     // Create session for user. We return the session values on the user
@@ -139,17 +139,16 @@ class LoginResource extends BaseResource {
       return this.errorResponse(
         422,
         "An error occurred whilst saving your session",
+        response,
       );
     }
 
     const entity = user.toEntity();
     entity.token = `${session.session_one}|::|${session.session_two}`;
 
-    this.response.body = {
+    return response.json({
       user: entity,
-    };
-
-    return this.response;
+    });
   }
 }
 

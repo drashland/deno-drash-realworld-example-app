@@ -2,9 +2,10 @@ import { bcrypt } from "../deps.ts";
 import BaseResource from "./base_resource.ts";
 import UserModel from "../models/user_model.ts";
 import ValidationService from "../services/validation_service.ts";
+import { Drash } from "../deps.ts";
 
 export default class UserResource extends BaseResource {
-  static paths = [
+  paths = [
     "/user",
     "/user/:username",
   ];
@@ -16,17 +17,19 @@ export default class UserResource extends BaseResource {
    * @return Drash.Http.Response
    *     Returns a User object matched to the username path param.
    */
-  public async GET() {
-    this.response.body = await UserModel.where({
-      username: this.request.getPathParam("username") || "",
-    });
-    if (!this.response.body) {
+  public async GET(request: Drash.Request, response: Drash.Response) {
+    response.json(
+      await UserModel.where({
+        username: request.pathParam("username") || "",
+      }),
+    );
+    if (!response.body) {
       return this.errorResponse(
         400,
         "Username must exist in the uri",
+        response,
       );
     }
-    return this.response;
   }
 
   /**
@@ -46,33 +49,33 @@ export default class UserResource extends BaseResource {
    *     - If all is successful, then we return a 200 response with the User
    *       object with its fields updated.
    */
-  public async POST() {
+  public async POST(request: Drash.Request, response: Drash.Response) {
     console.log("Handling UserResource POST.");
 
     // Gather data
-    const id = (this.request.getBodyParam("id") as string | number) || "";
+    const id = (request.bodyParam("id") as string | number) || "";
     const username = ValidationService.decodeInput(
-      (this.request.getBodyParam("username") as string) || "",
+      (request.bodyParam("username") as string) || "",
     );
     const email = ValidationService.decodeInput(
-      (this.request.getBodyParam("email") as string) || "",
+      (request.bodyParam("email") as string) || "",
     );
     const rawPassword = ValidationService.decodeInput(
-      (this.request.getBodyParam("password") as string) || "",
+      (request.bodyParam("password") as string) || "",
     );
     const bio = ValidationService.decodeInput(
-      (this.request.getBodyParam("bio") as string) || "",
+      (request.bodyParam("bio") as string) || "",
     );
     const image = ValidationService.decodeInput(
-      (this.request.getBodyParam("image") as string) || "",
+      (request.bodyParam("image") as string) || "",
     );
-    const token = (this.request.getBodyParam("token") as string) || "";
+    const token = (request.bodyParam("token") as string) || "";
 
     const result = await UserModel.where({ id: id });
 
     if (result.length <= 0) {
       console.log("User not found.");
-      return this.errorResponse(404, "Error updating your profile.");
+      return this.errorResponse(404, "Error updating your profile.", response);
     }
 
     const user = result[0];
@@ -80,20 +83,20 @@ export default class UserResource extends BaseResource {
     // Validate
     console.log("Validating inputs.");
     if (!username) {
-      return this.errorResponse(422, "Username field required.");
+      return this.errorResponse(422, "Username field required.", response);
     }
     if (!image) {
-      return this.errorResponse(422, "Image field required.");
+      return this.errorResponse(422, "Image field required.", response);
     }
     if (!email) {
-      return this.errorResponse(422, "Email field required.");
+      return this.errorResponse(422, "Email field required.", response);
     }
     if (!ValidationService.isEmail(email)) {
-      return this.errorResponse(422, "Email must be a valid email.");
+      return this.errorResponse(422, "Email must be a valid email.", response);
     }
     if (email != user.email) {
       if (!(await ValidationService.isEmailUnique(email))) {
-        return this.errorResponse(422, "Email already taken.");
+        return this.errorResponse(422, "Email already taken.", response);
       }
     }
     if (rawPassword) {
@@ -102,6 +105,7 @@ export default class UserResource extends BaseResource {
           422,
           "Password must be 8 characters long and include 1 number, 1 " +
             "uppercase letter, and 1 lowercase letter.",
+          response,
         );
       }
     }
@@ -117,6 +121,7 @@ export default class UserResource extends BaseResource {
       return this.errorResponse(
         422,
         "An error occurred whilst saving your user",
+        response,
       );
     }
 
@@ -124,10 +129,8 @@ export default class UserResource extends BaseResource {
     // Make sure to pass the user's session token back to them
     entity.token = token;
 
-    this.response.body = {
+    return response.json({
       user: entity,
-    };
-
-    return this.response;
+    });
   }
 }

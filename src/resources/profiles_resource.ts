@@ -1,41 +1,40 @@
 import BaseResource from "./base_resource.ts";
 import UserModel from "../models/user_model.ts";
+import { Drash } from "../deps.ts";
 
 class ProfilesResource extends BaseResource {
-  static paths = [
+  paths = [
     "/profiles/:username",
   ];
 
-  public async GET() {
+  public async GET(request: Drash.Request, response: Drash.Response) {
     console.log("Handling ProfilesResource GET.");
-    const username = this.request.getPathParam("username") || "";
+    const username = request.pathParam("username") || "";
     console.log(`Handling the following user's profile: ${username}.`);
 
     if (!username) {
-      this.response.status_code = 422;
-      this.response.body = {
+      response.status = 422;
+      return response.json({
         errors: {
           username: ["Username path param is required."],
         },
-      };
+      });
       // TODO(ebebbington) Return response
     }
 
-    this.response.body = {
+    response.json({
       profile: null,
-    };
+    });
 
     const result = await UserModel.where({ username: username });
     if (result.length <= 0) {
-      return this.errorResponse(404, "Profile not found.");
+      return this.errorResponse(404, "Profile not found.", response);
     }
 
     const entity = result[0].toEntity();
-    this.response.body = {
+    response.json({
       profile: entity,
-    };
-
-    return this.response;
+    });
   }
 }
 

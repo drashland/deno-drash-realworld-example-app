@@ -8,9 +8,7 @@ import UserResource from "./resources/user_resource.ts";
 import UsersLoginResource from "./resources/users_login_resource.ts";
 import UsersResource from "./resources/users_resource.ts";
 
-export const server = new Drash.Http.Server({
-  directory: ".",
-  response_output: "application/json",
+export const server = new Drash.Server({
   resources: [
     ArticleCommentsResource,
     ArticlesResource,
@@ -21,5 +19,7 @@ export const server = new Drash.Http.Server({
     UsersLoginResource,
     UsersResource,
   ],
-  static_paths: ["/public"],
+  hostname: "realworld_drash",
+  port: 1667,
+  protocol: "http"
 });
