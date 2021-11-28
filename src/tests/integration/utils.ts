@@ -5,7 +5,7 @@ import { server } from "../../server.ts";
 
 // TODO(edward) Add docblocks
 
-export function createServerObject(): Drash.Http.Server {
+export function createServerObject(): Drash.Server {
   return server;
 }
 

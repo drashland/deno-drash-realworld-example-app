@@ -21,5 +21,5 @@ export const server = new Drash.Server({
   ],
   hostname: "realworld_drash",
   port: 1667,
-  protocol: "http"
+  protocol: "http",
 });
