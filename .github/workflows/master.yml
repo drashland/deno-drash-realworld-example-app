@@ -9,6 +9,16 @@ on:
       - main
 jobs:
 
+  builds:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build client
+        run: |
+          cd src
+          npm i
+          npm run webpack
+
   tests:
 
     runs-on: ubuntu-latest

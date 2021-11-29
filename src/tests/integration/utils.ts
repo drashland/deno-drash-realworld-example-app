@@ -1,13 +1,8 @@
-import { bcrypt, Drash } from "../../deps.ts";
+import { bcrypt } from "../../deps.ts";
 import type { ArticleEntity } from "../../models/article_model.ts";
 import BaseModel from "../../models/base_model.ts";
-import { server } from "../../server.ts";
 
 // TODO(edward) Add docblocks
-
-export function createServerObject(): Drash.Http.Server {
-  return server;
-}
 
 export async function createTestArticle(overrides?: ArticleEntity) {
   const query =

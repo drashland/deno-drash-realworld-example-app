@@ -3,31 +3,32 @@ import BaseResource from "./base_resource.ts";
 import UserModel from "../models/user_model.ts";
 import SessionModel from "../models/session_model.ts";
 import ValidationService from "../services/validation_service.ts";
+import { Drash } from "../deps.ts";
 
 class RegisterResource extends BaseResource {
-  static paths = [
+  paths = [
     "/users",
   ];
 
   /**
-     * Handle POST requests with the following request body:
-     *
-     *     {
-     *         username: string,
-     *         email: string,
-     *         password: string,
-     *     }
-     */
-  public async POST() {
+   * Handle POST requests with the following request body:
+   *
+   *     {
+   *         username: string,
+   *         email: string,
+   *         password: string,
+   *     }
+   */
+  public async POST(request: Drash.Request, response: Drash.Response) {
     // Gather data
     const username = ValidationService.decodeInput(
-      (this.request.getBodyParam("username") as string) || "",
+      (request.bodyParam("username") as string) || "",
     );
     const email = ValidationService.decodeInput(
-      (this.request.getBodyParam("email") as string) || "",
+      (request.bodyParam("email") as string) || "",
     );
     const rawPassword = ValidationService.decodeInput(
-      (this.request.getBodyParam("password") as string) || "",
+      (request.bodyParam("password") as string) || "",
     );
 
     console.log("Creating the following user:");
@@ -35,25 +36,26 @@ class RegisterResource extends BaseResource {
 
     // Validate
     if (!username) {
-      return this.errorResponse(422, "Username field required.");
+      return this.errorResponse(422, "Username field required.", response);
     }
     if (!email) {
-      return this.errorResponse(422, "Email field required.");
+      return this.errorResponse(422, "Email field required.", response);
     }
     if (!rawPassword) {
-      return this.errorResponse(422, "Password field required.");
+      return this.errorResponse(422, "Password field required.", response);
     }
     if (!ValidationService.isEmail(email)) {
-      return this.errorResponse(422, "Email must be a valid email.");
+      return this.errorResponse(422, "Email must be a valid email.", response);
     }
     if (!(await ValidationService.isEmailUnique(email))) {
-      return this.errorResponse(422, "Email already taken.");
+      return this.errorResponse(422, "Email already taken.", response);
     }
     if (!ValidationService.isPasswordStrong(rawPassword)) {
       return this.errorResponse(
         422,
         "Password must be 8 characters long and include 1 number, 1 " +
           "uppercase letter, and 1 lowercase letter.",
+        response,
       );
     }
 
@@ -69,6 +71,7 @@ class RegisterResource extends BaseResource {
       return this.errorResponse(
         422,
         "An error occurred while trying to create your account.",
+        response,
       );
     }
 
@@ -88,10 +91,9 @@ class RegisterResource extends BaseResource {
     entity.token = `${sessionOneValue}|::|${sessionTwoValue}`;
 
     // Return the newly created user
-    this.response.body = {
+    return response.json({
       user: entity,
-    };
-    return this.response;
+    });
   }
 }
 

@@ -9,7 +9,7 @@ import { ArticlesFavoritesModel } from "../models/articles_favorites_model.ts";
 import UserModel from "../models/user_model.ts";
 
 class ArticlesResource extends BaseResource {
-  static paths = [
+  paths = [
     "/articles",
     "/articles/:slug",
     "/articles/:slug/favorite",
@@ -19,36 +19,36 @@ class ArticlesResource extends BaseResource {
   // FILE MARKER - METHODS - HTTP //////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  public async GET(): Promise<Drash.Http.Response> {
+  public async GET(request: Drash.Request, response: Drash.Response) {
     console.log("Handling ArticlesResource GET.");
 
-    if (this.request.getPathParam("slug")) {
-      return await this.getArticle();
+    if (request.pathParam("slug")) {
+      return await this.getArticle(request, response);
     }
 
-    return await this.getArticles();
+    return await this.getArticles(request, response);
   }
 
-  public async POST(): Promise<Drash.Http.Response> {
+  public async POST(request: Drash.Request, response: Drash.Response) {
     console.log("Handling ArticlesResource POST.");
 
-    if (this.request.url_path.includes("/favorite")) {
-      return await this.toggleFavorite();
+    if (request.url.includes("/favorite")) {
+      return await this.toggleFavorite(request, response);
     }
 
-    return await this.createArticle();
+    return await this.createArticle(request, response);
   }
 
-  public async PUT(): Promise<Drash.Http.Response> {
+  public async PUT(request: Drash.Request, response: Drash.Response) {
     console.log("Handling ArticlesResource PUT");
 
-    return await this.updateArticle();
+    return await this.updateArticle(request, response);
   }
 
-  public async DELETE(): Promise<Drash.Http.Response> {
+  public async DELETE(request: Drash.Request, response: Drash.Response) {
     console.log("Handling ArticlesResource DELETE");
 
-    return await this.deleteArticle();
+    return await this.deleteArticle(request, response);
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -94,8 +94,9 @@ class ArticlesResource extends BaseResource {
   protected async addFavoritedToEntities(
     articleIds: number[],
     entities: ArticleEntity[],
+    request: Drash.Request,
   ): Promise<ArticleEntity[]> {
-    const currentUser = await this.getCurrentUser();
+    const currentUser = await this.getCurrentUser(request);
     if (!currentUser) {
       return entities;
     }
@@ -159,17 +160,21 @@ class ArticlesResource extends BaseResource {
    *     ...
    *   }
    * }
-   *
-   * @return Promise<Drash.Http.Response>
    */
-  protected async updateArticle(): Promise<Drash.Http.Response> {
-    const inputArticle: ArticleEntity | null =
-      this.request.getBodyParam("article")
-        ? (this.request.getBodyParam("article") as ArticleEntity)
-        : null;
+  protected async updateArticle(
+    request: Drash.Request,
+    response: Drash.Response,
+  ) {
+    const inputArticle: ArticleEntity | null = request.bodyParam("article")
+      ? (request.bodyParam("article") as ArticleEntity)
+      : null;
 
     if (inputArticle === null) {
-      return this.errorResponse(400, "Article parameter must be passed in");
+      return this.errorResponse(
+        400,
+        "Article parameter must be passed in",
+        response,
+      );
     }
 
     const article: ArticleModel = new ArticleModel(
@@ -186,27 +191,26 @@ class ArticlesResource extends BaseResource {
     await article.save();
 
     if (!article) {
-      return this.errorResponse(500, "Article could not be saved.");
+      return this.errorResponse(500, "Article could not be saved.", response);
     }
 
-    this.response.body = {
+    return response.json({
       article: article.toEntity(),
-    };
-
-    return this.response;
+    });
   }
 
   /**
    * @description
    * Deletes an article by the slug
-   *
-   * @return Promise<Drash.Http.Response>
    */
-  protected async deleteArticle(): Promise<Drash.Http.Response> {
-    const articleSlug = this.request.getPathParam("slug");
+  protected async deleteArticle(
+    request: Drash.Request,
+    response: Drash.Response,
+  ) {
+    const articleSlug = request.pathParam("slug");
 
     if (!articleSlug) {
-      return this.errorResponse(400, "No article slug was passed in");
+      return this.errorResponse(400, "No article slug was passed in", response);
     }
 
     const articleResult: ArticleModel[] | [] = await ArticleModel.where(
@@ -216,6 +220,7 @@ class ArticlesResource extends BaseResource {
       return this.errorResponse(
         500,
         "Failed to fetch the article by slug: " + articleSlug,
+        response,
       );
     }
 
@@ -225,14 +230,13 @@ class ArticlesResource extends BaseResource {
       return this.errorResponse(
         500,
         "Failed to delete the article of slug: " + articleSlug,
+        response,
       );
     }
 
-    this.response.body = {
+    return response.json({
       success: true,
-    };
-
-    return this.response;
+    });
   }
 
   /**
@@ -246,15 +250,20 @@ class ArticlesResource extends BaseResource {
    *     body: string
    *   }
    * }
-   *
-   * @return Promise<Drash.Http.Response>
    */
-  protected async createArticle(): Promise<Drash.Http.Response> {
+  protected async createArticle(
+    request: Drash.Request,
+    response: Drash.Response,
+  ) {
     const inputArticle: ArticleEntity =
-      (this.request.getBodyParam("article") as ArticleEntity);
+      (request.bodyParam("article") as ArticleEntity);
 
     if (!inputArticle.title) {
-      return this.errorResponse(400, "You must set the article title.");
+      return this.errorResponse(
+        400,
+        "You must set the article title.",
+        response,
+      );
     }
 
     const article: ArticleModel = new ArticleModel(
@@ -269,35 +278,32 @@ class ArticlesResource extends BaseResource {
     await article.save();
 
     if (!article) {
-      return this.errorResponse(500, "Article could not be saved.");
+      return this.errorResponse(500, "Article could not be saved.", response);
     }
 
-    this.response.body = {
+    return response.json({
       article: article.toEntity(),
-    };
-
-    return this.response;
+    });
   }
 
-  /**
-   * @return Promise<Drash.Http.Response>
-   */
-  protected async getArticle(): Promise<Drash.Http.Response> {
-    const currentUser = await this.getCurrentUser();
+  protected async getArticle(request: Drash.Request, response: Drash.Response) {
+    const currentUser = await this.getCurrentUser(request);
     if (!currentUser) {
       return this.errorResponse(
         400,
         "`user_id` field is required.",
+        response,
       );
     }
 
-    const slug = this.request.getPathParam("slug") || "";
+    const slug = request.pathParam("slug") || "";
     const articleResult = await ArticleModel.where({ slug: slug });
 
     if (articleResult.length <= 0) {
       return this.errorResponse(
         404,
         "Article not found.",
+        response,
       );
     }
 
@@ -308,6 +314,7 @@ class ArticlesResource extends BaseResource {
       return this.errorResponse(
         400,
         "Unable to determine the article's author.",
+        response,
       );
     }
 
@@ -333,11 +340,9 @@ class ArticlesResource extends BaseResource {
       });
     }
 
-    this.response.body = {
+    return response.json({
       article: entity,
-    };
-
-    return this.response;
+    });
   }
 
   /**
@@ -351,12 +356,13 @@ class ArticlesResource extends BaseResource {
    *           offset: number;       (used for filtering articles by OFFSET)
    *           tag: string;          (used for filtering articles by tag)
    *         }
-   *
-   * @return Promise<Drash.Http.Response>
    */
-  protected async getArticles(): Promise<Drash.Http.Response> {
+  protected async getArticles(
+    request: Drash.Request,
+    response: Drash.Response,
+  ) {
     const articles: ArticleModel[] = await ArticleModel
-      .all(await this.getQueryFilters());
+      .all(await this.getQueryFilters(request));
 
     const articleIds: number[] = [];
     const authorIds: number[] = [];
@@ -373,13 +379,16 @@ class ArticlesResource extends BaseResource {
 
     entities = await this.addAuthorsToEntities(authorIds, entities);
     entities = await this.addFavoritesCountToEntities(articleIds, entities);
-    entities = await this.addFavoritedToEntities(articleIds, entities);
-    entities = await this.filterEntitiesByFavoritedBy(articleIds, entities);
+    entities = await this.addFavoritedToEntities(articleIds, entities, request);
+    entities = await this.filterEntitiesByFavoritedBy(
+      articleIds,
+      entities,
+      request,
+    );
 
-    this.response.body = {
+    return response.json({
       articles: entities,
-    };
-    return this.response;
+    });
   }
 
   /**
@@ -394,11 +403,12 @@ class ArticlesResource extends BaseResource {
   protected async filterEntitiesByFavoritedBy(
     articleIds: number[],
     entities: ArticleEntity[],
+    request: Drash.Request,
   ): Promise<ArticleEntity[]> {
     const favs: ArticlesFavoritesModel[] = await ArticlesFavoritesModel
       .whereIn("article_id", articleIds);
 
-    const username = this.request.getUrlQueryParam("favorited_by");
+    const username = request.queryParam("favorited_by");
     if (!username) {
       return entities;
     }
@@ -435,8 +445,10 @@ class ArticlesResource extends BaseResource {
    *
    * @return Promise<ArticleFilters>
    */
-  protected async getQueryFilters(): Promise<ArticleFilters> {
-    const author = this.request.getUrlQueryParam("author");
+  protected async getQueryFilters(
+    request: Drash.Request,
+  ): Promise<ArticleFilters> {
+    const author = request.queryParam("author");
     //const offset = this.request.getUrlQueryParam("offset");
 
     const filters: ArticleFilters = {};
@@ -451,32 +463,36 @@ class ArticlesResource extends BaseResource {
     return filters;
   }
 
-  /**
-   * @return Promise<Drash.Http.Response>
-   *     Returns the updated article in the response.
-   */
-  protected async toggleFavorite(): Promise<Drash.Http.Response> {
+  protected async toggleFavorite(
+    request: Drash.Request,
+    response: Drash.Response,
+  ) {
     console.log("Handling action: toggleFavorite.");
-    const currentUser = await this.getCurrentUser();
+    const currentUser = await this.getCurrentUser(request);
     if (!currentUser) {
       return this.errorResponse(
         400,
         "`user_id` field is required.",
+        response,
       );
     }
 
-    const slug = this.request.getPathParam("slug") || "";
+    const slug = request.pathParam("slug") || "";
 
     const result = await ArticleModel.where({ slug: slug });
     if (result.length <= 0) {
-      return this.errorResponse(404, `Article with slug "${slug}" not found.`);
+      return this.errorResponse(
+        404,
+        `Article with slug "${slug}" not found.`,
+        response,
+      );
     }
 
     const article = result[0];
 
     let favorite;
 
-    const action = this.request.getBodyParam("action");
+    const action = request.bodyParam("action");
     switch (action) {
       case "set":
         // Check if the user already has a record in the db before creating a
@@ -506,6 +522,7 @@ class ArticlesResource extends BaseResource {
           return this.errorResponse(
             404,
             "Can't unset favorite on article that doesn't have any favorites.",
+            response,
           );
         }
         favorite[0].value = false;
@@ -513,7 +530,7 @@ class ArticlesResource extends BaseResource {
         break;
     }
 
-    return this.getArticle();
+    return this.getArticle(request, response);
   }
 }
 

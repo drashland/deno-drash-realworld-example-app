@@ -3,21 +3,19 @@ import BaseResource from "./base_resource.ts";
 import { tengine } from "../middlewares/tengine.ts";
 
 class HomeResource extends BaseResource {
-  static paths = [
+  paths = [
     "/",
   ];
 
-  @Drash.Http.Middleware({
-    before_request: [tengine],
-    after_request: [],
-  })
-  public GET() {
-    this.response.headers.set("Content-Type", "text/html");
-    this.response.body = this.response.render(
+  services = {
+    GET: [tengine],
+  };
+
+  public GET(_request: Drash.Request, response: Drash.Response) {
+    response.html(response.render(
       "/index.html",
       { title: "Conduit" },
-    );
-    return this.response;
+    ) as string);
   }
 }
 
