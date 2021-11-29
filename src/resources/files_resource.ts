@@ -3,14 +3,14 @@ import { Drash } from "../deps.ts";
 
 class FilesResource extends BaseResource {
   paths = [
-    "/favicon.ico",  
+    "/favicon.ico",
     "/public/.*\.(js|css|)",
   ];
 
   public GET(request: Drash.Request, response: Drash.Response) {
-    const url = new URL(request.url)
-    console.log(url.pathname)
-    return response.file(`.${url.pathname}`)
+    const url = new URL(request.url);
+    console.log(url.pathname);
+    return response.file(`.${url.pathname}`);
   }
 }
 

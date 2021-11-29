@@ -2,7 +2,6 @@ import {
   clearTestArticles,
   clearTestComments,
   clearTestSessions,
-  createServerObject,
   createTestArticle,
   createTestComment,
   createTestSession,

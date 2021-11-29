@@ -15,6 +15,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build client
         run: |
+          cd src
           npm run webpack
 
   tests:
