@@ -4,7 +4,11 @@ const VueLoaderPlugin = require("vue-loader/lib/plugin");
 module.exports = (envVars) => {
   return {
     entry: {
-      app: path.resolve(__dirname, "public/js/_app.js"),
+      index: {
+        import: path.resolve(__dirname, "public/js/_app.js"),
+        dependOn: 'shared',
+      },
+      shared: 'vue',
     },
     mode: envVars.environment,
     output: {

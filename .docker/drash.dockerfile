@@ -13,4 +13,10 @@ RUN export PATH="$DENO_INSTALL/bin:$PATH"
 
 COPY ./.docker/drash-entrypoint.sh /drash-entrypoint.sh
 RUN chmod +x /drash-entrypoint.sh
+
+WORKDIR /var/www/src
+COPY src/package.json src/package-lock.json src/webpack.config.js ./
+RUN npm ci --prefer-offline --no-audit --progress=false
+COPY src/. .
+
 ENTRYPOINT ["sh","/drash-entrypoint.sh"]
