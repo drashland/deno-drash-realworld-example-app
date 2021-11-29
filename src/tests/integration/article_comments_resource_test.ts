@@ -9,15 +9,13 @@ import {
 } from "./utils.ts";
 import { Rhum } from "../deps.ts";
 
-const server = createServerObject();
+import { server } from "../../server.ts";
 
 Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
   Rhum.testSuite("GET /articles/:slug/comments", () => {
     Rhum.testCase(
       "Responds with a 200 status when comments for an article exist",
       async () => {
-        await server.run({ hostname: "localhost", port: 1447 });
-
         // create an article and comment inside the db
         const article = await createTestArticle();
         const id = typeof article.id === "boolean" ? 0 : Number(article.id);
@@ -30,7 +28,7 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
 
         // make request
         const res = await fetch(
-          "http://localhost:1447/articles/test-article-title/comments",
+          `${server.address}/articles/test-article-title/comments`,
         );
         const body = await res.json();
 
@@ -46,8 +44,6 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
           body.data[0].author_username,
           "Test Username",
         );
-
-        server.close();
       },
     );
     // TODO(any) Not completing for the v1 release as it isn't needed, but nice to have
@@ -150,8 +146,6 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
     Rhum.testCase(
       "Responds with 200 on valid post and saves the comment for the article",
       async () => {
-        await server.run({ hostname: "localhost", port: 1447 });
-
         // insert db data
         const article = await createTestArticle();
         const session = await createTestSession();
@@ -159,7 +153,7 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
         // make request
         const cookie = session.session_one + "|::|" + session.session_two;
         const res = await fetch(
-          `http://localhost:1447/articles/${article.slug}/comments`,
+          `${server.address}/articles/${article.slug}/comments`,
           {
             method: "POST",
             headers: {
@@ -183,8 +177,6 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
         Rhum.asserts.assertEquals(res.status, 200);
         Rhum.asserts.assertEquals(body.success, true);
         Rhum.asserts.assertEquals(body.data.body, "Hello world!");
-
-        await server.close();
       },
     );
   });
@@ -192,8 +184,6 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
     Rhum.testCase(
       "Responds with a 200 status when deleting a existing comment",
       async () => {
-        await server.run({ hostname: "localhost", port: 1447 });
-
         // create an article and comment inside the db
         const article = await createTestArticle();
         const id = typeof article.id === "boolean" ? 0 : Number(article.id);
@@ -207,7 +197,7 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
 
         // make request
         const res = await fetch(
-          "http://localhost:1447/articles/comment/" + comment.id,
+          `${server.address}/articles/comment/` + comment.id,
           {
             method: "DELETE",
             credentials: "same-origin",
@@ -231,8 +221,6 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
           success: true,
           message: "Deleted the comment",
         });
-
-        await server.close();
       },
     );
     // Rhum.testCase("Responds with 403 when user is not logged in", async () => {

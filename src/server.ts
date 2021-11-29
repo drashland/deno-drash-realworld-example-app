@@ -7,6 +7,7 @@ import TagsResource from "./resources/tags_resource.ts";
 import UserResource from "./resources/user_resource.ts";
 import UsersLoginResource from "./resources/users_login_resource.ts";
 import UsersResource from "./resources/users_resource.ts";
+import FilesResource from "./resources/files_resource.ts"
 
 export const server = new Drash.Server({
   resources: [
@@ -18,6 +19,7 @@ export const server = new Drash.Server({
     UserResource,
     UsersLoginResource,
     UsersResource,
+    FilesResource
   ],
   hostname: "realworld_drash",
   port: 1667,
