@@ -16,6 +16,7 @@ jobs:
       - name: Build client
         run: |
           cd src
+          npm i
           npm run webpack
 
   tests:
