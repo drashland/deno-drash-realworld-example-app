@@ -1,4 +1,3 @@
-import { bcrypt } from "../deps.ts";
 import UserModel from "../models/user_model.ts";
 
 export default class ValidationService {
