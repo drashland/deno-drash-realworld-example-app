@@ -59,24 +59,6 @@ export default class ValidationService {
 
   /**
    * @description
-   * Validate that the two given passwords match.
-   *
-   * @param string passwordOne
-   * @param string passwordTwo
-   *
-   * @return Promise<boolean>
-   *     - Returns true if the two passwords match.
-   *     - Returns false if the two passwords do not match.
-   */
-  static async isPasswordCorrect(
-    passwordOne: string,
-    passwordTwo: string,
-  ): Promise<boolean> {
-    return await bcrypt.compare(passwordOne, passwordTwo);
-  }
-
-  /**
-   * @description
    * Validate that the given password passes validation by testing it against a
    * regular expression. The regular expression tests to see if the given
    * password meets the following requirements:
