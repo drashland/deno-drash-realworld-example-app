@@ -1,7 +1,7 @@
 import { Rhum } from "../deps.ts";
-import { clearTestUsers, createServerObject } from "./utils.ts";
+import { clearTestUsers } from "./utils.ts";
 
-const server = createServerObject();
+import { server } from "../../server.ts";
 
 Rhum.testPlan("integration/users_resource_test.ts", () => {
   Rhum.testSuite("POST /users", () => {
@@ -32,9 +32,7 @@ Rhum.testPlan("integration/users_resource_test.ts", () => {
     Rhum.testCase(
       "Responds with 200 on a successful registration",
       async () => {
-        await server.run({ hostname: "localhost", port: 1447 });
-
-        const res = await fetch("http://localhost:1447/users", {
+        const res = await fetch(server.address + "/users", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -53,8 +51,6 @@ Rhum.testPlan("integration/users_resource_test.ts", () => {
 
         Rhum.asserts.assertEquals(res.status, 200);
         // TODO(any) Assert res `body`
-
-        server.close();
       },
     );
   });

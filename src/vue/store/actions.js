@@ -132,7 +132,7 @@ export default {
       axios
         .delete(`/articles/comment/${commentId}`)
         .then(
-          ((response) => {
+          (response) => {
             let comments = [];
             context.getters.comments.forEach((a, i) => {
               if (a.id == commentId) {
@@ -142,7 +142,7 @@ export default {
             });
             context.dispatch("setComments", comments);
             resolve(response);
-          }),
+          },
         )
         .catch((err) => {
           resolve(err.response);

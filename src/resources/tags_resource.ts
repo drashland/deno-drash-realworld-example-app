@@ -1,14 +1,14 @@
 import BaseResource from "./base_resource.ts";
+import { Drash } from "../deps.ts";
 
 class TagsResource extends BaseResource {
-  static paths = [
+  paths = [
     "/tags",
     "/tags/:id",
   ];
 
-  public GET() {
-    this.response.body = [];
-    return this.response;
+  public GET(_request: Drash.Request, response: Drash.Response) {
+    response.json([]);
   }
 }
 

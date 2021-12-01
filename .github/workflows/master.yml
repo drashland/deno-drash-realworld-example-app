@@ -3,12 +3,21 @@ name: master
 on:
   pull_request:
     branches:
-      - master
+      - main
   push:
     branches:
-      - master
-      -
+      - main
 jobs:
+
+  builds:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build client
+        run: |
+          cd src
+          npm i
+          npm run webpack
 
   tests:
 

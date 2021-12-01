@@ -1,7 +1,7 @@
 import { Drash } from "../deps.ts";
 import UserModel from "../models/user_model.ts";
 
-class BaseResource extends Drash.Http.Resource {
+class BaseResource extends Drash.Resource {
   public current_user: UserModel | null = null;
 
   /**
@@ -17,14 +17,14 @@ class BaseResource extends Drash.Http.Resource {
   protected errorResponse(
     statusCode: number,
     message: string,
-  ): Drash.Http.Response {
-    this.response.status_code = statusCode;
-    this.response.body = {
+    response: Drash.Response,
+  ): void {
+    response.status = statusCode;
+    response.json({
       errors: {
         body: [message],
       },
-    };
-    return this.response;
+    });
   }
 
   /**
@@ -34,10 +34,11 @@ class BaseResource extends Drash.Http.Resource {
    *
    * @return Drash.Http.Response
    */
-  protected errorResponseCurrentUser(): Drash.Http.Response {
+  protected errorResponseCurrentUser(response: Drash.Response) {
     return this.errorResponse(
       400,
       "`user_id` field is required.",
+      response,
     );
   }
 
@@ -47,15 +48,17 @@ class BaseResource extends Drash.Http.Resource {
    *
    * @return
    */
-  protected async getCurrentUser(): Promise<UserModel | null> {
+  protected async getCurrentUser(
+    request: Drash.Request,
+  ): Promise<UserModel | null> {
     console.log("Getting the current user.");
     if (this.current_user) {
       console.log(`Using cached User #${this.current_user.id}.`);
       return this.current_user;
     }
 
-    const userId = (this.request.getUrlQueryParam("user_id") as string) ||
-      (this.request.getBodyParam("user_id") as string);
+    const userId = (request.queryParam("user_id") as string) ||
+      (request.bodyParam("user_id") as string);
 
     if (!userId) {
       return null;

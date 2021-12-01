@@ -1,24 +1,20 @@
 import { Rhum } from "../deps.ts";
-import { clearTestUsers, createServerObject, createTestUser } from "./utils.ts";
+import { clearTestUsers, createTestUser } from "./utils.ts";
 
-const server = createServerObject();
+import { server } from "../../server.ts";
 
 Rhum.testPlan("integration/users_resource_test.ts", () => {
   Rhum.testSuite("GET /user/:username", () => {
     Rhum.testCase("Responds with 200 and returns the user", async () => {
-      await server.run({ hostname: "localhost", port: 1447 });
-
       await createTestUser();
 
-      const res = await fetch("http://localhost:1447/user/testUsername");
+      const res = await fetch(server.address + "/user/testUsername");
       await res.json();
 
       await clearTestUsers();
 
       Rhum.asserts.assertEquals(res.status, 200);
       // TODO(any) Assert `body` (result from await res.json())
-
-      server.close();
     });
   });
   Rhum.testSuite("POST /user", () => {
