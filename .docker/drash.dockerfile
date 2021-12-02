@@ -9,6 +9,7 @@ RUN apt update -y \
 RUN curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=/usr/local sh -s v1.16.3
 RUN export DENO_INSTALL="/root/.local"
 RUN export PATH="$DENO_INSTALL/bin:$PATH"
+RUN deno install --unstable --allow-net=realworld_postgres:5432,deno.land --allow-read=. --allow-write=nessie.config.ts,db --name nessie  https://deno.land/x/nessie/cli.ts
 
 WORKDIR /var/www/src
 
@@ -24,7 +25,3 @@ COPY src/. .
 # Cache app.ts and deps file
 RUN deno cache --unstable deps.ts
 RUN deno cache --unstable app.ts
-
-COPY ./.docker/drash-entrypoint.sh /drash-entrypoint.sh
-RUN chmod +x /drash-entrypoint.sh
-ENTRYPOINT ["bash","/drash-entrypoint.sh"]

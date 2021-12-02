@@ -20,9 +20,7 @@ jobs:
         run: |
           docker-compose up -d
           docker-compose exec drash deno install --unstable --allow-net=realworld_postgres:5432,deno.land --allow-read=. --allow-write=nessie.config.ts,db -f  https://deno.land/x/nessie/cli.ts
-          docker-compose exec drash export PATH="/root/.deno/bin:$PATH"
-          docker-compose exec drash nessie migrate
-          docker-compose exec drash nessie seed
+          docker-compose exec -T drash bash -c "/root/.deno/bin/nessie migrate"
 
       - name: Run Integration Tests
         run: |

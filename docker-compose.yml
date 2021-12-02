@@ -31,9 +31,11 @@ services:
 
   drash:
     container_name: realworld_drash
+    working_dir: /var/www/src
     build:
       context: .
       dockerfile: .docker/drash.dockerfile
+    command: bash -c "cd /var/www/src && deno run -A --unstable app.ts"
     volumes:
       - ./src/config:/var/www/src/config
       - ./src/db:/var/www/src/db
