@@ -11,7 +11,7 @@
     "babel-preset-env": "^1.7.0",
     "braces": ">=3.0.2",
     "css-loader": "^6.5.1",
-    "date-fns": "^2.26.0",
+    "date-fns": "^2.27.0",
     "elliptic": "^6.5.4",
     "kind-of": ">=6.0.3",
     "lodash": "^4.17.21",
