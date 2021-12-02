@@ -9,16 +9,6 @@ on:
       - main
 jobs:
 
-  builds:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build client
-        run: |
-          cd src
-          npm i
-          npm run webpack
-
   tests:
 
     runs-on: ubuntu-latest
@@ -29,6 +19,8 @@ jobs:
       - name: Builds and Starts
         run: |
           docker-compose up -d
+          docker-compose exec drash deno install --unstable --allow-net=realworld_postgres:5432,deno.land --allow-read=. --allow-write=nessie.config.ts,db -f  https://deno.land/x/nessie/cli.ts
+          docker-compose exec drash export PATH="/root/.deno/bin:$PATH"
           docker-compose exec drash nessie migrate
           docker-compose exec drash nessie seed
 

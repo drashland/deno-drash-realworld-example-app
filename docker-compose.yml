@@ -52,7 +52,6 @@ services:
       - ./src/package-lock.json:/var/www/src/package-lock.json
       - ./src/server.ts:/var/www/src/server.ts
       - ./src/webpack.config.js:/var/www/src/webpack.config.js
-    working_dir: /var/www/src
     ports:
       - "1667:1667"
     networks:
