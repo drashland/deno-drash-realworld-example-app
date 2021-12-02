@@ -1,7 +1,7 @@
-import { PostgresClient } from "./deps.ts";
 import { config } from "./config.ts";
+import { ClientPostgreSQL } from "./deps.ts";
 
-export const db = new PostgresClient({
+const client = new ClientPostgreSQL({
   database: config.database.database,
   hostname: config.database.hostname,
   port: config.database.port,
@@ -11,3 +11,9 @@ export const db = new PostgresClient({
     enforce: false,
   },
 });
+
+export default {
+  client,
+  migrationFolders: ["./db/migrations"],
+  seedFolders: ["./db/seeds"],
+};
