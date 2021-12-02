@@ -1,5 +1,5 @@
 import { PostgresClient } from "./deps.ts";
-import { config } from "./config.ts"
+import { config } from "./config.ts";
 
 export const db = new PostgresClient({
   database: config.database.database,
@@ -8,6 +8,6 @@ export const db = new PostgresClient({
   user: config.database.user,
   password: config.database.password,
   tls: {
-      enforce: false,
+    enforce: false,
   },
 });

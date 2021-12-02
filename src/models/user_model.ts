@@ -121,9 +121,10 @@ export class UserModel extends BaseModel {
   }
 
   public async session() {
-    return (await BaseModel.query('SELECT * FROM sessions WHERE user_id = ?', 
-      this.id.toString()
-    )).rows[0]
+    return (await BaseModel.query(
+      "SELECT * FROM sessions WHERE user_id = ?",
+      this.id.toString(),
+    )).rows[0];
   }
 
   //////////////////////////////////////////////////////////////////////////////

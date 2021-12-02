@@ -1,11 +1,14 @@
-import { AbstractSeed, Info, ClientPostgreSQL } from "https://deno.land/x/nessie@2.0.4/mod.ts";
+import {
+  AbstractSeed,
+  ClientPostgreSQL,
+} from "https://deno.land/x/nessie@2.0.4/mod.ts";
 
 export default class extends AbstractSeed<ClientPostgreSQL> {
-    /** Runs on seed */
-    async run(info: Info): Promise<void> {
-        let count = 1
-        while (count !== 100) {
-            this.client.queryObject(`
+  /** Runs on seed */
+  async run(): Promise<void> {
+    let count = 1;
+    while (count !== 100) {
+      await this.client.queryObject(`
                 INSERT INTO users (
                     username,
                     password,
@@ -23,8 +26,8 @@ export default class extends AbstractSeed<ClientPostgreSQL> {
                     https://static.productionready.io/images/smiley-cyrus.jpg,
                     NULL
                 )
-            `)
-            count++
-        }
+            `);
+      count++;
     }
+  }
 }

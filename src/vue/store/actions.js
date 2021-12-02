@@ -1,8 +1,4 @@
-import Vue from "vue";
 import axios from "axios";
-import { router } from "../../public/js/_app.js";
-import JwtService from "@/common/jwt_service.js";
-import { store } from "../../public/js/_app";
 
 const userDefault = {
   created_on: null,
@@ -440,8 +436,8 @@ function getCookie(cname) {
 }
 
 function setCookie(cname, cvalue, exdays) {
-  var d = new Date();
+  const d = new Date();
   d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-  var expires = "expires=" + d.toUTCString();
+  const expires = "expires=" + d.toUTCString();
   document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
