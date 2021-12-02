@@ -19,7 +19,7 @@ jobs:
       - name: Builds and Starts
         run: |
           docker-compose up -d
-          docker-compose exec -T drash bash -c "/root/.deno/bin/nessie migrate"
+          docker-compose exec -T drash bash -c "/root/.deno/bin/nessie migrate && /root/.deno/bin/nessie seed"
 
       - name: Run Integration Tests
         run: |
