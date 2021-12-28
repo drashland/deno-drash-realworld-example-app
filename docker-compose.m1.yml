@@ -1,0 +1,48 @@
+version: "3"
+
+services:
+
+  apache:
+    container_name: realworld_apache
+    build:
+      context: .
+      dockerfile: .docker/apache.dockerfile
+    volumes:
+      - ./src:/var/www/src
+    working_dir: /var/www/src
+    depends_on:
+      - drash
+    ports:
+      - "8080:80"
+    networks:
+      - drash-app-network
+
+  postgres:
+    image: "postgres:11"
+    container_name: "realworld_postgres"
+    ports:
+      - "54320:5432"
+    volumes:
+      - ./.docker/data:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=userpassword
+    networks:
+      - drash-app-network
+
+  drash:
+    container_name: realworld_drash
+    build:
+      context: .
+      dockerfile: .docker/drash-m1.dockerfile
+    volumes:
+      - ./src:/var/www/src
+    working_dir: /var/www/src
+    ports:
+      - "1667:1667"
+    networks:
+      - drash-app-network
+
+networks:
+  drash-app-network:
+    driver: bridge
