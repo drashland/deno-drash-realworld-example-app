@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "devDependencies": {
     "@babel/core": "^7.16.0",
-    "acorn": ">=8.6.0",
+    "acorn": ">=8.7.0",
     "axios": "^0.24.0",
     "babel-cli": "^6.26.0",
     "babel-loader": "^8.2.3",
