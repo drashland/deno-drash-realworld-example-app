@@ -15,7 +15,7 @@
     "elliptic": "^6.5.4",
     "kind-of": ">=6.0.3",
     "lodash": "^4.17.21",
-    "markdown-it": "^12.2.0",
+    "markdown-it": "^12.3.2",
     "mime-types": "^2.1.34",
     "node-sass": "^7.0.1",
     "prismjs": "^1.25.0",
