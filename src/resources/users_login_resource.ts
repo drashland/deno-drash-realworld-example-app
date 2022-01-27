@@ -122,7 +122,7 @@ class LoginResource extends BaseResource {
       return this.errorResponse(422, "Password field required.", response);
     }
     if (
-      !(await ValidationService.isPasswordCorrect(rawPassword, user.password))
+      !(await bcrypt.compare(rawPassword, user.password))
     ) {
       console.log("Passwords do not match.");
       return this.errorResponse(422, "Invalid user credentials.", response);
