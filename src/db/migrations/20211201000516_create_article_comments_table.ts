@@ -9,10 +9,9 @@ export default class extends AbstractMigration<ClientPostgreSQL> {
           article_id integer NOT NULL,
           author_image character varying(255) NOT NULL,
           author_id integer NOT NULL,
-          author_username character varying(255) NOT NULL,
           body character varying(255) NOT NULL,
-          created_at timestamp without time zone NOT NULL,
-          updated_at timestamp without time zone NOT NULL
+          created_at timestamp without time zone NOT NULL default now(),
+          updated_at timestamp without time zone
       );
   `);
   }

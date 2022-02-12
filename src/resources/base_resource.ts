@@ -64,13 +64,16 @@ class BaseResource extends Drash.Resource {
       return null;
     }
 
-    const user = await UserModel.where({ id: userId });
+    this.current_user = await UserModel.query({
+      where: [
+        ['id', userId]
+      ],
+      first: true
+    });
 
-    if (user.length <= 0) {
-      this.current_user = null;
+    if (!this.current_user) {
+      return null
     }
-
-    this.current_user = user[0];
 
     console.log(`Setting User #${this.current_user.id} as current user.`);
     return this.current_user;

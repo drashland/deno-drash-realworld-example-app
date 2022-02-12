@@ -39,10 +39,6 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
         Rhum.asserts.assertEquals(res.status, 200);
         Rhum.asserts.assertEquals(body.success, true);
         Rhum.asserts.assertEquals(body.data[0].body, "Test Body");
-        Rhum.asserts.assertEquals(
-          body.data[0].author_username,
-          "Test Username",
-        );
       },
     );
     // TODO(any) Not completing for the v1 release as it isn't needed, but nice to have

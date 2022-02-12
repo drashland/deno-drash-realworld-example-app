@@ -268,7 +268,7 @@ export default {
         .then((response) => {
           console.log("Registration successful.");
           console.log(response);
-          context.dispatch("setUser", response.data.user);
+          context.dispatch("setUser", { ...response.data.user, token: response.data.token });
           resolve(true);
         })
         .catch((error) => {

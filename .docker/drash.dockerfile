@@ -1,9 +1,9 @@
 FROM debian:stable-slim
 
-RUN apt update -y \
-  && apt clean \
-  && apt install bash curl unzip -y \
-  && apt install -y --no-install-recommends npm \
+RUN apt-get update -y \
+  && apt-get clean \
+  && apt-get install bash curl unzip -y \
+  && apt-get install -y --no-install-recommends npm \
   && npm install -g npm@latest
 
 RUN curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=/usr/local sh -s v1.16.3
@@ -17,7 +17,7 @@ WORKDIR /var/www/src
 COPY src/package.json src/package-lock.json src/webpack.config.js ./
 COPY src/public public
 COPY src/vue vue
-RUN npm ci --prefer-offline --no-audit --progress=false && npm run webpack
+RUN npm i && npm run webpack
 
 # Copy over other src code
 COPY src/. .

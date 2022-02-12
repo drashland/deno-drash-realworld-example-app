@@ -16,7 +16,7 @@ export default class extends AbstractMigration<ClientPostgreSQL> {
   /** Runs on rollback */
   async down(): Promise<void> {
     await this.client.queryObject(`
-            DROP TABLE article_favorites
+            DROP TABLE articles_favorites
         `);
   }
 }

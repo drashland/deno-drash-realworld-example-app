@@ -17,20 +17,24 @@ export default class UserResource extends BaseResource {
    * @return Drash.Http.Response
    *     Returns a User object matched to the username path param.
    */
-  public async GET(request: Drash.Request, response: Drash.Response) {
-    response.json(
-      await UserModel.where({
-        username: request.pathParam("username") || "",
-      }),
-    );
-    if (!response.body) {
-      return this.errorResponse(
-        400,
-        "Username must exist in the uri",
-        response,
-      );
-    }
-  }
+  // Dont think this is used
+  // public async GET(request: Drash.Request, response: Drash.Response) {
+  //   response.json(
+  //     await UserModel.query({
+  //       where: [
+  //         ['username', request.pathParam("username") || ""],
+  //       ],
+  //       first: true
+  //     }),
+  //   );
+  //   if (!response.body) {
+  //     return this.errorResponse(
+  //       400,
+  //       "Username must exist in the uri",
+  //       response,
+  //     );
+  //   }
+  // }
 
   /**
    * @description
@@ -71,14 +75,17 @@ export default class UserResource extends BaseResource {
     );
     const token = (request.bodyParam("token") as string) || "";
 
-    const result = await UserModel.where({ id: id });
+    const user = await UserModel.query({
+      where: [
+        ['id', id]
+      ],
+      first: true
+    });
 
-    if (result.length <= 0) {
+    if (!user) {
       console.log("User not found.");
       return this.errorResponse(404, "Error updating your profile.", response);
     }
-
-    const user = result[0];
 
     // Validate
     console.log("Validating inputs.");
@@ -116,21 +123,14 @@ export default class UserResource extends BaseResource {
     if (rawPassword) {
       user.password = await bcrypt.hash(rawPassword); // HASH THE PASSWORD
     }
-    const savedUser = await user.save();
-    if (savedUser === null) {
-      return this.errorResponse(
-        422,
-        "An error occurred whilst saving your user",
-        response,
-      );
-    }
+    await user.save();
 
-    const entity = savedUser.toEntity();
     // Make sure to pass the user's session token back to them
-    entity.token = token;
+    user.token = token;
 
     return response.json({
-      user: entity,
+      user: await user.toEntity(),
+      token,
     });
   }
 }

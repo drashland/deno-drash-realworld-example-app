@@ -35,7 +35,7 @@ services:
     build:
       context: .
       dockerfile: .docker/drash.dockerfile
-    command: bash -c "cd /var/www/src && deno run -A --unstable app.ts"
+    command: bash -c "cd /var/www/src && deno run -A --watch --unstable app.ts"
     volumes:
       - ./src/config:/var/www/src/config
       - ./src/db:/var/www/src/db

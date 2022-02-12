@@ -22,7 +22,7 @@ export default class extends AbstractSeed<ClientPostgreSQL> {
       `,
         `user${count}`,
         "$2a$10$Ha7shP2TNTmTR9tC8xdXg.Vta3w6IaHYnMNOxxfl5EG.cdwVFnTlW",
-        "user${count}@hotmail.com",
+        `user${count}@hotmail.com`,
         "2020-05-14 20:03:56.025651",
         null,
         "https://static.productionready.io/images/smiley-cyrus.jpg",

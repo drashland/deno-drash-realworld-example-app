@@ -24,15 +24,23 @@ export default class UserService {
     }
     const sessionOne = sessionCookie.split("|::|")[0];
     const sessionTwo = sessionCookie.split("|::|")[1];
-    const session = await SessionModel.getUserSession(sessionOne, sessionTwo);
+    const session = await SessionModel.query({
+      where: [
+        ['session_one', sessionOne],
+        ['session_two', sessionTwo]
+      ], first: true
+    });
     if (!session) {
       return false;
     }
     const userId = session.user_id;
-    const user = await UserModel.where({ id: userId });
-    if (!user.length) {
+    const user = await UserModel.query({
+      where: [
+        ['id', userId]
+       ], first: true });
+    if (!user) {
       return false;
     }
-    return user[0];
+    return user;
   }
 }

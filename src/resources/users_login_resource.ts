@@ -59,37 +59,42 @@ class LoginResource extends BaseResource {
     response: Drash.Response,
   ) {
     console.log("Checking if user has a session.");
-    const sessionValues = (request.bodyParam("token") as string);
-    if (sessionValues) {
-      const sessionValuesSplit = sessionValues.split("|::|");
-      const sessionOne = sessionValuesSplit[0];
-      const sessionTwo = sessionValuesSplit[1];
-      if (sessionOne && sessionTwo) {
-        const session = await SessionModel.getUserSession(
-          sessionOne,
-          sessionTwo,
-        );
-        if (session) {
-          const user = await UserModel.where({ "id": session.user_id });
-          if (user.length > 0) {
-            const entity = user[0].toEntity();
-            entity.token = `${session.session_one}|::|${session.session_two}`;
-            console.log("User has an active session.");
-            return response.json({
-              user: entity,
-            });
-          }
-        }
+    // TODO :: Turn this into a authenticate/redirect middleware
+    const sessionValues = request.bodyParam<string>("token");
+    if (!sessionValues) {
+      console.log("User's session is invalid or has expired.");
+      response.status = 401;
+      return response.json({
+        errors: {
+          body: ["Invalid session."],
+        },
+      });
+    }
+    const sessionValuesSplit = sessionValues.split("|::|");
+    const sessionOne = sessionValuesSplit[0];
+    const sessionTwo = sessionValuesSplit[1];
+    const session = await SessionModel.query({
+      where: [
+        ['session_one', sessionOne],
+        ['session_two', sessionTwo],
+      ],
+      first: true
+    });
+    if (session) {
+      const user = await UserModel.query({
+        where: [
+          [ "id", session.user_id]
+        ]
+      });
+      if (user.length > 0) {
+        const entity = await user[0].toEntity();
+        console.log("User has an active session.");
+        return response.json({
+          user: entity,
+          token: `${session.session_one}|::|${session.session_two}`
+        });
       }
     }
-
-    console.log("User's session is invalid or has expired.");
-    response.status = 401;
-    return response.json({
-      errors: {
-        body: ["Invalid session."],
-      },
-    });
   }
 
   /**
@@ -108,7 +113,11 @@ class LoginResource extends BaseResource {
     }
 
     // Convert the user to a real user model object
-    const result = await UserModel.where({ email: inputUser.email });
+    const result = await UserModel.query({
+      where: [
+        ['email', inputUser.email]
+       ]
+     });
 
     if (result.length <= 0) {
       console.log("User not found.");
@@ -133,8 +142,11 @@ class LoginResource extends BaseResource {
     // cookie.
     const sessionOne = await bcrypt.hash("sessionOne2020Drash");
     const sessionTwo = await bcrypt.hash("sessionTwo2020Drash");
-    const Session = new SessionModel(sessionOne, sessionTwo, user.id);
-    const session = await Session.save();
+    const session = new SessionModel();
+    session.session_one = sessionOne
+    session.session_two = sessionTwo
+    session.user_id = user.id
+    await session.save();
     if (!session) {
       return this.errorResponse(
         422,
@@ -143,11 +155,12 @@ class LoginResource extends BaseResource {
       );
     }
 
-    const entity = user.toEntity();
-    entity.token = `${session.session_one}|::|${session.session_two}`;
-
+    const entity = await user.toEntity<UserEntity>();
     return response.json({
-      user: entity,
+      user: {
+        ...entity,
+        token: `${session.session_one}|::|${session.session_two}`
+      },
     });
   }
 }

@@ -13,8 +13,13 @@ export default class ArticleCommentsResource extends BaseResource {
 
   public async GET(request: Drash.Request, response: Drash.Response) {
     const slug = request.pathParam("slug") || "";
-    const articles = await ArticleModel.where({ slug });
-    if (!articles.length) {
+    const article = await ArticleModel.query({
+      where: [
+        ['slug', slug]
+       ],
+       first: true
+    });
+    if (!article) {
       console.error("No article was found with the slug of: " + slug);
       response.status = 404;
       return response.json({
@@ -23,11 +28,7 @@ export default class ArticleCommentsResource extends BaseResource {
         },
       });
     }
-    const article = articles[0];
-    const comments = await ArticleCommentsModel.whereIn(
-      "article_id",
-      [article.id],
-    );
+    const comments = await article.comments();
     if (!comments.length) {
       console.log(
         "No comments were found for the article with id: " + article.id,
@@ -50,7 +51,11 @@ export default class ArticleCommentsResource extends BaseResource {
     const slug = request.pathParam("slug") || "";
     console.log("The slug for the article: " + slug);
     // First find an article by that slug. The article should exist.
-    const articles = await ArticleModel.where({ slug });
+    const articles = await ArticleModel.query({
+      where: [
+        ['slug', slug]
+       ]
+      });
     if (!articles.length) {
       return this.errorResponse(404, "No article was found.", response);
     }
@@ -73,19 +78,15 @@ export default class ArticleCommentsResource extends BaseResource {
       );
     }
     // save the comment
-    const articleComment = new ArticleCommentsModel(
-      article.id,
-      comment,
-      user.image,
-      user.id,
-      user.username,
-    );
-    const savedArticleComment: ArticleCommentsModel = await articleComment
+    const articleComment = new ArticleCommentsModel();
+    articleComment.article_id = article.id,
+    articleComment.comment = comment,
+    // TODO :: No need for author img and username, we can do this via relations
+    articleComment.author_image = user.image;
+    articleComment.author_id = user.id;
+    await articleComment
       .save();
-    if (!savedArticleComment) {
-      return this.errorResponse(500, "Failed to save the comment.", response);
-    }
-    const articleEntity = savedArticleComment.toEntity();
+    const articleEntity = await  articleComment.toEntity();
     response.status = 200;
     return response.json({
       success: true,
@@ -110,7 +111,11 @@ export default class ArticleCommentsResource extends BaseResource {
     // Make sure they are the author of the comment
     const commentId = Number(request.pathParam("id")) || 0;
     console.log("going to get comments");
-    const comments = await ArticleCommentsModel.where({ author_id: user.id });
+    const comments = await ArticleCommentsModel.query({
+      where: [
+        ['author_id', user.id]
+       ]
+    });
     const isTheirComment = comments.filter((comment) => {
       return comment.id == Number(commentId);
     }).length >= 0;
@@ -122,17 +127,12 @@ export default class ArticleCommentsResource extends BaseResource {
       );
     }
     // Delete the comment
-    const articleCommentsModel = new ArticleCommentsModel(
-      0,
-      ", ",
-      "",
-      0,
-      ", ",
-      0,
-      0,
-      commentId,
-    );
-    articleCommentsModel.id = Number(commentId);
+    const articleCommentsModel = await ArticleCommentsModel.query({
+      'where': [
+        ['id', commentId]
+      ],
+      first: true,
+    }) as ArticleCommentsModel;
     await articleCommentsModel.delete();
     return response.json({
       message: "Deleted the comment",

@@ -1,6 +1,6 @@
 import { bcrypt } from "../deps.ts";
 import BaseResource from "./base_resource.ts";
-import UserModel from "../models/user_model.ts";
+import {UserModel, UserEntity } from "../models/user_model.ts";
 import SessionModel from "../models/session_model.ts";
 import ValidationService from "../services/validation_service.ts";
 import { Drash } from "../deps.ts";
@@ -21,15 +21,9 @@ class RegisterResource extends BaseResource {
    */
   public async POST(request: Drash.Request, response: Drash.Response) {
     // Gather data
-    const username = ValidationService.decodeInput(
-      (request.bodyParam("username") as string) || "",
-    );
-    const email = ValidationService.decodeInput(
-      (request.bodyParam("email") as string) || "",
-    );
-    const rawPassword = ValidationService.decodeInput(
-      (request.bodyParam("password") as string) || "",
-    );
+    const username = request.bodyParam<string>("username") ?? "";
+    const email = request.bodyParam<string>("email") ?? "";
+    const rawPassword = request.bodyParam<string>("password") ?? "";
 
     console.log("Creating the following user:");
     console.log(username, email, rawPassword);
@@ -60,39 +54,29 @@ class RegisterResource extends BaseResource {
     }
 
     // Create user
-    const User = new UserModel(
-      username,
-      await bcrypt.hash(rawPassword), // HASH THE PASSWORD
-      email,
-    );
-    const user = await User.save();
+    const user = new UserModel;
+    user.username = username;
+    user.password = bcrypt.hashSync(rawPassword)
+    user.email = email
+    await user.save()
 
-    if (!user) {
-      return this.errorResponse(
-        422,
-        "An error occurred while trying to create your account.",
-        response,
-      );
-    }
-
-    const entity = user.toEntity();
+    const entity = await user.toEntity<UserEntity>();
 
     // Create session for user. We return the session values on the user
     // object and the front-end is in charge of setting the values as a
     // cookie.
     const sessionOneValue = await bcrypt.hash("sessionOne2020Drash");
     const sessionTwoValue = await bcrypt.hash("sessionTwo2020Drash");
-    const session = new SessionModel(
-      sessionOneValue,
-      sessionTwoValue,
-      user.id,
-    );
-    session.save();
-    entity.token = `${sessionOneValue}|::|${sessionTwoValue}`;
+    const session = new SessionModel;
+    session.session_one = sessionOneValue
+    session.session_two = sessionTwoValue
+    session.user_id = user.id
+    await session.save();
 
     // Return the newly created user
     return response.json({
       user: entity,
+      token: `${sessionOneValue}|::|${sessionTwoValue}`
     });
   }
 }
