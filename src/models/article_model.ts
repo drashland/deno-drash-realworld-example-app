@@ -1,7 +1,7 @@
 import BaseModel from "./base_model.ts";
 import { UserModel } from "./user_model.ts";
-import { ArticlesFavoritesModel } from "./articles_favorites_model.ts"
-import { ArticleCommentsModel } from "./article_comments_model.ts"
+import { ArticlesFavoritesModel } from "./articles_favorites_model.ts";
+import { ArticleCommentsModel } from "./article_comments_model.ts";
 
 export type ArticleEntity = {
   author_id: number;
@@ -9,7 +9,7 @@ export type ArticleEntity = {
   created_at: number;
   description: string;
   id: number;
-  slug?: string;
+  slug: string;
   title: string;
   updated_at: number;
   tags: string[];
@@ -123,23 +123,23 @@ export class ArticleModel extends BaseModel {
   public async author() {
     return await UserModel.query({
       where: [
-        ['id', this.author_id]
+        ["id", this.author_id],
       ],
-      first: true
-    })
+      first: true,
+    });
   }
 
-  public async articleFavorites(where: Array<Array<string|number>> = []) {
-    where.push(['article_id', this.id])
+  public async articleFavorites(where: Array<Array<string | number>> = []) {
+    where.push(["article_id", this.id]);
     return await ArticlesFavoritesModel.query({
-      where
-    })
+      where,
+    });
   }
 
-  public async comments(where: Array<Array<string|number>> = []) {
-    where.push(['article_id', this.id])
+  public async comments(where: Array<Array<string | number>> = []) {
+    where.push(["article_id", this.id]);
     return await ArticleCommentsModel.query({
-      where
-    })
+      where,
+    });
   }
 }

@@ -62,15 +62,17 @@ export default abstract class BaseModel {
     return fields;
   }
 
-  public async toEntity<Entity>(extraProps: Record<string, unknown> = {}): Promise<Entity> {
+  public async toEntity<Entity>(
+    extraProps: Record<string, unknown> = {},
+  ): Promise<Entity> {
     const fields: Record<string, unknown> = {};
     for (const field of await this.getChildFieldNames()) {
       fields[field] = this[field];
     }
     const { ...data } = this;
-    Object.keys(extraProps).forEach(propname => {
-      data[propname] = extraProps[propname]
-    })
+    Object.keys(extraProps).forEach((propname) => {
+      data[propname] = extraProps[propname];
+    });
     //@ts-ignore
     return data as Entity;
   }
@@ -149,7 +151,7 @@ export default abstract class BaseModel {
     opts: {
       select?: string[];
       where?: Array<Array<string | number>>;
-      whereIn?: [string, string|number[]]
+      whereIn?: [string, string | number[]];
       first?: T;
     },
   ): Promise<QueryResponse<T, Model>> {
@@ -173,14 +175,14 @@ export default abstract class BaseModel {
     }
 
     if (opts.whereIn) {
-      let whereInQuery = ` WHERE ? IN (`
-      const whereInParams = opts.whereIn.flat()
+      let whereInQuery = ` WHERE ? IN (`;
+      const whereInParams = opts.whereIn.flat();
       const whereInPreparedParams = whereInParams.map((w, i) => {
-        args.push(w.toString())
-        return `$${i + 1}`
-      })
-      whereInQuery += whereInPreparedParams.join(', ')
-      query += `${whereInQuery} `
+        args.push(w.toString());
+        return `$${i + 1}`;
+      });
+      whereInQuery += whereInPreparedParams.join(", ");
+      query += `${whereInQuery} `;
     }
 
     const models: Model[] = [];
@@ -242,7 +244,7 @@ export default abstract class BaseModel {
     let query = `INSERT INTO ${model.tablename} (`;
     query += Object.keys(defaults).join(", ");
     query += `) VALUES (`;
-    query += Object.keys(defaults).map((k, i) => `$${i + 1}`).join(", ");
+    query += Object.keys(defaults).map((_k, i) => `$${i + 1}`).join(", ");
     query += `) RETURNING id`;
     //@ts-ignore
     const result = await this.queryRaw(

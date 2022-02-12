@@ -1,9 +1,6 @@
 import type { Drash } from "../deps.ts";
 import BaseResource from "./base_resource.ts";
-import {
-  ArticleEntity,
-  ArticleModel,
-} from "../models/article_model.ts";
+import { ArticleEntity, ArticleModel } from "../models/article_model.ts";
 import { ArticlesFavoritesModel } from "../models/articles_favorites_model.ts";
 import UserModel from "../models/user_model.ts";
 
@@ -85,20 +82,20 @@ class ArticlesResource extends BaseResource {
 
     const article = await ArticleModel.query({
       where: [
-        ['id', inputArticle.id]
+        ["id", inputArticle.id],
       ],
-      first: true
-    })
-    
+      first: true,
+    });
+
     if (!article) {
       return this.errorResponse(500, "Article could not be saved.", response);
     }
-    article.author_id = inputArticle.author_id
+    article.author_id = inputArticle.author_id;
     article.title = inputArticle.title;
-    article.description = inputArticle.description
-    article.body = inputArticle.body
+    article.description = inputArticle.description;
+    article.body = inputArticle.body;
     article.tags = inputArticle.tags;
-    article.slug = inputArticle.slug ?? article.createSlug(article.title)
+    article.slug = inputArticle.slug ?? article.createSlug(article.title);
     await article.save();
 
     return response.json({
@@ -122,9 +119,9 @@ class ArticlesResource extends BaseResource {
 
     const article = await ArticleModel.query({
       where: [
-        ['slug', articleSlug ],
+        ["slug", articleSlug],
       ],
-      first: true
+      first: true,
     });
     if (!article) {
       return this.errorResponse(
@@ -168,12 +165,12 @@ class ArticlesResource extends BaseResource {
       );
     }
 
-    const article = new ArticleModel;
-    article.author_id = inputArticle.author_id
-    article.title = inputArticle.title
-    article.description = inputArticle.description ?? ''
-    article.body = inputArticle.body ?? ''
-    article.tags = inputArticle.tags ?? []
+    const article = new ArticleModel();
+    article.author_id = inputArticle.author_id;
+    article.title = inputArticle.title;
+    article.description = inputArticle.description ?? "";
+    article.body = inputArticle.body ?? "";
+    article.tags = inputArticle.tags ?? [];
     console.log("article to save:");
     console.log(article);
     await article.save();
@@ -196,9 +193,9 @@ class ArticlesResource extends BaseResource {
     const slug = request.pathParam("slug") || "";
     const article = await ArticleModel.query({
       where: [
-        ['slug', slug ]
+        ["slug", slug],
       ],
-      first: true
+      first: true,
     });
 
     if (!article) {
@@ -211,9 +208,9 @@ class ArticlesResource extends BaseResource {
 
     const user = await UserModel.query({
       where: [
-        ['id', article.author_id]
+        ["id", article.author_id],
       ],
-      first: true
+      first: true,
     });
     if (!user) {
       return this.errorResponse(
@@ -223,18 +220,17 @@ class ArticlesResource extends BaseResource {
       );
     }
 
-
     const entity = await article.toEntity<ArticleEntity>();
 
     const favorites = (await article.articleFavorites([
-      ['user_id', user.id]
-    ]))
+      ["user_id", user.id],
+    ]));
     return response.json({
       article: {
         ...entity,
         author: await user.toEntity(),
         favoritesCount: favorites.length,
-        favorited: favorites.length > 0
+        favorited: favorites.length > 0,
       },
     });
   }
@@ -255,50 +251,52 @@ class ArticlesResource extends BaseResource {
     request: Drash.Request,
     response: Drash.Response,
   ) {
-    const authorParam = request.queryParam('author')
-        // { author: user where username is queryparam author } | {}
-    const where = []
+    const authorParam = request.queryParam("author");
+    // { author: user where username is queryparam author } | {}
+    const where = [];
     if (authorParam) {
       const author = await UserModel.query({
         where: [
-          ['username', authorParam]
+          ["username", authorParam],
         ],
-        first: true
-      })
+        first: true,
+      });
       if (author) {
-      where.push([
-        'author_id', author.id
-      ])
-    }
+        where.push([
+          "author_id",
+          author.id,
+        ]);
+      }
     }
     const articles: ArticleModel[] = await ArticleModel
       .query({
-        where
-      })
+        where,
+      });
     const username = request.queryParam("favorited_by");
-    const result = articles.map(async article => {
-      const favorites = await article.articleFavorites()
+    const result = articles.map(async (article) => {
+      const favorites = await article.articleFavorites();
       return {
         ...await article.toEntity<ArticleEntity>(),
         author: (await article.author())?.toEntity(),
         favoritesCount: favorites.length,
-        favorited: favorites.length > 0
-      }
-    }) as any
+        favorited: favorites.length > 0,
+      };
+    }) as any;
     if (!username) {
       return response.json({
-        articles: result
-      })
+        articles: result,
+      });
     }
 
     const userToFilterBy = await UserModel.query({
       where: [
-        ['username', username]
-       ], first: true
+        ["username", username],
+      ],
+      first: true,
     });
     if (!userToFilterBy) {
       return response.json({
-        articles: result
+        articles: result,
       });
     }
 
@@ -308,13 +306,13 @@ class ArticlesResource extends BaseResource {
 
     for (const article of result) {
       if (article.favorited && userToFilterBy.id === article.author_id) {
-        filtered.push(article)
+        filtered.push(article);
       }
     }
 
     return response.json({
-      articles: filtered
-    })
+      articles: filtered,
+    });
   }
 
   protected async toggleFavorite(
@@ -335,8 +333,10 @@ class ArticlesResource extends BaseResource {
 
     const result = await ArticleModel.query({
       where: [
-        ['slug', slug]
-       ], first: true });
+        ["slug", slug],
+      ],
+      first: true,
+    });
     if (!result) {
       return this.errorResponse(
         404,
@@ -356,28 +356,29 @@ class ArticlesResource extends BaseResource {
         // new one. If the user has a record, then we just update the record.
         favorite = await ArticlesFavoritesModel.query({
           where: [
-          ['article_id', article.id],
-          ['user_id', currentUser.id],
+            ["article_id", article.id],
+            ["user_id", currentUser.id],
           ],
-          first: true
+          first: true,
         });
         if (favorite) {
           favorite.value = true;
           await favorite.save();
         } else {
-          favorite = new ArticlesFavoritesModel;
+          favorite = new ArticlesFavoritesModel();
           favorite.article_id = article.id;
           favorite.user_id = currentUser.id;
-          favorite.value = true
+          favorite.value = true;
           await favorite.save();
         }
         break;
       case "unset":
         favorite = await ArticlesFavoritesModel.query({
           where: [
-            ['article_id', article.id],
-          ['user_id', currentUser.id],
-          ], first: true
+            ["article_id", article.id],
+            ["user_id", currentUser.id],
+          ],
+          first: true,
         });
         if (!favorite) {
           return this.errorResponse(

@@ -1,7 +1,7 @@
 import BaseModel from "./base_model.ts";
 import { ArticleModel } from "./article_model.ts";
 import { SessionModel } from "./session_model.ts";
-import { ArticlesFavoritesModel } from "./articles_favorites_model.ts"
+import { ArticlesFavoritesModel } from "./articles_favorites_model.ts";
 
 export type UserEntity = {
   bio: string;
@@ -111,11 +111,11 @@ export class UserModel extends BaseModel {
    * public config = {} // if config is json, postgres will return it
    */
 
-  public async articleFavorites(where: Array<Array<string|number>> = []) {
-    where.push(['user_id', this.id])
+  public async articleFavorites(where: Array<Array<string | number>> = []) {
+    where.push(["user_id", this.id]);
     return await ArticlesFavoritesModel.query({
-      where
-    })
+      where,
+    });
   }
 }
 

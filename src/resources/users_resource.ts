@@ -1,6 +1,6 @@
 import { bcrypt } from "../deps.ts";
 import BaseResource from "./base_resource.ts";
-import {UserModel, UserEntity } from "../models/user_model.ts";
+import { UserEntity, UserModel } from "../models/user_model.ts";
 import SessionModel from "../models/session_model.ts";
 import ValidationService from "../services/validation_service.ts";
 import { Drash } from "../deps.ts";
@@ -54,11 +54,11 @@ class RegisterResource extends BaseResource {
     }
 
     // Create user
-    const user = new UserModel;
+    const user = new UserModel();
     user.username = username;
-    user.password = bcrypt.hashSync(rawPassword)
-    user.email = email
-    await user.save()
+    user.password = bcrypt.hashSync(rawPassword);
+    user.email = email;
+    await user.save();
 
     const entity = await user.toEntity<UserEntity>();
 
@@ -67,16 +67,16 @@ class RegisterResource extends BaseResource {
     // cookie.
     const sessionOneValue = await bcrypt.hash("sessionOne2020Drash");
     const sessionTwoValue = await bcrypt.hash("sessionTwo2020Drash");
-    const session = new SessionModel;
-    session.session_one = sessionOneValue
-    session.session_two = sessionTwoValue
-    session.user_id = user.id
+    const session = new SessionModel();
+    session.session_one = sessionOneValue;
+    session.session_two = sessionTwoValue;
+    session.user_id = user.id;
     await session.save();
 
     // Return the newly created user
     return response.json({
       user: entity,
-      token: `${sessionOneValue}|::|${sessionTwoValue}`
+      token: `${sessionOneValue}|::|${sessionTwoValue}`,
     });
   }
 }

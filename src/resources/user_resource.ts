@@ -77,9 +77,9 @@ export default class UserResource extends BaseResource {
 
     const user = await UserModel.query({
       where: [
-        ['id', id]
+        ["id", id],
       ],
-      first: true
+      first: true,
     });
 
     if (!user) {

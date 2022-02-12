@@ -66,13 +66,13 @@ class BaseResource extends Drash.Resource {
 
     this.current_user = await UserModel.query({
       where: [
-        ['id', userId]
+        ["id", userId],
       ],
-      first: true
+      first: true,
     });
 
     if (!this.current_user) {
-      return null
+      return null;
     }
 
     console.log(`Setting User #${this.current_user.id} as current user.`);

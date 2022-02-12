@@ -75,23 +75,23 @@ class LoginResource extends BaseResource {
     const sessionTwo = sessionValuesSplit[1];
     const session = await SessionModel.query({
       where: [
-        ['session_one', sessionOne],
-        ['session_two', sessionTwo],
+        ["session_one", sessionOne],
+        ["session_two", sessionTwo],
       ],
-      first: true
+      first: true,
     });
     if (session) {
       const user = await UserModel.query({
         where: [
-          [ "id", session.user_id]
-        ]
+          ["id", session.user_id],
+        ],
       });
       if (user.length > 0) {
         const entity = await user[0].toEntity();
         console.log("User has an active session.");
         return response.json({
           user: entity,
-          token: `${session.session_one}|::|${session.session_two}`
+          token: `${session.session_one}|::|${session.session_two}`,
         });
       }
     }
@@ -115,9 +115,9 @@ class LoginResource extends BaseResource {
     // Convert the user to a real user model object
     const result = await UserModel.query({
       where: [
-        ['email', inputUser.email]
-       ]
-     });
+        ["email", inputUser.email],
+      ],
+    });
 
     if (result.length <= 0) {
       console.log("User not found.");
@@ -143,9 +143,9 @@ class LoginResource extends BaseResource {
     const sessionOne = await bcrypt.hash("sessionOne2020Drash");
     const sessionTwo = await bcrypt.hash("sessionTwo2020Drash");
     const session = new SessionModel();
-    session.session_one = sessionOne
-    session.session_two = sessionTwo
-    session.user_id = user.id
+    session.session_one = sessionOne;
+    session.session_two = sessionTwo;
+    session.user_id = user.id;
     await session.save();
     if (!session) {
       return this.errorResponse(
@@ -159,7 +159,7 @@ class LoginResource extends BaseResource {
     return response.json({
       user: {
         ...entity,
-        token: `${session.session_one}|::|${session.session_two}`
+        token: `${session.session_one}|::|${session.session_two}`,
       },
     });
   }

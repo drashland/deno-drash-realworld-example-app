@@ -15,9 +15,9 @@ export default class ArticleCommentsResource extends BaseResource {
     const slug = request.pathParam("slug") || "";
     const article = await ArticleModel.query({
       where: [
-        ['slug', slug]
-       ],
-       first: true
+        ["slug", slug],
+      ],
+      first: true,
     });
     if (!article) {
       console.error("No article was found with the slug of: " + slug);
@@ -53,9 +53,9 @@ export default class ArticleCommentsResource extends BaseResource {
     // First find an article by that slug. The article should exist.
     const articles = await ArticleModel.query({
       where: [
-        ['slug', slug]
-       ]
-      });
+        ["slug", slug],
+      ],
+    });
     if (!articles.length) {
       return this.errorResponse(404, "No article was found.", response);
     }
@@ -80,13 +80,13 @@ export default class ArticleCommentsResource extends BaseResource {
     // save the comment
     const articleComment = new ArticleCommentsModel();
     articleComment.article_id = article.id,
-    articleComment.comment = comment,
-    // TODO :: No need for author img and username, we can do this via relations
-    articleComment.author_image = user.image;
+      articleComment.comment = comment,
+      // TODO :: No need for author img and username, we can do this via relations
+      articleComment.author_image = user.image;
     articleComment.author_id = user.id;
     await articleComment
       .save();
-    const articleEntity = await  articleComment.toEntity();
+    const articleEntity = await articleComment.toEntity();
     response.status = 200;
     return response.json({
       success: true,
@@ -113,8 +113,8 @@ export default class ArticleCommentsResource extends BaseResource {
     console.log("going to get comments");
     const comments = await ArticleCommentsModel.query({
       where: [
-        ['author_id', user.id]
-       ]
+        ["author_id", user.id],
+      ],
     });
     const isTheirComment = comments.filter((comment) => {
       return comment.id == Number(commentId);
@@ -128,8 +128,8 @@ export default class ArticleCommentsResource extends BaseResource {
     }
     // Delete the comment
     const articleCommentsModel = await ArticleCommentsModel.query({
-      'where': [
-        ['id', commentId]
+      "where": [
+        ["id", commentId],
       ],
       first: true,
     }) as ArticleCommentsModel;

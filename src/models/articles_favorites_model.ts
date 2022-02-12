@@ -52,9 +52,9 @@ export class ArticlesFavoritesModel extends BaseModel {
   public async user(): Promise<UserModel | null> {
     return await UserModel.query({
       where: [
-       ["id", this.user_id],
+        ["id", this.user_id],
       ],
-      first: true
+      first: true,
     });
   }
 
