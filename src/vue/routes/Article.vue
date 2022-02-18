@@ -75,8 +75,9 @@ export default {
   },
   async beforeRouteEnter(to, from, next) {
     next((vm) => {
+      console.log('nfroe route enter article route', to)
       vm.$store.dispatch("fetchArticle", to.params.slug);
-      vm.$store.dispatch("fetchArticleComments", to.params.slug);
+      vm.$store.dispatch("fetchArticleComments", to.params.id);
     });
   },
   computed: {

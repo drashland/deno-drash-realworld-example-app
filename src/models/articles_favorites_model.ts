@@ -5,7 +5,7 @@ import { ArticleModel } from "./article_model.ts";
 export type ArticlesFavoritesEntity = {
   article_id: number;
   user_id: number;
-  id?: number;
+  id: number;
   value: boolean;
 };
 
@@ -14,7 +14,7 @@ export class ArticlesFavoritesModel extends BaseModel {
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  public tablename = "article_favourites";
+  public tablename = "articles_favorites";
 
   /**
    * @var number
@@ -50,11 +50,10 @@ export class ArticlesFavoritesModel extends BaseModel {
 
   // belongs to
   public async user(): Promise<UserModel | null> {
-    return await UserModel.query({
+    return await UserModel.first({
       where: [
         ["id", this.user_id],
       ],
-      first: true,
     });
   }
 

@@ -64,11 +64,10 @@ class BaseResource extends Drash.Resource {
       return null;
     }
 
-    this.current_user = await UserModel.query({
+    this.current_user = await UserModel.first({
       where: [
         ["id", userId],
       ],
-      first: true,
     });
 
     if (!this.current_user) {

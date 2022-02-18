@@ -166,11 +166,11 @@ export default {
     });
   },
 
-  fetchArticleComments({ commit }, slug) {
+  fetchArticleComments({ commit }, id) {
     console.log("Handling action: fetchArticleComments");
     return new Promise((resolve) => {
       axios
-        .get(`/articles/${slug}/comments`)
+        .get(`/articles/${id}/comments`)
         .then((response) => {
           commit("setComments", response.data.data);
           resolve(response);
@@ -194,6 +194,7 @@ export default {
           },
         })
         .then((response) => {
+          console.log('Dispatching setArticles', response.data.articles)
           context.dispatch("setArticles", response.data.articles);
           resolve(response);
         })
@@ -332,8 +333,10 @@ export default {
   },
 
   setUser(context, user) {
+    
     context.commit("setIsAuthenticated", true);
     context.commit("setUser", user);
+    console.log('setting drash ess', user)
     setCookie("drash_sess", user.token, 1);
   },
 
@@ -341,7 +344,7 @@ export default {
     console.log(`Handling action: toggleArticleFavorite (${params.action})`);
     return new Promise((resolve) => {
       axios
-        .post(`/articles/${params.slug}/favorite`, {
+        .post(`/articles/${params.id}/favorite`, {
           action: params.action,
           user_id: context.getters.user.id,
         })
@@ -362,6 +365,7 @@ export default {
   },
 
   unsetUser(context) {
+    console.log('unsetting user')
     context.commit("setIsAuthenticated", false);
     context.commit("setUser", userDefault);
     setCookie("drash_sess", null);

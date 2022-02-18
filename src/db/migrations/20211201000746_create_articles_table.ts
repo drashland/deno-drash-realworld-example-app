@@ -12,7 +12,7 @@ export default class extends AbstractMigration<ClientPostgreSQL> {
           body character varying(255) NOT NULL,
           slug character varying(255) NOT NULL,
           created_at timestamp without time zone NOT NULL default now(),
-          updated_at timestamp without time zone,
+          updated_at timestamp without time zone default now(),
           tags text[]
       );
     `);

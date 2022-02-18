@@ -45,9 +45,6 @@ export class ArticleCommentsModel extends BaseModel {
    */
   public author_id = 0;
 
-  // TODO :: Dont need below props, just add an article relationship
-  public author_image = "";
-
   /**
    * Timestamp of the last time the database row was updated
    */
@@ -61,22 +58,21 @@ export class ArticleCommentsModel extends BaseModel {
    * Override default toEntity so we can supply the
    * authors username to the frontend
    */
-  public async toEntity<ArticleCommentEntity>(): Promise<ArticleCommentEntity> {
-    const user = await UserModel.query({
+  public async toEntity(): Promise<ArticleCommentEntity> {
+    const user = await UserModel.first({
       select: ["username"],
       where: [
         ["id", this.author_id],
       ],
-      first: true,
     });
-    return await super.toEntity({
+    return await super.toEntity<ArticleCommentEntity>({
       author_username: user?.username ?? "",
+      author_image: user?.image ?? ""
     });
   }
 
   public async factoryDefaults(params: Partial<ArticleCommentEntity> = {}) {
     return {
-      author_image: params.author_image ?? "https://drash.land/favicon.ico",
       author_id: params.author_id ?? (await UserModel.factory()).id,
       body: params.body ?? "bodyyy",
       article_id: params.article_id ?? (await ArticleModel.factory()).id,

@@ -73,25 +73,26 @@ class LoginResource extends BaseResource {
     const sessionValuesSplit = sessionValues.split("|::|");
     const sessionOne = sessionValuesSplit[0];
     const sessionTwo = sessionValuesSplit[1];
-    const session = await SessionModel.query({
+    const session = await SessionModel.first({
       where: [
         ["session_one", sessionOne],
         ["session_two", sessionTwo],
       ],
-      first: true,
     });
     if (session) {
-      const user = await UserModel.query({
+      const user = await UserModel.first({
         where: [
           ["id", session.user_id],
         ],
       });
-      if (user.length > 0) {
-        const entity = await user[0].toEntity();
+      if (user) {
+        const entity = await user.toEntity<UserEntity>();
         console.log("User has an active session.");
         return response.json({
-          user: entity,
-          token: `${session.session_one}|::|${session.session_two}`,
+          user: {
+            ...entity,
+            token: `${session.session_one}|::|${session.session_two}`
+          },
         });
       }
     }
@@ -113,18 +114,18 @@ class LoginResource extends BaseResource {
     }
 
     // Convert the user to a real user model object
-    const result = await UserModel.query({
+    const result = await UserModel.first({
       where: [
         ["email", inputUser.email],
       ],
     });
 
-    if (result.length <= 0) {
+    if (!result) {
       console.log("User not found.");
       return this.errorResponse(422, "Invalid user credentials.", response);
     }
 
-    const user = result[0];
+    const user = result;
 
     const rawPassword = inputUser.password ? inputUser.password : "";
     if (!rawPassword) {
@@ -147,13 +148,6 @@ class LoginResource extends BaseResource {
     session.session_two = sessionTwo;
     session.user_id = user.id;
     await session.save();
-    if (!session) {
-      return this.errorResponse(
-        422,
-        "An error occurred whilst saving your session",
-        response,
-      );
-    }
 
     const entity = await user.toEntity<UserEntity>();
     return response.json({

@@ -112,7 +112,12 @@ export default {
     }
   },
   mounted() {
+    console.log(this.articles)
     this.fetchArticles();
+    console.log(this.articles)
+    setTimeout(() => {
+      console.log(this.$store.state.articles)
+    }, 5000)
   },
   methods: {
     fetchArticles() {

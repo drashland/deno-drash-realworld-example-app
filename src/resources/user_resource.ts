@@ -75,11 +75,10 @@ export default class UserResource extends BaseResource {
     );
     const token = (request.bodyParam("token") as string) || "";
 
-    const user = await UserModel.query({
+    const user = await UserModel.first({
       where: [
         ["id", id],
       ],
-      first: true,
     });
 
     if (!user) {
@@ -117,20 +116,24 @@ export default class UserResource extends BaseResource {
       }
     }
 
+    console.log('existing user pass', user.password)
+    console.log('new password to hash', rawPassword)
+    
+
     user.username = username;
     user.bio = bio ?? "";
     user.image = image;
     if (rawPassword) {
       user.password = await bcrypt.hash(rawPassword); // HASH THE PASSWORD
     }
+    user.email = email
     await user.save();
 
-    // Make sure to pass the user's session token back to them
-    user.token = token;
-
     return response.json({
-      user: await user.toEntity(),
-      token,
+      user: {
+        ...await user.toEntity(),
+        token,
+      },
     });
   }
 }

@@ -2,6 +2,8 @@ import BaseModel from "./base_model.ts";
 import { ArticleModel } from "./article_model.ts";
 import { SessionModel } from "./session_model.ts";
 import { ArticlesFavoritesModel } from "./articles_favorites_model.ts";
+import type { Where } from "./base_model.ts"
+
 
 export type UserEntity = {
   bio: string;
@@ -61,8 +63,6 @@ export class UserModel extends BaseModel {
 
   public tablename = "users";
 
-  public token: string | null = null;
-
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -78,9 +78,9 @@ export class UserModel extends BaseModel {
   }
 
   public async articles(
-    where: Array<Array<string | number>> = [],
+    where: Where = [],
   ): Promise<ArticleModel[] | []> {
-    return await ArticleModel.query({
+    return await ArticleModel.all({
       where: [
         ["author_id", this.id],
         ...where,
@@ -89,11 +89,10 @@ export class UserModel extends BaseModel {
   }
 
   public async session(): Promise<SessionModel | null> {
-    return await SessionModel.query({
+    return await SessionModel.first({
       where: [
         ["user_id", this.id],
       ],
-      first: true,
     });
   }
 
@@ -111,9 +110,9 @@ export class UserModel extends BaseModel {
    * public config = {} // if config is json, postgres will return it
    */
 
-  public async articleFavorites(where: Array<Array<string | number>> = []) {
+  public async articleFavorites(where: Where = []) {
     where.push(["user_id", this.id]);
-    return await ArticlesFavoritesModel.query({
+    return await ArticlesFavoritesModel.all({
       where,
     });
   }

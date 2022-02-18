@@ -26,11 +26,10 @@ class ProfilesResource extends BaseResource {
       profile: null,
     });
 
-    const result = await UserModel.query({
+    const result = await UserModel.first({
       where: [
         ["username", username],
       ],
-      first: true,
     });
     if (!result) {
       return this.errorResponse(404, "Profile not found.", response);

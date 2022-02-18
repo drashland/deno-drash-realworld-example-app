@@ -2,6 +2,7 @@ import BaseModel from "./base_model.ts";
 import { UserModel } from "./user_model.ts";
 import { ArticlesFavoritesModel } from "./articles_favorites_model.ts";
 import { ArticleCommentsModel } from "./article_comments_model.ts";
+import type { Where } from "./base_model.ts"
 
 export type ArticleEntity = {
   author_id: number;
@@ -121,24 +122,23 @@ export class ArticleModel extends BaseModel {
   }
 
   public async author() {
-    return await UserModel.query({
+    return await UserModel.first({
       where: [
         ["id", this.author_id],
       ],
-      first: true,
     });
   }
 
-  public async articleFavorites(where: Array<Array<string | number>> = []) {
+  public async articleFavorites(where: Where = []) {
     where.push(["article_id", this.id]);
-    return await ArticlesFavoritesModel.query({
+    return await ArticlesFavoritesModel.all({
       where,
     });
   }
 
-  public async comments(where: Array<Array<string | number>> = []) {
+  public async comments(where: Where = []) {
     where.push(["article_id", this.id]);
-    return await ArticleCommentsModel.query({
+    return await ArticleCommentsModel.all({
       where,
     });
   }

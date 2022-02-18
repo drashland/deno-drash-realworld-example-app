@@ -102,7 +102,7 @@ export default {
         ? "unset"
         : "set";
       this.$store.dispatch("toggleArticleFavorite", {
-        slug: this.article.slug,
+        id: this.article.id,
         action: action
       });
     },

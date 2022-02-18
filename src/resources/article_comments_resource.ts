@@ -7,20 +7,19 @@ import BaseResource from "./base_resource.ts";
 
 export default class ArticleCommentsResource extends BaseResource {
   paths = [
-    "/articles/:slug/comments",
+    "/articles/:id/comments",
     "/articles/comment/:id", // Only for deleting
   ];
 
   public async GET(request: Drash.Request, response: Drash.Response) {
-    const slug = request.pathParam("slug") || "";
-    const article = await ArticleModel.query({
+    const id = request.pathParam("id") || "";
+    const article = await ArticleModel.first({
       where: [
-        ["slug", slug],
+        ["id", id],
       ],
-      first: true,
     });
     if (!article) {
-      console.error("No article was found with the slug of: " + slug);
+      console.error("No article was found with the id of: " + id);
       response.status = 404;
       return response.json({
         errors: {
@@ -51,15 +50,14 @@ export default class ArticleCommentsResource extends BaseResource {
     const slug = request.pathParam("slug") || "";
     console.log("The slug for the article: " + slug);
     // First find an article by that slug. The article should exist.
-    const articles = await ArticleModel.query({
+    const article = await ArticleModel.first({
       where: [
         ["slug", slug],
       ],
     });
-    if (!articles.length) {
+    if (!article) {
       return this.errorResponse(404, "No article was found.", response);
     }
-    const article = articles[0];
     // Get user and validation check
     if (!comment) {
       return this.errorResponse(
@@ -81,8 +79,6 @@ export default class ArticleCommentsResource extends BaseResource {
     const articleComment = new ArticleCommentsModel();
     articleComment.article_id = article.id,
       articleComment.comment = comment,
-      // TODO :: No need for author img and username, we can do this via relations
-      articleComment.author_image = user.image;
     articleComment.author_id = user.id;
     await articleComment
       .save();
@@ -110,8 +106,7 @@ export default class ArticleCommentsResource extends BaseResource {
 
     // Make sure they are the author of the comment
     const commentId = Number(request.pathParam("id")) || 0;
-    console.log("going to get comments");
-    const comments = await ArticleCommentsModel.query({
+    const comments = await ArticleCommentsModel.all({
       where: [
         ["author_id", user.id],
       ],
@@ -127,11 +122,10 @@ export default class ArticleCommentsResource extends BaseResource {
       );
     }
     // Delete the comment
-    const articleCommentsModel = await ArticleCommentsModel.query({
+    const articleCommentsModel = await ArticleCommentsModel.first({
       "where": [
         ["id", commentId],
       ],
-      first: true,
     }) as ArticleCommentsModel;
     await articleCommentsModel.delete();
     return response.json({

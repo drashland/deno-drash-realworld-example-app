@@ -47,7 +47,6 @@ services:
       - ./src/vue:/var/www/src/vue
       - ./src/config.ts:/var/www/src/config.ts
       - ./src/app.ts:/var/www/src/app.ts
-      - ./src/db.ts:/var/www/src/db.ts
       - ./src/deps.ts:/var/www/src/deps.ts
       - ./src/nessie.config.ts:/var/www/src/nessie.config.ts
       - ./src/package.json:/var/www/src/package.json

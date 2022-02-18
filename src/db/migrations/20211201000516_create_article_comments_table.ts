@@ -7,7 +7,6 @@ export default class extends AbstractMigration<ClientPostgreSQL> {
       CREATE TABLE article_comments (
           id SERIAL PRIMARY KEY,
           article_id integer NOT NULL,
-          author_image character varying(255) NOT NULL,
           author_id integer NOT NULL,
           body character varying(255) NOT NULL,
           created_at timestamp without time zone NOT NULL default now(),

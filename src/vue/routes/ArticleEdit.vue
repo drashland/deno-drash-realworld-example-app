@@ -109,14 +109,7 @@ export default {
         text: "Please wait...",
         buttons: false,
       });
-      let tags = this.tags.length ? this.tags.map(tag => tag.text) : []
-
-      // Prep for sending to the Drash backend, that accepts a string
-      if (tags.length) {
-        tags = tags.join(",")
-      } else {
-        tags = ""
-      }
+      const tags = this.tags.length ? this.tags.map(tag => tag.text) : []
 
       this.article.tags = tags
       this.publishing_article = true;

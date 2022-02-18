@@ -119,7 +119,7 @@ const routesDef = [
   },
   {
     name: "article",
-    path: "/articles/:slug",
+    path: "/articles/:id",
     component: Article,
     props: true,
   },
