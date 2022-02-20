@@ -53,6 +53,14 @@ export class SessionModel extends BaseModel {
     await super.delete();
   }
 
+  public async user(): Promise<UserModel | null> {
+    return await UserModel.first({
+      where: [
+        ["id", this.user_id],
+      ],
+    });
+  }
+
   public async factoryDefaults(params: Partial<SessionModelEntity> = {}) {
     return {
       user_id: params.user_id ?? (await UserModel.factory()).id,

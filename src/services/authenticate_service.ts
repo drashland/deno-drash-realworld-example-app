@@ -20,9 +20,14 @@ export class AuthenticateService extends Drash.Service {
     const sessionValuesSplit = sessionValues.split("|::|");
     const sessionOne = sessionValuesSplit[0];
     const sessionTwo = sessionValuesSplit[1];
-    const session = await SessionModel.select(["*"], [
-      ["session_one", sessionOne],
-      ["session_two", sessionTwo],
-    ]);
+    const session = await SessionModel.first({
+      where: [
+        ["session_one", sessionOne],
+        ["session_two", sessionTwo],
+      ],
+    });
+    if (!session) {
+      throw new Drash.Errors.HttpError(403, "Invalid session");
+    }
   }
 }

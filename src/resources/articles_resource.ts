@@ -179,15 +179,6 @@ class ArticlesResource extends BaseResource {
   }
 
   protected async getArticle(request: Drash.Request, response: Drash.Response) {
-    const currentUser = await this.getCurrentUser(request);
-    if (!currentUser) {
-      return this.errorResponse(
-        400,
-        "`user_id` field is required.",
-        response,
-      );
-    }
-
     const id = request.pathParam("id") || "";
     const article = await ArticleModel.first({
       where: [
@@ -324,15 +315,6 @@ class ArticlesResource extends BaseResource {
     response: Drash.Response,
   ) {
     console.log("Handling action: toggleFavorite.");
-    const currentUser = await this.getCurrentUser(request);
-    if (!currentUser) {
-      return this.errorResponse(
-        400,
-        "`user_id` field is required.",
-        response,
-      );
-    }
-
     const id = request.pathParam("id") || 0;
 
     const result = await ArticleModel.first({
@@ -349,6 +331,14 @@ class ArticlesResource extends BaseResource {
     }
 
     const article = result;
+    const currentUser = await article.author();
+    if (!currentUser) {
+      return this.errorResponse(
+        404,
+        `Unable to find user for article #${article.id}`,
+        response,
+      );
+    }
 
     let favorite;
 
