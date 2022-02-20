@@ -2,8 +2,7 @@ import BaseModel from "./base_model.ts";
 import { ArticleModel } from "./article_model.ts";
 import { SessionModel } from "./session_model.ts";
 import { ArticlesFavoritesModel } from "./articles_favorites_model.ts";
-import type { Where } from "./base_model.ts"
-
+import type { Where } from "./base_model.ts";
 
 export type UserEntity = {
   bio: string;

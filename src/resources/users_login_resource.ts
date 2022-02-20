@@ -91,7 +91,7 @@ class LoginResource extends BaseResource {
         return response.json({
           user: {
             ...entity,
-            token: `${session.session_one}|::|${session.session_two}`
+            token: `${session.session_one}|::|${session.session_two}`,
           },
         });
       }

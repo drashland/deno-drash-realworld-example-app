@@ -116,9 +116,8 @@ export default class UserResource extends BaseResource {
       }
     }
 
-    console.log('existing user pass', user.password)
-    console.log('new password to hash', rawPassword)
-    
+    console.log("existing user pass", user.password);
+    console.log("new password to hash", rawPassword);
 
     user.username = username;
     user.bio = bio ?? "";
@@ -126,7 +125,7 @@ export default class UserResource extends BaseResource {
     if (rawPassword) {
       user.password = await bcrypt.hash(rawPassword); // HASH THE PASSWORD
     }
-    user.email = email
+    user.email = email;
     await user.save();
 
     return response.json({

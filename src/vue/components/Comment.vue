@@ -15,7 +15,7 @@
       </router-link>
       <span class="date-posted">{{ comment.created_at | date }}</span>
       <span v-if="isCurrentUser" class="mod-options">
-        <i class="ion-trash-a" @click="destroy(slug, comment.id)"></i>
+        <i class="ion-trash-a" @click="destroy(id, comment.id)"></i>
       </span>
     </div>
   </div>
@@ -26,7 +26,7 @@ import { mapGetters } from "vuex";
 export default {
   name: "Comment",
   props: {
-    slug: { type: String, required: true },
+    id: { type: Number, required: true },
     comment: { type: Object, required: true }
   },
   computed: {
@@ -41,8 +41,8 @@ export default {
     },
   },
   methods: {
-    destroy(slug, commentId) {
-      this.$store.dispatch("deleteComment", { slug, commentId });
+    destroy(id, commentId) {
+      this.$store.dispatch("deleteComment", { id, commentId });
     }
   }
 };

@@ -6,15 +6,15 @@ Rhum.testPlan("integration/articles_resource_test.ts", () => {
       // TODO(any) Assert response
     });
   });
-  Rhum.testSuite("GET /article/:slug", () => {
+  Rhum.testSuite("GET /article/:id", () => {
     Rhum.testCase(
-      "Responds with 200 on valid slug and returns the article",
+      "Responds with 200 on valid id and returns the article",
       () => {
         // TODO(any) Assert response
       },
     );
   });
-  Rhum.testSuite("POST /articles/:slug/favorite", () => {
+  Rhum.testSuite("POST /articles/:id/favorite", () => {
     Rhum.testCase(
       "Responds with 200 and removes the favorite on the article",
       () => {
@@ -30,7 +30,7 @@ Rhum.testPlan("integration/articles_resource_test.ts", () => {
       },
     );
   });
-  Rhum.testSuite("PUT /articles/:slug", () => {
+  Rhum.testSuite("PUT /articles/:id", () => {
     Rhum.testSuite(
       "Responds with 200 on successfully updating an article",
       () => {

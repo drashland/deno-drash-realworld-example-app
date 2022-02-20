@@ -51,8 +51,9 @@ export default class ValidationService {
   static async isEmailUnique(email: string): Promise<boolean> {
     const user = await UserModel.first({
       where: [
-        ['email', email]
-       ] });
+        ["email", email],
+      ],
+    });
     if (!user) {
       return true;
     }

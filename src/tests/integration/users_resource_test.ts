@@ -1,5 +1,5 @@
 import { Rhum } from "../deps.ts";
-import { clearTestUsers } from "./utils.ts";
+import { UserModel } from "../../models/user_model.ts";
 
 import { server } from "../../server.ts";
 
@@ -46,8 +46,8 @@ Rhum.testPlan("integration/users_resource_test.ts", () => {
         await res.json();
 
         // TODO(any) assert user was correctly saved in db, along with the session
-
-        await clearTestUsers("testUsername");
+        const user = await UserModel.first({});
+        await user.delete();
 
         Rhum.asserts.assertEquals(res.status, 200);
         // TODO(any) Assert res `body`

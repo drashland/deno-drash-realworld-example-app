@@ -26,8 +26,8 @@ export default class UserService {
     const sessionTwo = sessionCookie.split("|::|")[1];
     const session = await SessionModel.first({
       where: [
-        ['session_one', sessionOne],
-        ['session_two', sessionTwo]
+        ["session_one", sessionOne],
+        ["session_two", sessionTwo],
       ],
     });
     if (!session) {
@@ -36,8 +36,9 @@ export default class UserService {
     const userId = session.user_id;
     const user = await UserModel.first({
       where: [
-        ['id', userId]
-       ] });
+        ["id", userId],
+      ],
+    });
     if (!user) {
       return false;
     }

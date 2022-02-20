@@ -4,7 +4,7 @@ export default {
   },
 
   setArticles(state, articles) {
-    console.log(state + ' is setting artivles', articles)
+    console.log(state + " is setting artivles", articles);
     state.articles = articles;
   },
 

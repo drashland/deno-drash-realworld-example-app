@@ -1,17 +1,17 @@
 import { Rhum } from "../deps.ts";
-import { clearTestUsers, createTestUser } from "./utils.ts";
+import { UserModel } from "../../models/user_model.ts";
 
 import { server } from "../../server.ts";
 
 Rhum.testPlan("integration/users_resource_test.ts", () => {
   Rhum.testSuite("GET /user/:username", () => {
     Rhum.testCase("Responds with 200 and returns the user", async () => {
-      await createTestUser();
+      const user = await UserModel.factory();
 
       const res = await fetch(server.address + "/user/testUsername");
       await res.json();
 
-      await clearTestUsers();
+      await user.delete();
 
       Rhum.asserts.assertEquals(res.status, 200);
       // TODO(any) Assert `body` (result from await res.json())

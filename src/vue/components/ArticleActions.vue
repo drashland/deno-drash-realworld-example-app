@@ -43,7 +43,7 @@ export default {
       "is_authenticated"
     ]),
     editArticleLink() {
-      return { name: "article-edit", params: { slug: this.article.slug } };
+      return { name: "article-edit", params: { id: this.article.id } };
     },
     favoriteArticleLabel() {
       return this.article.favorited ? "Unfavorite Article" : "Favorite Article";
@@ -69,7 +69,7 @@ export default {
     async deleteArticle() {
       try {
         const result = await this.$store.dispatch("deleteArticle", {
-          article_slug: this.article.slug
+          article_id: this.article.id
         });
         if (result === true) {
           swal({

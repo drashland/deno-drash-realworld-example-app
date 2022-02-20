@@ -4,7 +4,7 @@
       <div class="row">
         <div class="col-md-10 offset-md-1 col-xs-12">
           <ListErrors :errors="errors" />
-          <form @submit.prevent="onPublish(article.slug)">
+          <form @submit.prevent="onPublish(article.id)">
             <fieldset :disabled="publishing_article">
               <fieldset class="form-group">
                 <input
@@ -101,22 +101,23 @@ export default {
     })
   },
   methods: {
-    onPublish(slug) {
-      // If the article has a slug, then it already exists in the database; and
+    onPublish(id) {
+      console.log('got onpublish', id, this.article)
+      // If the article has a id, then it already exists in the database; and
       // that means we're updating the article--not creating a new one.
-      let action = slug ? "updateArticle" : "createArticle";
+      let action = id ? "updateArticle" : "createArticle";
       swal({
         text: "Please wait...",
         buttons: false,
       });
       const tags = this.tags.length ? this.tags.map(tag => tag.text) : []
-
       this.article.tags = tags
       this.publishing_article = true;
+      console.log('publishing')
       this.$store.dispatch(action, this.article)
         .then((response) => {
+          console.log('saved article', response.data.article)
           swal.close();
-          console.log(response);
           this.publishing_article = false;
           this.$store.dispatch("unsetArticle");
           this.tag = ""
@@ -125,7 +126,7 @@ export default {
             this.$store.dispatch("setArticle", response.data.article)
             this.$router.push({
               name: "article",
-              params: { slug: response.data.article.slug }
+              params: { id: response.data.article.id }
             });
             return;
           }

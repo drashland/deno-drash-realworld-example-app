@@ -3,12 +3,12 @@ import BaseResource from "./base_resource.ts";
 import { ArticleEntity, ArticleModel } from "../models/article_model.ts";
 import { ArticlesFavoritesModel } from "../models/articles_favorites_model.ts";
 import UserModel from "../models/user_model.ts";
-import type { Where } from "../models/base_model.ts"
+import type { Where } from "../models/base_model.ts";
 
 class ArticlesResource extends BaseResource {
   paths = [
     "/articles",
-    "/articles/:slug",
+    "/articles/:id",
     "/articles/:id/favorite",
   ];
 
@@ -19,7 +19,7 @@ class ArticlesResource extends BaseResource {
   public async GET(request: Drash.Request, response: Drash.Response) {
     console.log("Handling ArticlesResource GET.");
 
-    if (request.pathParam("slug")) {
+    if (request.pathParam("id")) {
       return await this.getArticle(request, response);
     }
 
@@ -95,7 +95,6 @@ class ArticlesResource extends BaseResource {
     article.description = inputArticle.description;
     article.body = inputArticle.body;
     article.tags = inputArticle.tags;
-    article.slug = inputArticle.slug ?? article.createSlug(article.title);
     await article.save();
 
     return response.json({
@@ -105,27 +104,27 @@ class ArticlesResource extends BaseResource {
 
   /**
    * @description
-   * Deletes an article by the slug
+   * Deletes an article by the id
    */
   protected async deleteArticle(
     request: Drash.Request,
     response: Drash.Response,
   ) {
-    const articleSlug = request.pathParam("slug");
+    const articleId = request.pathParam("id");
 
-    if (!articleSlug) {
-      return this.errorResponse(400, "No article slug was passed in", response);
+    if (!articleId) {
+      return this.errorResponse(400, "No article id was passed in", response);
     }
 
     const article = await ArticleModel.first({
       where: [
-        ["slug", articleSlug],
+        ["id", articleId],
       ],
     });
     if (!article) {
       return this.errorResponse(
         500,
-        "Failed to fetch the article by slug: " + articleSlug,
+        "Failed to fetch the article by id: " + articleId,
         response,
       );
     }
@@ -173,8 +172,6 @@ class ArticlesResource extends BaseResource {
     console.log("article to save:");
     console.log(article);
     await article.save();
-    console.log('SAVED ARTICLE:')
-    console.log(article)
 
     return response.json({
       article: await article.toEntity(),
@@ -191,10 +188,10 @@ class ArticlesResource extends BaseResource {
       );
     }
 
-    const slug = request.pathParam("slug") || "";
+    const id = request.pathParam("id") || "";
     const article = await ArticleModel.first({
       where: [
-        ["slug", slug],
+        ["id", id],
       ],
     });
 
@@ -251,6 +248,8 @@ class ArticlesResource extends BaseResource {
     response: Drash.Response,
   ) {
     const authorParam = request.queryParam("author");
+    const authorId = request.queryParam("user_id");
+    console.log("autor param", authorParam);
     // { author: user where username is queryparam author } | {}
     const where: Where = [];
     if (authorParam) {
@@ -266,23 +265,29 @@ class ArticlesResource extends BaseResource {
         ]);
       }
     }
+    console.log("author id", authorId);
+    if (authorId) {
+      where.push(["author_id", authorId]);
+    }
     const articles: ArticleModel[] = await ArticleModel
       .all({
         where,
       });
+    console.log("got the rticles", articles.map((article) => article.id));
     const username = request.queryParam("favorited_by");
-    const result = []
+    const result = [];
     for (const article of articles) {
       const favorites = await article.articleFavorites();
-      const author = await article.author()
+      const author = await article.author();
       result.push({
         ...await article.toEntity<ArticleEntity>(),
         author: author ? await author.toEntity() : null,
         favoritesCount: favorites.length,
         favorited: favorites.length > 0,
-      })
+      });
     }
     if (!username) {
+      console.log("returning the articles");
       return response.json({
         articles: result,
       });

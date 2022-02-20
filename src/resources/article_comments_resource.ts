@@ -47,12 +47,12 @@ export default class ArticleCommentsResource extends BaseResource {
   public async POST(request: Drash.Request, response: Drash.Response) {
     console.log("Handling ArticleCommentsResource POST.");
     const comment = (request.bodyParam("comment") as string);
-    const slug = request.pathParam("slug") || "";
-    console.log("The slug for the article: " + slug);
-    // First find an article by that slug. The article should exist.
+    const id = request.pathParam("id") || "";
+    console.log("The id for the article: " + id);
+    // First find an article by that id. The article should exist.
     const article = await ArticleModel.first({
       where: [
-        ["slug", slug],
+        ["id", id],
       ],
     });
     if (!article) {
@@ -79,7 +79,7 @@ export default class ArticleCommentsResource extends BaseResource {
     const articleComment = new ArticleCommentsModel();
     articleComment.article_id = article.id,
       articleComment.comment = comment,
-    articleComment.author_id = user.id;
+      articleComment.author_id = user.id;
     await articleComment
       .save();
     const articleEntity = await articleComment.toEntity();

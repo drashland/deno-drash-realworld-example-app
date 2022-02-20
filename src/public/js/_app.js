@@ -126,7 +126,7 @@ const routesDef = [
   {
     name: "article-edit",
     protected: true,
-    path: "/editor/:slug?",
+    path: "/editor/:id?",
     props: true,
     component: ArticleEdit,
   },

@@ -31,7 +31,7 @@ export default {
       return {
         name: "article",
         params: {
-          slug: this.article.slug
+          id: this.article.id
         }
       };
     }

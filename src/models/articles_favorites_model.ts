@@ -57,6 +57,22 @@ export class ArticlesFavoritesModel extends BaseModel {
     });
   }
 
+  public async delete() {
+    const user = await UserModel.first({
+      where: [
+        ["id", this.user_id],
+      ],
+    });
+    await user?.delete();
+    const article = await ArticleModel.first({
+      where: [
+        ["id", this.article_id],
+      ],
+    });
+    await article?.delete();
+    await super.delete();
+  }
+
   public async factoryDefaults(params: Partial<ArticlesFavoritesEntity> = {}) {
     return {
       article_id: params.article_id ?? (await ArticleModel.factory()).id,

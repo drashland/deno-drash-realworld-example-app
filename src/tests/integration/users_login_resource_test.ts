@@ -1,5 +1,5 @@
 import { Rhum } from "../deps.ts";
-import { clearTestUsers, createTestUser } from "./utils.ts";
+import { UserModel } from "../../models/user_model.ts";
 import { server } from "../../server.ts";
 
 Rhum.testPlan("integration/users_login_resource_test.ts", () => {
@@ -33,7 +33,7 @@ Rhum.testPlan("integration/users_login_resource_test.ts", () => {
     //   // TODO(any Assert response status and body
     // })
     Rhum.testCase("Responds with 200 on a successful POST", async () => {
-      await createTestUser();
+      const user = await UserModel.factory();
 
       const res = await fetch(server.address + "/users/login", {
         method: "POST",
@@ -50,7 +50,7 @@ Rhum.testPlan("integration/users_login_resource_test.ts", () => {
 
       await res.json();
 
-      await clearTestUsers();
+      await user.delete();
 
       Rhum.asserts.assertEquals(res.status, 200);
       // TODO(any) Asserts `body` and assert all the data was correctly saved

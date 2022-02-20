@@ -2,7 +2,7 @@ import BaseModel from "./base_model.ts";
 import { UserModel } from "./user_model.ts";
 import { ArticlesFavoritesModel } from "./articles_favorites_model.ts";
 import { ArticleCommentsModel } from "./article_comments_model.ts";
-import type { Where } from "./base_model.ts"
+import type { Where } from "./base_model.ts";
 
 export type ArticleEntity = {
   author_id: number;
@@ -10,7 +10,6 @@ export type ArticleEntity = {
   created_at: number;
   description: string;
   id: number;
-  slug: string;
   title: string;
   updated_at: number;
   tags: string[];
@@ -71,13 +70,6 @@ export class ArticleModel extends BaseModel {
   /**
    * @var string
    *
-   * Slug for the article content
-   */
-  public slug = "";
-
-  /**
-   * @var string
-   *
    * Title of the article
    */
   public title = "";
@@ -90,30 +82,22 @@ export class ArticleModel extends BaseModel {
   public updated_at = 0;
 
   //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - METHODS - PRIVATE /..////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * Create a slug based on the given title.
-   *
-   * @param string title
-   *
-   * @return string
-   */
-  public createSlug(title: string): string {
-    return title.toLowerCase()
-      .replace(/[^a-zA-Z0-9 ]/g, "")
-      .replace(/\s/g, "-");
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - METHODS - PUBLIC .../////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
+
+  public async delete() {
+    const user = await UserModel.first({
+      where: [
+        ["id", this.author_id],
+      ],
+    });
+    await user?.delete();
+    await super.delete();
+  }
 
   public async factoryDefaults(params: Partial<ArticleEntity> = {}) {
     return {
       title: params.title ?? "title",
-      slug: params.slug ?? this.createSlug(params.title ?? "title"),
       description: params.description ?? "a desc",
       tags: params.tags ?? ["a tag"],
       body: params.body ?? " the body",

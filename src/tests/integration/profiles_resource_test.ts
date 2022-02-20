@@ -1,5 +1,5 @@
 import { Rhum } from "../deps.ts";
-import { clearTestUsers, createTestUser } from "./utils.ts";
+import { UserModel } from "../../models/user_model.ts";
 
 import { server } from "../../server.ts";
 
@@ -14,14 +14,14 @@ Rhum.testPlan("integration/profiles_resource_test.ts", () => {
     //
     // })
     Rhum.testCase("Responds with 200 and the profile when found", async () => {
-      const user = await createTestUser();
+      const user = await UserModel.factory();
 
       const res = await fetch(
         `${server.address}/profiles/${user.username}`,
       );
       const body = await res.json();
 
-      await clearTestUsers();
+      await user.delete();
 
       Rhum.asserts.assertEquals(res.status, 200);
       Rhum.asserts.assertEquals(body.profile.username, "testUsername");
