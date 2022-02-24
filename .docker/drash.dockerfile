@@ -9,7 +9,7 @@ RUN apt-get update -y \
 RUN curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=/usr/local sh -s v1.16.3
 RUN export DENO_INSTALL="/root/.local"
 RUN export PATH="$DENO_INSTALL/bin:$PATH"
-RUN deno install --unstable --allow-net=realworld_postgres:5432,deno.land --no-check --allow-read=. --allow-write=nessie.config.ts,db --name nessie  https://deno.land/x/nessie/cli.ts
+RUN deno install --unstable --allow-net=realworld_postgres:5432,deno.land --no-check --allow-env=PGDATABASE,PGHOST,PGPORT,PGUSER,PGPASSWORD,PGAPPNAME --allow-read=. --allow-write=nessie.config.ts,db --name nessie  https://deno.land/x/nessie@2.0.5/cli.ts
 
 WORKDIR /var/www/src
 

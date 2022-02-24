@@ -54,9 +54,9 @@ interface QueryOpts {
  *   } = {}; // As postgres supports objects: `config json NOT NULL`
  *
  *   public company_id = 0;
- * 
+ *
  *   public created_at = "";
- * 
+ *
  *   public updated_at = "";
  *
  *   public customClassProperty = "hello world"; // Excluded when saving/updating
@@ -76,7 +76,7 @@ interface QueryOpts {
  *       customClassProperty
  *     }); // { id: 1, ..., company: ..., ... }
  *   }
- * 
+ *
  *   public async factoryDefaults(params: Partial<UserEntity> = {}) {
  *     return {
  *       company_id: params.company_id ?? (await Company.factory()).id,
@@ -383,8 +383,12 @@ export default abstract class BaseModel {
     const rows = await BaseModel.queryRaw(
       `SELECT EXISTS(SELECT 1 FROM ${this.tablename} WHERE id = $1)`,
       [this.id],
-    );
-    return !!rows[0];
+    ) as [
+      {
+        exists: boolean;
+      },
+    ];
+    return rows[0].exists;
   }
 
   //////////////////////////////////////////////////////////////////////////////

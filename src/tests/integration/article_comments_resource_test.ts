@@ -2,6 +2,7 @@ import { Rhum } from "../deps.ts";
 import { ArticleModel } from "../../models/article_model.ts";
 import { ArticleCommentsModel } from "../../models/article_comments_model.ts";
 import { SessionModel } from "../../models/session_model.ts";
+import { UserModel } from "../../models/user_model.ts";
 
 import { server } from "../../server.ts";
 
@@ -14,6 +15,7 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
         const article = await ArticleModel.factory();
         const comment = await ArticleCommentsModel.factory({
           article_id: article.id,
+          author_id: (await article.author())?.id ?? 0,
         });
         // make request
         const res = await fetch(
@@ -133,7 +135,10 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
       async () => {
         // insert db data
         const article = await ArticleModel.factory();
-        const session = await SessionModel.factory();
+        const user = await article.author() as UserModel;
+        const session = await SessionModel.factory({
+          user_id: user.id,
+        });
 
         // make request
         const cookie = session.session_one + "|::|" + session.session_two;
@@ -174,10 +179,14 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
       async () => {
         // create an article and comment inside the db
         const article = await ArticleModel.factory();
+        const user = await article.author() as UserModel;
         const comment = await ArticleCommentsModel.factory({
           article_id: article.id,
+          author_id: user.id,
         });
-        const session = await SessionModel.factory();
+        const session = await SessionModel.factory({
+          user_id: user.id,
+        });
 
         // make request
         const res = await fetch(
@@ -197,7 +206,7 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
         await article.delete();
         await session.delete();
 
-        Rhum.asserts.assertEquals(await comment.exists(), true);
+        Rhum.asserts.assertEquals(await comment.exists(), false);
         Rhum.asserts.assertEquals(res.status, 200);
         Rhum.asserts.assertEquals(body, {
           success: true,
