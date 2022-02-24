@@ -6,7 +6,7 @@ export default class extends AbstractMigration<ClientPostgreSQL> {
     await this.client.queryObject(`
       CREATE TABLE articles (
           id SERIAL PRIMARY KEY,
-          author_id integer NOT NULL,
+          author_id integer NOT NULL REFERENCES users ON DELETE CASCADE,
           title character varying(255) NOT NULL,
           description character varying(255) NOT NULL,
           body character varying(255) NOT NULL,

@@ -1,6 +1,7 @@
 import { Rhum } from "../deps.ts";
 import { UserModel } from "../../models/user_model.ts";
 import { server } from "../../server.ts";
+import { bcrypt } from "../../deps.ts";
 
 Rhum.testPlan("integration/users_login_resource_test.ts", () => {
   Rhum.testSuite("POST /users/login", () => {
@@ -33,7 +34,9 @@ Rhum.testPlan("integration/users_login_resource_test.ts", () => {
     //   // TODO(any Assert response status and body
     // })
     Rhum.testCase("Responds with 200 on a successful POST", async () => {
-      const user = await UserModel.factory();
+      const user = await UserModel.factory({
+        password: await bcrypt.hash("TestPassword1"),
+      });
 
       const res = await fetch(server.address + "/users/login", {
         method: "POST",
@@ -42,7 +45,7 @@ Rhum.testPlan("integration/users_login_resource_test.ts", () => {
         },
         body: JSON.stringify({
           user: {
-            email: "test@hotmail.com",
+            email: user.email,
             password: "TestPassword1",
           },
         }),

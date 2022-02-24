@@ -24,6 +24,57 @@ interface QueryOpts {
   offset?: number;
 }
 
+/**
+ * A base class to provide helper methods to querying the database.
+ *
+ * You can define a class like so:
+ * ```js
+ * interface UserEntity {
+ *   id: number;
+ *   name: string;
+ *   nicknames: string[];
+ *   is_admin: boolean;
+ *   config: { google_uri?: string };
+ *   customClassProperty: string;
+ *   company: Company | null;
+ * }
+ * class User extends Model {
+ *   public tablename = "users";
+ *
+ *   public id = 0;
+ *
+ *   public name = "";
+ *
+ *   public nicknames: string[] = []; // As postgres supports arrays: `nicknames text[] NOT NULL`
+ *
+ *   public is_admin = false; // As postgres supports booleans: `is_admin boolean NOT NULL`
+ *
+ *   public config: {
+ *     google_uri?: string
+ *   } = {}; // As postgres supports objects: `config json NOT NULL`
+ *
+ *   public company_id = 0;
+ *
+ *   public customClassProperty = "hello world"; // Excluded when saving/updating
+ *
+ *   public async company(): Promise<Company> {
+ *     return await Company.first({
+ *       where: [
+ *         ['id', this.company_id]
+ *       ]
+ *     });
+ *   }
+ *
+ *   public async toEntity(): Promise<UserEntity> {
+ *     const company = await this.company();
+ *     return await super.toEntity({
+ *       company ? await company.toEntity() : null,
+ *       customClassProperty
+ *     }); // { id: 1, ..., company: ..., ... }
+ *   }
+ * }
+ * ```
+ */
 export default abstract class BaseModel {
   [k: string]: unknown
 
@@ -222,6 +273,17 @@ export default abstract class BaseModel {
    *
    * Once all done, this will then update the class properties with the values inserted, and auto fields
    * such as assigning the new `created_at` value (if your table uses auto timestamps for example)
+   *
+   * You can also override this class if you needed to perform actions before or after saving:
+   * ```js
+   * public async save() {
+   *   // do somthing before saving...
+   *   // ...
+   *   await super.save();
+   *   // do something after
+   *   // ...
+   * }
+   * ```
    */
   public async save(): Promise<void> {
     const fields = await this.getChildFieldNames({
@@ -256,6 +318,21 @@ export default abstract class BaseModel {
   /**
    * Delete the model from the database using the `id`.
    * Will not modify the models properties
+   *
+   * You can extend this if you need to something before or after deleting:
+   * ```js
+   * public async delete() {
+   *   doSomethingBeforeDeleting();
+   *   await super.delete();
+   *   doSomethingElseNowRowHasBeenDeleted();
+   *   console.log(await this.exists()); // false
+   * }
+   * ```
+   *
+   * If the table has foreign constraints and you wish to delete those
+   * along with this row, for example you have `users`, and `comments`,
+   * and `comments` as a foreign key `user_id`, then be sure to add
+   * `user_id ... REFERENCES users ON DELETE CASCASE`
    */
   public async delete(): Promise<void> {
     await BaseModel.queryRaw(
@@ -272,7 +349,7 @@ export default abstract class BaseModel {
   public async exists(): Promise<boolean> {
     // Fastest way to query if row exists
     const rows = await BaseModel.queryRaw(
-      `SELECT EXISTS(SELECT 1 FROM ${this.tablename} WHERE id = $1`,
+      `SELECT EXISTS(SELECT 1 FROM ${this.tablename} WHERE id = $1)`,
       [this.id],
     );
     return !!rows[0];

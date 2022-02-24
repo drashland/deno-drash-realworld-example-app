@@ -47,7 +47,7 @@ Rhum.testPlan("integration/users_resource_test.ts", () => {
 
         // TODO(any) assert user was correctly saved in db, along with the session
         const user = await UserModel.first({});
-        await user.delete();
+        await user!.delete();
 
         Rhum.asserts.assertEquals(res.status, 200);
         // TODO(any) Assert res `body`

@@ -78,7 +78,7 @@ export default class ArticleCommentsResource extends BaseResource {
     // save the comment
     const articleComment = new ArticleCommentsModel();
     articleComment.article_id = article.id,
-      articleComment.comment = comment,
+      articleComment.body = comment,
       articleComment.author_id = user.id;
     await articleComment
       .save();

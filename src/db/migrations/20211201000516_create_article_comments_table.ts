@@ -6,8 +6,8 @@ export default class extends AbstractMigration<ClientPostgreSQL> {
     await this.client.queryObject(`
       CREATE TABLE article_comments (
           id SERIAL PRIMARY KEY,
-          article_id integer NOT NULL,
-          author_id integer NOT NULL,
+          article_id integer NOT NULL REFERENCES articles ON DELETE CASCADE,
+          author_id integer NOT NULL REFERENCES users ON DELETE CASCADE,
           body character varying(255) NOT NULL,
           created_at timestamp without time zone NOT NULL default now(),
           updated_at timestamp without time zone

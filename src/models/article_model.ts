@@ -86,12 +86,12 @@ export class ArticleModel extends BaseModel {
   //////////////////////////////////////////////////////////////////////////////
 
   public async delete() {
-    const user = await UserModel.first({
-      where: [
-        ["id", this.author_id],
-      ],
-    });
-    await user?.delete();
+    // const user = await UserModel.first({
+    //   where: [
+    //     ["id", this.author_id],
+    //   ],
+    // });
+    // await user?.delete();
     await super.delete();
   }
 

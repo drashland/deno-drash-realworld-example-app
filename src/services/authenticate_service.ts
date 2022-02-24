@@ -7,7 +7,7 @@ export class AuthenticateService extends Drash.Service {
    */
   public async runBeforeResource(
     request: Drash.Request,
-    response: Drash.Response,
+    _response: Drash.Response,
   ) {
     const sessionValues = request.bodyParam<string>("token");
     if (!sessionValues) {

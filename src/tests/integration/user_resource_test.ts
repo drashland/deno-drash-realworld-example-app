@@ -1,22 +1,9 @@
 import { Rhum } from "../deps.ts";
-import { UserModel } from "../../models/user_model.ts";
+// import { UserModel } from "../../models/user_model.ts";
 
-import { server } from "../../server.ts";
+// import { server } from "../../server.ts";
 
 Rhum.testPlan("integration/users_resource_test.ts", () => {
-  Rhum.testSuite("GET /user/:username", () => {
-    Rhum.testCase("Responds with 200 and returns the user", async () => {
-      const user = await UserModel.factory();
-
-      const res = await fetch(server.address + "/user/testUsername");
-      await res.json();
-
-      await user.delete();
-
-      Rhum.asserts.assertEquals(res.status, 200);
-      // TODO(any) Assert `body` (result from await res.json())
-    });
-  });
   Rhum.testSuite("POST /user", () => {
     // TODO(any) Not completing for the v1 release as it isn't needed, but nice to have
     // Rhum.testCase("Responds with 404 when no id was passed in with body", () => {

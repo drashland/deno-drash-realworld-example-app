@@ -12,32 +12,6 @@ export default class UserResource extends BaseResource {
 
   /**
    * @description
-   * Handle a GET request given the specified username path param.
-   *
-   * @return Drash.Http.Response
-   *     Returns a User object matched to the username path param.
-   */
-  // Dont think this is used
-  // public async GET(request: Drash.Request, response: Drash.Response) {
-  //   response.json(
-  //     await UserModel.query({
-  //       where: [
-  //         ['username', request.pathParam("username") || ""],
-  //       ],
-  //       first: true
-  //     }),
-  //   );
-  //   if (!response.body) {
-  //     return this.errorResponse(
-  //       400,
-  //       "Username must exist in the uri",
-  //       response,
-  //     );
-  //   }
-  // }
-
-  /**
-   * @description
    * Handle a POST request with the following accepted request body params:
    *     {
    *       username: string,

@@ -33,7 +33,7 @@ export class ArticleCommentsModel extends BaseModel {
   /**
    * Comment for the article
    */
-  public body = 0;
+  public body = "";
 
   /**
    * Id of the related row in the database
@@ -88,10 +88,13 @@ export class ArticleCommentsModel extends BaseModel {
   }
 
   public async factoryDefaults(params: Partial<ArticleCommentEntity> = {}) {
+    const userId = params.author_id ?? (await UserModel.factory()).id;
     return {
-      author_id: params.author_id ?? (await UserModel.factory()).id,
+      author_id: userId,
       body: params.body ?? "bodyyy",
-      article_id: params.article_id ?? (await ArticleModel.factory()).id,
+      article_id: params.article_id ?? (await ArticleModel.factory({
+        author_id: userId,
+      })).id,
     };
   }
 }

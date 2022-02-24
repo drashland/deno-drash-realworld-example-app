@@ -95,20 +95,6 @@ export class UserModel extends BaseModel {
     });
   }
 
-  // Example overriding save method
-  public async save() {
-    // do some stuff, like set a uuid or something
-    await super.save();
-  }
-
-  /**
-   * can also do:
-   *
-   * public tags = [] // if tags is array, postgres will return it as array
-   * public admin = false // if admin is BOOLEAN, postgres will return it as such
-   * public config = {} // if config is json, postgres will return it
-   */
-
   public async articleFavorites(where: Where = []) {
     where.push(["user_id", this.id]);
     return await ArticlesFavoritesModel.all({

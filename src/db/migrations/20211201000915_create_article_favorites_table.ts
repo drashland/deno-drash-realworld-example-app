@@ -6,8 +6,8 @@ export default class extends AbstractMigration<ClientPostgreSQL> {
     await this.client.queryObject(`
       CREATE TABLE articles_favorites (
           id SERIAL PRIMARY KEY,
-          article_id integer NOT NULL,
-          user_id integer NOT NULL,
+          article_id integer NOT NULL REFERENCES articles ON DELETE CASCADE,
+          user_id integer NOT NULL REFERENCES users ON DELETE CASCADE,
           value boolean NOT NULL
       );
     `);
