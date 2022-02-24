@@ -54,6 +54,10 @@ interface QueryOpts {
  *   } = {}; // As postgres supports objects: `config json NOT NULL`
  *
  *   public company_id = 0;
+ * 
+ *   public created_at = "";
+ * 
+ *   public updated_at = "";
  *
  *   public customClassProperty = "hello world"; // Excluded when saving/updating
  *
@@ -72,7 +76,35 @@ interface QueryOpts {
  *       customClassProperty
  *     }); // { id: 1, ..., company: ..., ... }
  *   }
+ * 
+ *   public async factoryDefaults(params: Partial<UserEntity> = {}) {
+ *     return {
+ *       company_id: params.company_id ?? (await Company.factory()).id,
+ *       name: params.name ?? "Some name",
+ *       // ...,
+ *     }
+ *   }
  * }
+ * let user = await User.factory() // User { ... }
+ * console.log(user.id); // 1
+ * console.log(await user.company()); // Company { ... }
+ * user = await User.first({
+ *   where: [
+ *     ['id', user.id]
+ *   ]
+ * });
+ * console.log(user.id); // 1
+ * console.log(user.name) // "Some name"
+ * const user2 = await User.factory({
+ *   company_id: (await user.company()).id,
+ *   name: "Hello",
+ * });
+ * console.log(user2.id); // 2
+ * console.log(user2.name); // "Hello"
+ * console.log((await user2.company()).id); // 1
+ * user2.name = "World";
+ * await user2.save();
+ * console.log(user2.name); // "World";
  * ```
  */
 export default abstract class BaseModel {
@@ -263,7 +295,7 @@ export default abstract class BaseModel {
   }
 
   /**
-   * Save or update the model to the database
+   * Save or update the model to the database.
    *
    * If the model exists (eg the `id` property is set), this will
    * update the model, using the values of the field names on the class,
