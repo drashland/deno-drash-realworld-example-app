@@ -1,15 +1,21 @@
 import { ArticleModel } from "../models/article_model.ts";
-import { ArticleCommentsModel } from "../models/article_comments_model.ts";
+import { ArticleCommentModel } from "../models/article_comment_model.ts";
 import { Drash } from "../deps.ts";
-import UserService from "../services/user_service.ts";
 import BaseResource from "./base_resource.ts";
+import { AuthenticateService } from "../services/authenticate_service.ts";
+const authenticateService = new AuthenticateService();
 // import ArticleService from "../services/article_service.ts";
 
-export default class ArticleCommentsResource extends BaseResource {
+export default class ArticleCommentResource extends BaseResource {
   paths = [
     "/articles/:id/comments",
     "/articles/comment/:id", // Only for deleting
   ];
+
+  public services = {
+    "POST": [authenticateService],
+    "DELETE": [authenticateService],
+  };
 
   public async GET(request: Drash.Request, response: Drash.Response) {
     const id = request.pathParam("id") || "";
@@ -45,7 +51,7 @@ export default class ArticleCommentsResource extends BaseResource {
   }
 
   public async POST(request: Drash.Request, response: Drash.Response) {
-    console.log("Handling ArticleCommentsResource POST.");
+    console.log("Handling ArticleCommentResource POST.");
     const comment = (request.bodyParam("comment") as string);
     const id = request.pathParam("id") || "";
     console.log("The id for the article: " + id);
@@ -66,8 +72,9 @@ export default class ArticleCommentsResource extends BaseResource {
         response,
       );
     }
-    const cookie = request.getCookie("drash_sess");
-    const user = await UserService.getLoggedInUser(cookie || "");
+    const user = await this.getUser({
+      session: true,
+    }, request);
     if (typeof user === "boolean") {
       return this.errorResponse(
         403,
@@ -76,7 +83,7 @@ export default class ArticleCommentsResource extends BaseResource {
       );
     }
     // save the comment
-    const articleComment = new ArticleCommentsModel();
+    const articleComment = new ArticleCommentModel();
     articleComment.article_id = article.id,
       articleComment.body = comment,
       articleComment.author_id = user.id;
@@ -91,12 +98,13 @@ export default class ArticleCommentsResource extends BaseResource {
   }
 
   public async DELETE(request: Drash.Request, response: Drash.Response) {
-    console.log("Handling ArticleCommentsResource DELETE.");
+    console.log("Handling ArticleCommentResource DELETE.");
 
     // make sure they are authorised to do so
-    const cookie = request.getCookie("drash_sess");
-    const user = await UserService.getLoggedInUser(cookie || "");
-    if (typeof user === "boolean") {
+    const user = await this.getUser({
+      session: true,
+    }, request);
+    if (user === false) {
       return this.errorResponse(
         403,
         "You are unauthorised to do this action.",
@@ -106,7 +114,7 @@ export default class ArticleCommentsResource extends BaseResource {
 
     // Make sure they are the author of the comment
     const commentId = Number(request.pathParam("id")) || 0;
-    const comments = await ArticleCommentsModel.all({
+    const comments = await ArticleCommentModel.all({
       where: [
         ["author_id", user.id],
       ],
@@ -122,12 +130,12 @@ export default class ArticleCommentsResource extends BaseResource {
       );
     }
     // Delete the comment
-    const articleCommentsModel = await ArticleCommentsModel.first({
+    const articleCommentModel = await ArticleCommentModel.first({
       "where": [
         ["id", commentId],
       ],
-    }) as ArticleCommentsModel;
-    await articleCommentsModel.delete();
+    }) as ArticleCommentModel;
+    await articleCommentModel.delete();
     return response.json({
       message: "Deleted the comment",
       success: true,

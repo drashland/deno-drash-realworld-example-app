@@ -1,7 +1,7 @@
 import BaseModel from "./base_model.ts";
 import { UserModel } from "./user_model.ts";
 import { ArticlesFavoritesModel } from "./articles_favorites_model.ts";
-import { ArticleCommentsModel } from "./article_comments_model.ts";
+import { ArticleCommentModel } from "./article_comment_model.ts";
 import type { Where } from "./base_model.ts";
 
 export type ArticleEntity = {
@@ -85,16 +85,6 @@ export class ArticleModel extends BaseModel {
   // FILE MARKER - METHODS - PUBLIC .../////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  public async delete() {
-    // const user = await UserModel.first({
-    //   where: [
-    //     ["id", this.author_id],
-    //   ],
-    // });
-    // await user?.delete();
-    await super.delete();
-  }
-
   public async factoryDefaults(params: Partial<ArticleEntity> = {}) {
     return {
       title: params.title ?? "title",
@@ -122,7 +112,7 @@ export class ArticleModel extends BaseModel {
 
   public async comments(where: Where = []) {
     where.push(["article_id", this.id]);
-    return await ArticleCommentsModel.all({
+    return await ArticleCommentModel.all({
       where,
     });
   }

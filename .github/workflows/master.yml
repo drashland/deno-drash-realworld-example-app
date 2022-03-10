@@ -25,9 +25,6 @@ jobs:
         run: |
           docker exec realworld_drash deno test -A --unstable tests/integration
 
-      - name: Test Migration down methods
-        run: docker-compose exec drash bash -c "/root/.deno/bin/nessie rollback all"
-
   linter:
       # Only one OS is required since fmt is cross platform
     runs-on: ubuntu-latest

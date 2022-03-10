@@ -169,8 +169,6 @@ class ArticlesResource extends BaseResource {
     article.description = inputArticle.description ?? "";
     article.body = inputArticle.body ?? "";
     article.tags = inputArticle.tags ?? [];
-    console.log("article to save:");
-    console.log(article);
     await article.save();
 
     return response.json({
@@ -209,9 +207,7 @@ class ArticlesResource extends BaseResource {
 
     const entity = await article.toEntity<ArticleEntity>();
 
-    const favorites = (await article.articleFavorites([
-      ["article_id", entity.id],
-    ]));
+    const favorites = await article.articleFavorites();
     return response.json({
       article: {
         ...entity,
@@ -353,14 +349,10 @@ class ArticlesResource extends BaseResource {
             ["user_id", currentUser.id],
           ],
         });
-        if (favorite) {
-          favorite.value = true;
-          await favorite.save();
-        } else {
+        if (!favorite) {
           favorite = new ArticlesFavoritesModel();
           favorite.article_id = article.id;
           favorite.user_id = currentUser.id;
-          favorite.value = true;
           await favorite.save();
         }
         break;
@@ -378,8 +370,7 @@ class ArticlesResource extends BaseResource {
             response,
           );
         }
-        favorite.value = false;
-        await favorite.save();
+        await favorite.delete();
         break;
     }
 
