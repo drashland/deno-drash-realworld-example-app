@@ -60,7 +60,7 @@ class BaseResource extends Drash.Resource {
   }, request: Drash.Request): Promise<UserModel | false> {
     let userId = "";
     if (type.session) {
-      const sessionValues = request.bodyParam<string>("token");
+      const sessionValues = request.getCookie("drash_sess");
       if (!sessionValues) {
         return false;
       }

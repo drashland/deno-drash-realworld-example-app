@@ -6,7 +6,6 @@ export type ArticlesFavoritesEntity = {
   article_id: number;
   user_id: number;
   id: number;
-  value: boolean;
 };
 
 export class ArticlesFavoritesModel extends BaseModel {
@@ -37,13 +36,6 @@ export class ArticlesFavoritesModel extends BaseModel {
    */
   public id = 0;
 
-  /**
-   * @var boolean
-   *
-   * TODO(ebebbington) What is this property used for?
-   */
-  public value = false;
-
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -57,27 +49,10 @@ export class ArticlesFavoritesModel extends BaseModel {
     });
   }
 
-  public async delete() {
-    const user = await UserModel.first({
-      where: [
-        ["id", this.user_id],
-      ],
-    });
-    await user?.delete();
-    const article = await ArticleModel.first({
-      where: [
-        ["id", this.article_id],
-      ],
-    });
-    await article?.delete();
-    await super.delete();
-  }
-
   public async factoryDefaults(params: Partial<ArticlesFavoritesEntity> = {}) {
     return {
       article_id: params.article_id ?? (await ArticleModel.factory()).id,
       user_id: params.user_id ?? (await UserModel.factory()).id,
-      value: params.value ?? true,
     };
   }
 }

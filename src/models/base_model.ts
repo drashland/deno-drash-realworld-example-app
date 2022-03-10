@@ -1,27 +1,20 @@
-// deno-lint-ignore-file ban-ts-comment
-//import { db } from "../db.ts"
-
-// TODO :: USE TRANSACTIONS
-
 import { PostgresClient } from "../deps.ts";
-
-type First<IsFirst> = IsFirst extends true ? true
-  : false;
-
-type QueryResponse<IsFirst, Model extends BaseModel> = First<IsFirst> extends
-  true ? Model | null : Model[] | [];
 
 export type Where = Array<
   [string, string | number] | [string, string, string | number]
 >; // [ ['id', 2], ['created_at', '>', new Date()] ]
 type WhereIn = [string, Array<string | number>];
 
-interface QueryOpts {
+interface QueryFirstOpts {
   select?: string[]; // ["username", "id"]
   where?: Where;
   whereIn?: WhereIn;
-  limit?: number;
   offset?: number;
+  orderBy?: [string, "asc" | "desc"];
+}
+
+interface QueryAllOpts extends QueryFirstOpts {
+  limit?: number;
 }
 
 /**
@@ -61,6 +54,10 @@ interface QueryOpts {
  *
  *   public customClassProperty = "hello world"; // Excluded when saving/updating
  *
+ *   public async getSomeData() {
+ *     return await doSomething();
+ *   }
+ *
  *   public async company(): Promise<Company> {
  *     return await Company.first({
  *       where: [
@@ -72,8 +69,9 @@ interface QueryOpts {
  *   public async toEntity(): Promise<UserEntity> {
  *     const company = await this.company();
  *     return await super.toEntity({
- *       company ? await company.toEntity() : null,
- *       customClassProperty
+ *       company: company ? await company.toEntity() : null,
+ *       customClassProperty,
+ *       someData: await this.getSomeData(),
  *     }); // { id: 1, ..., company: ..., ... }
  *   }
  *
@@ -414,7 +412,7 @@ export default abstract class BaseModel {
    */
   public static async first<Model extends BaseModel>(
     this: new () => Model,
-    opts: QueryOpts,
+    opts: QueryFirstOpts = {},
   ): Promise<Model | null> {
     if (!opts.select) opts.select = ["*"];
     if (!opts.where) opts.where = [];
@@ -446,9 +444,11 @@ export default abstract class BaseModel {
       query += ` OFFSET ${opts.offset}`;
     }
 
-    if (opts.limit) {
-      query += ` LIMIT ${opts.limit}`;
+    if (opts.orderBy) {
+      query += ` ORDER BY ${opts.orderBy[0]} ${opts.orderBy[1].toUpperCase()}`;
     }
+
+    query += ` LIMIT 1`;
 
     // Execute
     const rows = await BaseModel.queryRaw(query, args);
@@ -478,7 +478,7 @@ export default abstract class BaseModel {
    */
   public static async all<Model extends BaseModel>(
     this: new () => Model,
-    opts: QueryOpts,
+    opts: QueryAllOpts = {},
   ): Promise<Model[] | []> {
     if (!opts.select) opts.select = ["*"];
     if (!opts.where) opts.where = [];
@@ -508,6 +508,10 @@ export default abstract class BaseModel {
 
     if (opts.offset) {
       query += ` OFFSET ${opts.offset}`;
+    }
+
+    if (opts.orderBy) {
+      query += ` ORDER BY ${opts.orderBy[0]} ${opts.orderBy[1].toUpperCase()}`;
     }
 
     if (opts.limit) {
@@ -545,7 +549,7 @@ export default abstract class BaseModel {
    *
    * @returns An instance of the parent model
    */
-  public static async factory<Model extends BaseModel>(
+  public static async factory<Model extends BaseModel, Entity>(
     this: new () => Model,
     params: Record<string, string | number> = {},
   ): Promise<Model> {
@@ -558,16 +562,12 @@ export default abstract class BaseModel {
     query += Object.keys(defaults).join(", ");
     query += `) VALUES (`;
     query += Object.keys(defaults).map((_k, i) => `$${i + 1}`).join(", ");
-    query += `) RETURNING id`;
+    query += `) RETURNING *`;
     const result = await BaseModel.queryRaw(
       query,
       Object.values(defaults) as string[],
     );
-    //@ts-ignore
-    return await this.first({
-      where: [
-        ["id", result[0].id],
-      ],
-    });
+    Object.assign(model, result[0]);
+    return model;
   }
 }

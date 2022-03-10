@@ -1,36 +1,35 @@
 import { Rhum } from "../deps.ts";
 import { ArticleModel } from "../../models/article_model.ts";
-import { ArticleCommentsModel } from "../../models/article_comments_model.ts";
+import { ArticleCommentModel } from "../../models/article_comment_model.ts";
 import { SessionModel } from "../../models/session_model.ts";
 import { UserModel } from "../../models/user_model.ts";
+import { test } from "./utils.ts";
 
 import { server } from "../../server.ts";
 
-Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
+Rhum.testPlan("integration/article_comment_resource_test.ts", () => {
   Rhum.testSuite("GET /articles/:id/comments", () => {
     Rhum.testCase(
       "Responds with a 200 status when comments for an article exist",
       async () => {
-        // create an article and comment inside the db
-        const article = await ArticleModel.factory();
-        const comment = await ArticleCommentsModel.factory({
-          article_id: article.id,
-          author_id: (await article.author())?.id ?? 0,
+        await test(async () => {
+          // create an article and comment inside the db
+          const article = await ArticleModel.factory();
+          const comment = await ArticleCommentModel.factory({
+            article_id: article.id,
+            author_id: (await article.author())?.id ?? 0,
+          });
+          // make request
+          const res = await fetch(
+            `${server.address}/articles/${article.id}/comments`,
+          );
+          const body = await res.json();
+
+          // assertions
+          Rhum.asserts.assertEquals(res.status, 200);
+          Rhum.asserts.assertEquals(body.success, true);
+          Rhum.asserts.assertEquals(body.data[0].body, comment.body);
         });
-        // make request
-        const res = await fetch(
-          `${server.address}/articles/${article.id}/comments`,
-        );
-        const body = await res.json();
-
-        // clear down db
-        await article.delete();
-        await comment.delete();
-
-        // assertions
-        Rhum.asserts.assertEquals(res.status, 200);
-        Rhum.asserts.assertEquals(body.success, true);
-        Rhum.asserts.assertEquals(body.data[0].body, comment.body);
       },
     );
     // TODO(any) Not completing for the v1 release as it isn't needed, but nice to have
@@ -133,43 +132,40 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
     Rhum.testCase(
       "Responds with 200 on valid post and saves the comment for the article",
       async () => {
-        // insert db data
-        const article = await ArticleModel.factory();
-        const user = await article.author() as UserModel;
-        const session = await SessionModel.factory({
-          user_id: user.id,
-        });
+        await test(async () => {
+          // insert db data
+          const article = await ArticleModel.factory();
+          const user = await article.author() as UserModel;
+          const session = await SessionModel.factory({
+            user_id: user.id,
+          });
 
-        // make request
-        const cookie = session.session_one + "|::|" + session.session_two;
-        const res = await fetch(
-          `${server.address}/articles/${article.id}/comments`,
-          {
-            method: "POST",
-            headers: {
-              "Cookie": "drash_sess=" + cookie,
-              "Content-Type": "application/json",
+          // make request
+          const cookie = session.session_one + "|::|" + session.session_two;
+          const res = await fetch(
+            `${server.address}/articles/${article.id}/comments`,
+            {
+              method: "POST",
+              headers: {
+                "Cookie": "drash_sess=" + cookie,
+                "Content-Type": "application/json",
+              },
+              credentials: "same-origin",
+              body: JSON.stringify({
+                comment: "Hello world!",
+              }),
             },
-            credentials: "same-origin",
-            body: JSON.stringify({
-              comment: "Hello world!",
-            }),
-          },
-        );
-        const body = await res.json();
+          );
+          const body = await res.json();
 
-        const comment = await ArticleCommentsModel.first({});
+          //const comment = await ArticleCommentModel.first({});
 
-        // clear down db
-        await article.delete();
-        await session.delete();
-        await comment?.delete();
-
-        // assertions
-        Rhum.asserts.assertEquals(res.status, 200);
-        Rhum.asserts.assertEquals(body.success, true);
-        Rhum.asserts.assertEquals(body.data.body, "Hello world!");
-        // TODO :: Assert `comment`
+          // assertions
+          Rhum.asserts.assertEquals(res.status, 200);
+          Rhum.asserts.assertEquals(body.success, true);
+          Rhum.asserts.assertEquals(body.data.body, "Hello world!");
+          // TODO :: Assert `comment`
+        });
       },
     );
   });
@@ -177,40 +173,38 @@ Rhum.testPlan("integration/article_comments_resource_test.ts", () => {
     Rhum.testCase(
       "Responds with a 200 status when deleting a existing comment",
       async () => {
-        // create an article and comment inside the db
-        const article = await ArticleModel.factory();
-        const user = await article.author() as UserModel;
-        const comment = await ArticleCommentsModel.factory({
-          article_id: article.id,
-          author_id: user.id,
-        });
-        const session = await SessionModel.factory({
-          user_id: user.id,
-        });
+        await test(async () => {
+          // create an article and comment inside the db
+          const article = await ArticleModel.factory();
+          const user = await article.author() as UserModel;
+          const comment = await ArticleCommentModel.factory({
+            article_id: article.id,
+            author_id: user.id,
+          });
+          const session = await SessionModel.factory({
+            user_id: user.id,
+          });
 
-        // make request
-        const res = await fetch(
-          `${server.address}/articles/comment/` + comment.id,
-          {
-            method: "DELETE",
-            credentials: "same-origin",
-            headers: {
-              "Cookie": "drash_sess=" + session.session_one + "|::|" +
-                session.session_two,
+          // make request
+          const res = await fetch(
+            `${server.address}/articles/comment/` + comment.id,
+            {
+              method: "DELETE",
+              credentials: "same-origin",
+              headers: {
+                "Cookie": "drash_sess=" + session.session_one + "|::|" +
+                  session.session_two,
+              },
             },
-          },
-        );
-        const body = await res.json();
+          );
+          const body = await res.json();
 
-        // clear down db
-        await article.delete();
-        await session.delete();
-
-        Rhum.asserts.assertEquals(await comment.exists(), false);
-        Rhum.asserts.assertEquals(res.status, 200);
-        Rhum.asserts.assertEquals(body, {
-          success: true,
-          message: "Deleted the comment",
+          Rhum.asserts.assertEquals(await comment.exists(), false);
+          Rhum.asserts.assertEquals(res.status, 200);
+          Rhum.asserts.assertEquals(body, {
+            success: true,
+            message: "Deleted the comment",
+          });
         });
       },
     );

@@ -1,5 +1,5 @@
 import { Rhum } from "../deps.ts";
-import { UserModel } from "../../models/user_model.ts";
+import { test } from "./utils.ts";
 
 import { server } from "../../server.ts";
 
@@ -32,25 +32,26 @@ Rhum.testPlan("integration/users_resource_test.ts", () => {
     Rhum.testCase(
       "Responds with 200 on a successful registration",
       async () => {
-        const res = await fetch(server.address + "/users", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: "testUsername",
-            email: "abc@hotmail.com",
-            password: "TestPassword1",
-          }),
+        await test(async () => {
+          const res = await fetch(server.address + "/users", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username: "testUsername",
+              email: "abc@hotmail.com",
+              password: "TestPassword1",
+            }),
+          });
+          await res.json();
+
+          // TODO(any) assert user was correctly saved in db, along with the session
+          //const user = await UserModel.first({});
+
+          Rhum.asserts.assertEquals(res.status, 200);
+          // TODO(any) Assert res `body`
         });
-        await res.json();
-
-        // TODO(any) assert user was correctly saved in db, along with the session
-        const user = await UserModel.first({});
-        await user!.delete();
-
-        Rhum.asserts.assertEquals(res.status, 200);
-        // TODO(any) Assert res `body`
       },
     );
   });

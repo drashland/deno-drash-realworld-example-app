@@ -1,5 +1,5 @@
 import { Drash } from "./deps.ts";
-import ArticleCommentsResource from "./resources/article_comments_resource.ts";
+import ArticleCommentResource from "./resources/article_comment_resource.ts";
 import ArticlesResource from "./resources/articles_resource.ts";
 import HomeResource from "./resources/home_resource.ts";
 import ProfilesResource from "./resources/profiles_resource.ts";
@@ -11,7 +11,7 @@ import FilesResource from "./resources/files_resource.ts";
 
 export const server = new Drash.Server({
   resources: [
-    ArticleCommentsResource,
+    ArticleCommentResource,
     ArticlesResource,
     HomeResource,
     ProfilesResource,

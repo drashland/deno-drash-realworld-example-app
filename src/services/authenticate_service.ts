@@ -9,7 +9,7 @@ export class AuthenticateService extends Drash.Service {
     request: Drash.Request,
     _response: Drash.Response,
   ) {
-    const sessionValues = request.bodyParam<string>("token");
+    const sessionValues = request.getCookie("drash_sess");
     if (!sessionValues) {
       console.log("User's session is invalid or has expired.");
       throw new Drash.Errors.HttpError(

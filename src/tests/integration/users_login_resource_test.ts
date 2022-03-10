@@ -2,6 +2,7 @@ import { Rhum } from "../deps.ts";
 import { UserModel } from "../../models/user_model.ts";
 import { server } from "../../server.ts";
 import { bcrypt } from "../../deps.ts";
+import { test } from "./utils.ts";
 
 Rhum.testPlan("integration/users_login_resource_test.ts", () => {
   Rhum.testSuite("POST /users/login", () => {
@@ -34,28 +35,28 @@ Rhum.testPlan("integration/users_login_resource_test.ts", () => {
     //   // TODO(any Assert response status and body
     // })
     Rhum.testCase("Responds with 200 on a successful POST", async () => {
-      const user = await UserModel.factory({
-        password: await bcrypt.hash("TestPassword1"),
-      });
+      await test(async () => {
+        const user = await UserModel.factory({
+          password: await bcrypt.hash("TestPassword1"),
+        });
 
-      const res = await fetch(server.address + "/users/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user: {
-            email: user.email,
-            password: "TestPassword1",
+        const res = await fetch(server.address + "/users/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        }),
+          body: JSON.stringify({
+            user: {
+              email: user.email,
+              password: "TestPassword1",
+            },
+          }),
+        });
+
+        await res.json();
+
+        Rhum.asserts.assertEquals(res.status, 200);
       });
-
-      await res.json();
-
-      await user.delete();
-
-      Rhum.asserts.assertEquals(res.status, 200);
       // TODO(any) Asserts `body` and assert all the data was correctly saved
     });
   });
