@@ -11,7 +11,8 @@ and docker-compose.
 $ sudo docker-compose build && sudo docker-compose up
 ```
 
-For M1
+# How to Run on MacBook with M1 chip
+
 ```bash
 $ docker-compose -f docker-compose.m1.yml build && docker-compose -f docker-compose.m1.yml up
 ```
