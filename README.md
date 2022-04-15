@@ -19,6 +19,15 @@ $ docker-compose -f docker-compose.m1.yml build && docker-compose -f docker-comp
 
 Navigate to [http://localhost:1667](http://localhost:1667)
 
+## Run with `make` commands
+
+Also, you can run the project with `Makefile` ([Unbuntu](https://www.unixmen.com/install-ubuntu-make-on-ubuntu-15-04/)), ([Windows](https://stackoverflow.com/questions/32127524/how-to-install-and-use-make-in-windows)) commands:
+
+```bash
+  $ make up
+  $ make up-m1
+```
+
 # Features
 
 - [x] Docker compose environment
