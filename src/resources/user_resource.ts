@@ -50,8 +50,9 @@ export default class UserResource extends BaseResource {
     const token = (request.bodyParam("token") as string) || "";
 
     const user = await UserModel.where(
-        "id", id,
-      ).first();
+      "id",
+      id,
+    ).first();
 
     if (!user) {
       console.log("User not found.");

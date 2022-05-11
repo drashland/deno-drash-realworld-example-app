@@ -20,8 +20,9 @@ export default class ArticleCommentResource extends BaseResource {
   public async GET(request: Drash.Request, response: Drash.Response) {
     const id = request.pathParam("id") || "";
     const article = await ArticleModel.where<ArticleModel>(
-        "id", id,
-      ).first();
+      "id",
+      id,
+    ).first();
     if (!article) {
       console.error("No article was found with the id of: " + id);
       response.status = 404;
@@ -55,8 +56,9 @@ export default class ArticleCommentResource extends BaseResource {
     console.log("The id for the article: " + id);
     // First find an article by that id. The article should exist.
     const article = await ArticleModel.where<ArticleModel>(
-        "id", id,
-      ).first();
+      "id",
+      id,
+    ).first();
     if (!article) {
       return this.errorResponse(404, "No article was found.", response);
     }
@@ -111,8 +113,9 @@ export default class ArticleCommentResource extends BaseResource {
     // Make sure they are the author of the comment
     const commentId = Number(request.pathParam("id")) || 0;
     const comments = await ArticleCommentModel.where(
-        "author_id", user.id,
-      ).all();
+      "author_id",
+      user.id,
+    ).all();
     const isTheirComment = comments.filter((comment) => {
       return comment.id == Number(commentId);
     }).length >= 0;
@@ -125,8 +128,9 @@ export default class ArticleCommentResource extends BaseResource {
     }
     // Delete the comment
     const articleCommentModel = await ArticleCommentModel.where(
-        "id", commentId,
-      ).first() as ArticleCommentModel;
+      "id",
+      commentId,
+    ).first() as ArticleCommentModel;
     await articleCommentModel.delete();
     return response.json({
       message: "Deleted the comment",
