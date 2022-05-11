@@ -49,11 +49,10 @@ export default class ValidationService {
    *     - Returns false if the email is already taken.
    */
   static async isEmailUnique(email: string): Promise<boolean> {
-    const user = await UserModel.first({
-      where: [
-        ["email", email],
-      ],
-    });
+    const user = await UserModel.where(
+      "email",
+      email,
+    ).first();
     if (!user) {
       return true;
     }

@@ -49,11 +49,9 @@ export default class UserResource extends BaseResource {
     );
     const token = (request.bodyParam("token") as string) || "";
 
-    const user = await UserModel.first({
-      where: [
-        ["id", id],
-      ],
-    });
+    const user = await UserModel.where(
+        "id", id,
+      ).first();
 
     if (!user) {
       console.log("User not found.");
@@ -104,7 +102,7 @@ export default class UserResource extends BaseResource {
 
     return response.json({
       user: {
-        ...await user.toEntity(),
+        ...user,
         token,
       },
     });

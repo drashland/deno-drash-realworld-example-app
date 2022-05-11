@@ -60,8 +60,6 @@ class RegisterResource extends BaseResource {
     user.email = email;
     await user.save();
 
-    const entity = await user.toEntity<UserEntity>();
-
     // Create session for user. We return the session values on the user
     // object and the front-end is in charge of setting the values as a
     // cookie.
@@ -75,7 +73,7 @@ class RegisterResource extends BaseResource {
 
     // Return the newly created user
     return response.json({
-      user: entity,
+      user,
       token: `${sessionOneValue}|::|${sessionTwoValue}`,
     });
   }

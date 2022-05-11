@@ -1,8 +1,7 @@
-import BaseModel from "./base_model.ts";
 import { ArticleModel } from "./article_model.ts";
 import { SessionModel } from "./session_model.ts";
 import { ArticlesFavoritesModel } from "./articles_favorites_model.ts";
-import type { Where } from "./base_model.ts";
+import { Model, QueryBuilder } from "../deps.ts";
 
 export type UserEntity = {
   bio: string;
@@ -13,7 +12,7 @@ export type UserEntity = {
   username: string;
 };
 
-export class UserModel extends BaseModel {
+export class UserModel extends Model {
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -76,30 +75,19 @@ export class UserModel extends BaseModel {
     };
   }
 
-  public async articles(
-    where: Where = [],
-  ): Promise<ArticleModel[] | []> {
-    return await ArticleModel.all({
-      where: [
-        ["author_id", this.id],
-        ...where,
-      ],
-    });
+  public articles(): QueryBuilder<ArticleModel> {
+    return ArticleModel.where("author_id", this.id);
   }
 
   public async session(): Promise<SessionModel | null> {
-    return await SessionModel.first({
-      where: [
-        ["user_id", this.id],
-      ],
-    });
+    return await SessionModel.where<SessionModel>(
+      "user_id",
+      this.id,
+    ).first();
   }
 
-  public async articleFavorites(where: Where = []) {
-    where.push(["user_id", this.id]);
-    return await ArticlesFavoritesModel.all({
-      where,
-    });
+  public articleFavorites(): QueryBuilder<ArticlesFavoritesModel> {
+    return ArticlesFavoritesModel.where("user_id", this.id);
   }
 }
 

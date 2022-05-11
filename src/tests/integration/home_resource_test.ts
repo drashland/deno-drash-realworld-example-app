@@ -1,15 +1,12 @@
-import { Rhum } from "../deps.ts";
+import { assertEquals } from "../deps.ts";
+import { test } from "./utils.ts";
 
 import { server } from "../../server.ts";
 
-Rhum.testPlan("integration/home_resource_test.ts", () => {
-  Rhum.testSuite("GET /", () => {
-    Rhum.testCase("Responds with 200 status", async () => {
-      const res = await fetch(server.address);
-      await res.text();
-      Rhum.asserts.assertEquals(res.status, 200);
-    });
+Deno.test("GET /", async (t) => {
+  await test(t, "Responds with 200 status", async () => {
+    const res = await fetch(server.address);
+    await res.text();
+    assertEquals(res.status, 200);
   });
 });
-
-Rhum.run();

@@ -3,7 +3,6 @@ import BaseResource from "./base_resource.ts";
 import { ArticleEntity, ArticleModel } from "../models/article_model.ts";
 import { ArticlesFavoritesModel } from "../models/articles_favorites_model.ts";
 import UserModel from "../models/user_model.ts";
-import type { Where } from "../models/base_model.ts";
 
 class ArticlesResource extends BaseResource {
   paths = [
@@ -81,11 +80,9 @@ class ArticlesResource extends BaseResource {
       );
     }
 
-    const article = await ArticleModel.first({
-      where: [
-        ["id", inputArticle.id],
-      ],
-    });
+    const article = await ArticleModel.where(
+        "id", inputArticle.id,
+      ).first();
 
     if (!article) {
       return this.errorResponse(500, "Article could not be saved.", response);
@@ -98,7 +95,7 @@ class ArticlesResource extends BaseResource {
     await article.save();
 
     return response.json({
-      article: await article.toEntity(),
+      article,
     });
   }
 
@@ -116,11 +113,9 @@ class ArticlesResource extends BaseResource {
       return this.errorResponse(400, "No article id was passed in", response);
     }
 
-    const article = await ArticleModel.first({
-      where: [
-        ["id", articleId],
-      ],
-    });
+    const article = await ArticleModel.where(
+        "id", articleId,
+      ).first();
     if (!article) {
       return this.errorResponse(
         500,
@@ -172,17 +167,15 @@ class ArticlesResource extends BaseResource {
     await article.save();
 
     return response.json({
-      article: await article.toEntity(),
+      article,
     });
   }
 
   protected async getArticle(request: Drash.Request, response: Drash.Response) {
     const id = request.pathParam("id") || "";
-    const article = await ArticleModel.first({
-      where: [
-        ["id", id],
-      ],
-    });
+    const article = await ArticleModel.where<ArticleModel>(
+        "id", id,
+      ).first();
 
     if (!article) {
       return this.errorResponse(
@@ -192,11 +185,9 @@ class ArticlesResource extends BaseResource {
       );
     }
 
-    const user = await UserModel.first({
-      where: [
-        ["id", article.author_id],
-      ],
-    });
+    const user = await UserModel.where<UserModel>(
+        "id", article.author_id,
+      ).first();
     if (!user) {
       return this.errorResponse(
         400,
@@ -205,13 +196,11 @@ class ArticlesResource extends BaseResource {
       );
     }
 
-    const entity = await article.toEntity<ArticleEntity>();
-
-    const favorites = await article.articleFavorites();
+    const favorites = await article.articleFavorites().all();
     return response.json({
       article: {
-        ...entity,
-        author: await user.toEntity(),
+        ...article,
+        author: user,
         favoritesCount: favorites.length,
         favorited: favorites.length > 0,
       },
@@ -238,37 +227,32 @@ class ArticlesResource extends BaseResource {
     const authorId = request.queryParam("user_id");
     console.log("autor param", authorParam);
     // { author: user where username is queryparam author } | {}
-    const where: Where = [];
+    let id = 0;
     if (authorParam) {
-      const author = await UserModel.first({
-        where: [
-          ["username", authorParam],
-        ],
-      });
+      const author = await UserModel.where<UserModel>(
+          "username", authorParam,
+        ).first();
       if (author) {
-        where.push([
-          "author_id",
-          author.id,
-        ]);
+        id = author.id
       }
     }
     console.log("author id", authorId);
     if (authorId) {
-      where.push(["author_id", authorId]);
+      id = Number(authorId)
     }
-    const articles: ArticleModel[] = await ArticleModel
-      .all({
-        where,
-      });
+    const articles = await ArticleModel
+      .where<ArticleModel>(
+        'author_id', id,
+    ).all();
     console.log("got the rticles", articles.map((article) => article.id));
     const username = request.queryParam("favorited_by");
     const result = [];
     for (const article of articles) {
-      const favorites = await article.articleFavorites();
+      const favorites = await article.articleFavorites().all();
       const author = await article.author();
       result.push({
-        ...await article.toEntity<ArticleEntity>(),
-        author: author ? await author.toEntity() : null,
+        ...article,
+        author: author ?? null,
         favoritesCount: favorites.length,
         favorited: favorites.length > 0,
       });
@@ -280,11 +264,9 @@ class ArticlesResource extends BaseResource {
       });
     }
 
-    const userToFilterBy = await UserModel.first({
-      where: [
-        ["username", username],
-      ],
-    });
+    const userToFilterBy = await UserModel.where( 
+        "username", username,
+      ).first();
     if (!userToFilterBy) {
       return response.json({
         articles: result,
@@ -313,11 +295,9 @@ class ArticlesResource extends BaseResource {
     console.log("Handling action: toggleFavorite.");
     const id = request.pathParam("id") || 0;
 
-    const result = await ArticleModel.first({
-      where: [
-        ["id", id],
-      ],
-    });
+    const result = await ArticleModel.where<ArticleModel>(
+        "id", id,
+      ).first();
     if (!result) {
       return this.errorResponse(
         404,
@@ -343,12 +323,10 @@ class ArticlesResource extends BaseResource {
       case "set":
         // Check if the user already has a record in the db before creating a
         // new one. If the user has a record, then we just update the record.
-        favorite = await ArticlesFavoritesModel.first({
-          where: [
-            ["article_id", article.id],
-            ["user_id", currentUser.id],
-          ],
-        });
+        favorite = await ArticlesFavoritesModel.where(
+            "article_id", article.id)
+            .where("user_id", currentUser.id)
+        .first();
         if (!favorite) {
           favorite = new ArticlesFavoritesModel();
           favorite.article_id = article.id;
@@ -357,12 +335,9 @@ class ArticlesResource extends BaseResource {
         }
         break;
       case "unset":
-        favorite = await ArticlesFavoritesModel.first({
-          where: [
-            ["article_id", article.id],
-            ["user_id", currentUser.id],
-          ],
-        });
+        favorite = await ArticlesFavoritesModel.where("article_id", article.id)
+            .where("user_id", currentUser.id)
+            .first();
         if (!favorite) {
           return this.errorResponse(
             404,

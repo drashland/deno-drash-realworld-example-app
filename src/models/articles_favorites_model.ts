@@ -1,6 +1,6 @@
-import BaseModel from "./base_model.ts";
 import { UserModel } from "./user_model.ts";
 import { ArticleModel } from "./article_model.ts";
+import { Model } from "../deps.ts";
 
 export type ArticlesFavoritesEntity = {
   article_id: number;
@@ -8,7 +8,7 @@ export type ArticlesFavoritesEntity = {
   id: number;
 };
 
-export class ArticlesFavoritesModel extends BaseModel {
+export class ArticlesFavoritesModel extends Model {
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -42,11 +42,10 @@ export class ArticlesFavoritesModel extends BaseModel {
 
   // belongs to
   public async user(): Promise<UserModel | null> {
-    return await UserModel.first({
-      where: [
-        ["id", this.user_id],
-      ],
-    });
+    return await UserModel.where<UserModel>(
+      "id",
+      this.user_id,
+    ).first();
   }
 
   public async factoryDefaults(params: Partial<ArticlesFavoritesEntity> = {}) {

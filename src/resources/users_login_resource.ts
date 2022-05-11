@@ -73,24 +73,17 @@ class LoginResource extends BaseResource {
     const sessionValuesSplit = sessionValues.split("|::|");
     const sessionOne = sessionValuesSplit[0];
     const sessionTwo = sessionValuesSplit[1];
-    const session = await SessionModel.first({
-      where: [
-        ["session_one", sessionOne],
-        ["session_two", sessionTwo],
-      ],
-    });
+    const session = await SessionModel.where<SessionModel>(
+        "session_one", sessionOne)
+        .where("session_two", sessionTwo)
+      .first();
     if (session) {
-      const user = await UserModel.first({
-        where: [
-          ["id", session.user_id],
-        ],
-      });
+      const user = await session.user();
       if (user) {
-        const entity = await user.toEntity<UserEntity>();
         console.log("User has an active session.");
         return response.json({
           user: {
-            ...entity,
+            ...user,
             token: `${session.session_one}|::|${session.session_two}`,
           },
         });
@@ -114,11 +107,9 @@ class LoginResource extends BaseResource {
     }
 
     // Convert the user to a real user model object
-    const result = await UserModel.first({
-      where: [
-        ["email", inputUser.email],
-      ],
-    });
+    const result = await UserModel.where<UserModel>(
+        "email", inputUser.email,
+      ).first();
 
     if (!result) {
       console.log("User not found.");
@@ -146,13 +137,12 @@ class LoginResource extends BaseResource {
     const session = new SessionModel();
     session.session_one = sessionOne;
     session.session_two = sessionTwo;
-    session.user_id = user.id;
+    session.user_id = user.id as number;
     await session.save();
 
-    const entity = await user.toEntity<UserEntity>();
     return response.json({
       user: {
-        ...entity,
+        ...user,
         token: `${session.session_one}|::|${session.session_two}`,
       },
     });

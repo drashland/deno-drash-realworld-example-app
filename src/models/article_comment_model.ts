@@ -1,6 +1,6 @@
-import BaseModel from "./base_model.ts";
 import { ArticleModel } from "./article_model.ts";
 import { UserModel } from "./user_model.ts";
+import { Model } from "../deps.ts";
 
 export type ArticleCommentEntity = {
   created_at: number;
@@ -13,7 +13,7 @@ export type ArticleCommentEntity = {
   author_username: string;
 };
 
-export class ArticleCommentModel extends BaseModel {
+export class ArticleCommentModel extends Model {
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -59,16 +59,16 @@ export class ArticleCommentModel extends BaseModel {
    * authors username to the frontend
    */
   public async toEntity(): Promise<ArticleCommentEntity> {
-    const user = await UserModel.first({
-      select: ["username"],
-      where: [
-        ["id", this.author_id],
-      ],
-    });
-    return await super.toEntity<ArticleCommentEntity>({
+    const user = await UserModel.select("username", "image").where(
+      "id",
+      this.author_id,
+    )
+      .first();
+    return {
+      ...this,
       author_username: user?.username ?? "",
       author_image: user?.image ?? "",
-    });
+    };
   }
 
   public async factoryDefaults(params: Partial<ArticleCommentEntity> = {}) {
