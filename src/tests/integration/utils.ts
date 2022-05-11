@@ -1,4 +1,4 @@
-import { State } from "./.deps.ts";
+import { State } from "../deps.ts";
 
 async function migrate() {
   const state = await State.init({
