@@ -1,8 +1,7 @@
-import BaseModel from "./base_model.ts";
 import { UserModel } from "./user_model.ts";
 import { ArticlesFavoritesModel } from "./articles_favorites_model.ts";
 import { ArticleCommentModel } from "./article_comment_model.ts";
-import type { Where } from "./base_model.ts";
+import { Model, QueryBuilder } from "../deps.ts";
 
 export type ArticleEntity = {
   author_id: number;
@@ -15,7 +14,7 @@ export type ArticleEntity = {
   tags: string[];
 };
 
-export class ArticleModel extends BaseModel {
+export class ArticleModel extends Model {
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -65,7 +64,7 @@ export class ArticleModel extends BaseModel {
    *
    * Id of the related row in the database
    */
-  public id = 0;
+  public override id = 0;
 
   /**
    * @var string
@@ -96,24 +95,17 @@ export class ArticleModel extends BaseModel {
   }
 
   public async author() {
-    return await UserModel.first({
-      where: [
-        ["id", this.author_id],
-      ],
-    });
+    return await UserModel.where<UserModel>(
+      "id",
+      this.author_id,
+    ).first();
   }
 
-  public async articleFavorites(where: Where = []) {
-    where.push(["article_id", this.id]);
-    return await ArticlesFavoritesModel.all({
-      where,
-    });
+  public articleFavorites(): QueryBuilder<ArticlesFavoritesModel> {
+    return ArticlesFavoritesModel.where("article_id", this.id);
   }
 
-  public async comments(where: Where = []) {
-    where.push(["article_id", this.id]);
-    return await ArticleCommentModel.all({
-      where,
-    });
+  public comments(): QueryBuilder<ArticleCommentModel> {
+    return ArticleCommentModel.where("article_id", this.id);
   }
 }

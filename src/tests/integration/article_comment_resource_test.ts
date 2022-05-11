@@ -1,4 +1,4 @@
-import { Rhum } from "../deps.ts";
+import { assertEquals } from "../deps.ts";
 import { ArticleModel } from "../../models/article_model.ts";
 import { ArticleCommentModel } from "../../models/article_comment_model.ts";
 import { SessionModel } from "../../models/session_model.ts";
@@ -7,12 +7,10 @@ import { test } from "./utils.ts";
 
 import { server } from "../../server.ts";
 
-Rhum.testPlan("integration/article_comment_resource_test.ts", () => {
-  Rhum.testSuite("GET /articles/:id/comments", () => {
-    Rhum.testCase(
+  Deno.test("GET /articles/:id/comments", async t => {
+    await test(t,
       "Responds with a 200 status when comments for an article exist",
       async () => {
-        await test(async () => {
           // create an article and comment inside the db
           const article = await ArticleModel.factory();
           const comment = await ArticleCommentModel.factory({
@@ -26,9 +24,9 @@ Rhum.testPlan("integration/article_comment_resource_test.ts", () => {
           const body = await res.json();
 
           // assertions
-          Rhum.asserts.assertEquals(res.status, 200);
-          Rhum.asserts.assertEquals(body.success, true);
-          Rhum.asserts.assertEquals(body.data[0].body, comment.body);
+          assertEquals(res.status, 200);
+          assertEquals(body.success, true);
+          assertEquals(body.data[0].body, comment.body);
         });
       },
     );
@@ -66,8 +64,8 @@ Rhum.testPlan("integration/article_comment_resource_test.ts", () => {
     //
     //   await server.close()
     // })
-  });
-  Rhum.testSuite("POST /articles/:id/comments", () => {
+
+  Deno.test("POST /articles/:id/comments", async t => {
     // TODO(any) Not completing for the v1 release as it isn't needed, but nice to have
     // Rhum.testCase("Responds with 404 when no article was found", async () => {
     //   await server.run({ hostname: "localhost", port: 1447 });
@@ -129,10 +127,9 @@ Rhum.testPlan("integration/article_comment_resource_test.ts", () => {
     //
     //   await server.close()
     // });
-    Rhum.testCase(
+    await test(t,
       "Responds with 200 on valid post and saves the comment for the article",
       async () => {
-        await test(async () => {
           // insert db data
           const article = await ArticleModel.factory();
           const user = await article.author() as UserModel;
@@ -161,19 +158,17 @@ Rhum.testPlan("integration/article_comment_resource_test.ts", () => {
           //const comment = await ArticleCommentModel.first({});
 
           // assertions
-          Rhum.asserts.assertEquals(res.status, 200);
-          Rhum.asserts.assertEquals(body.success, true);
-          Rhum.asserts.assertEquals(body.data.body, "Hello world!");
+          assertEquals(res.status, 200);
+          assertEquals(body.success, true);
+          assertEquals(body.data.body, "Hello world!");
           // TODO :: Assert `comment`
         });
       },
     );
-  });
-  Rhum.testSuite("DELETE /articles/comments/:id", () => {
-    Rhum.testCase(
+  Deno.test("DELETE /articles/comments/:id", async t => {
+    await test(t,
       "Responds with a 200 status when deleting a existing comment",
       async () => {
-        await test(async () => {
           // create an article and comment inside the db
           const article = await ArticleModel.factory();
           const user = await article.author() as UserModel;
@@ -199,9 +194,9 @@ Rhum.testPlan("integration/article_comment_resource_test.ts", () => {
           );
           const body = await res.json();
 
-          Rhum.asserts.assertEquals(await comment.exists(), false);
-          Rhum.asserts.assertEquals(res.status, 200);
-          Rhum.asserts.assertEquals(body, {
+          assertEquals(await comment.exists(), false);
+          assertEquals(res.status, 200);
+          assertEquals(body, {
             success: true,
             message: "Deleted the comment",
           });
@@ -249,7 +244,5 @@ Rhum.testPlan("integration/article_comment_resource_test.ts", () => {
     //
     //   await server.close()
     // })
-  });
-});
 
-Rhum.run();
+

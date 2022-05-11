@@ -1,5 +1,5 @@
-import BaseModel from "./base_model.ts";
 import { UserModel } from "./user_model.ts";
+import { Model } from "../deps.ts";
 
 interface SessionModelEntity {
   session_one: string;
@@ -8,7 +8,7 @@ interface SessionModelEntity {
   user_id: number;
 }
 
-export class SessionModel extends BaseModel {
+export class SessionModel extends Model {
   /**
    * @var number
    *
@@ -44,21 +44,19 @@ export class SessionModel extends BaseModel {
   //////////////////////////////////////////////////////////////////////////////
 
   public async delete() {
-    const user = await UserModel.first({
-      where: [
-        ["id", this.user_id],
-      ],
-    });
+    const user = await UserModel.where(
+      "id",
+      this.user_id,
+    ).first();
     await user?.delete();
     await super.delete();
   }
 
   public async user(): Promise<UserModel | null> {
-    return await UserModel.first({
-      where: [
-        ["id", this.user_id],
-      ],
-    });
+    return await UserModel.where<UserModel>(
+      "id",
+      this.user_id,
+    ).first();
   }
 
   public async factoryDefaults(params: Partial<SessionModelEntity> = {}) {

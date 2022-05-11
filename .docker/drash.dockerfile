@@ -6,7 +6,7 @@ RUN apt-get update -y \
   && apt-get install -y --no-install-recommends npm \
   && npm install -g npm@latest
 
-RUN curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=/usr/local sh -s v1.16.3 \
+RUN curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=/usr/local sh -s v1.20.3 \
   && export DENO_INSTALL="/root/.local" \
   && export PATH="$DENO_INSTALL/bin:$PATH" \
   && deno install --unstable --allow-net=realworld_postgres:5432,deno.land --no-check --allow-env=PGDATABASE,PGHOST,PGPORT,PGUSER,PGPASSWORD,PGAPPNAME --allow-read=. --allow-write=nessie.config.ts,db --name nessie  https://deno.land/x/nessie@2.0.5/cli.ts
