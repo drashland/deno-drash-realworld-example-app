@@ -74,8 +74,10 @@ class LoginResource extends BaseResource {
     const sessionOne = sessionValuesSplit[0];
     const sessionTwo = sessionValuesSplit[1];
     const session = await SessionModel.where<SessionModel>(
-        "session_one", sessionOne)
-        .where("session_two", sessionTwo)
+      "session_one",
+      sessionOne,
+    )
+      .where("session_two", sessionTwo)
       .first();
     if (session) {
       const user = await session.user();
@@ -108,8 +110,9 @@ class LoginResource extends BaseResource {
 
     // Convert the user to a real user model object
     const result = await UserModel.where<UserModel>(
-        "email", inputUser.email,
-      ).first();
+      "email",
+      inputUser.email,
+    ).first();
 
     if (!result) {
       console.log("User not found.");

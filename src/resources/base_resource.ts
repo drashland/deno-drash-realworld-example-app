@@ -68,8 +68,10 @@ class BaseResource extends Drash.Resource {
       const sessionOne = sessionValuesSplit[0];
       const sessionTwo = sessionValuesSplit[1];
       const session = await SessionModel.where<SessionModel>(
-          "session_one", sessionOne)
-          .where("session_two", sessionTwo)
+        "session_one",
+        sessionOne,
+      )
+        .where("session_two", sessionTwo)
         .first();
       if (!session) {
         return false;
@@ -87,8 +89,9 @@ class BaseResource extends Drash.Resource {
       userId = request.bodyParam<string>("user_id") ?? "";
     }
     const user = await UserModel.where<UserModel>(
-        "id", userId,
-      ).first();
+      "id",
+      userId,
+    ).first();
     if (!user) {
       return false;
     }

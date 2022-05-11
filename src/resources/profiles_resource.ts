@@ -27,8 +27,9 @@ class ProfilesResource extends BaseResource {
     });
 
     const result = await UserModel.where(
-        "username", username,
-      ).first();
+      "username",
+      username,
+    ).first();
     if (!result) {
       return this.errorResponse(404, "Profile not found.", response);
     }
