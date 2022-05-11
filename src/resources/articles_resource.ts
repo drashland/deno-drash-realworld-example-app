@@ -231,26 +231,21 @@ class ArticlesResource extends BaseResource {
     const authorId = request.queryParam("user_id");
     console.log("autor param", authorParam);
     // { author: user where username is queryparam author } | {}
-    let id = 0;
+    let articles: ArticleModel[] = [];
     if (authorParam) {
       const author = await UserModel.where<UserModel>(
         "username",
         authorParam,
       ).first();
       if (author) {
-        id = author.id;
+        articles = await author.articles().all()
       }
+    } else if (authorId) {
+      articles = await ArticleModel.where<ArticleModel>('author_id', authorId).all()
+    } else {
+      // TODO :: Using the where here cause vital doesnt support `Model.all()`
+      articles = await ArticleModel.where<ArticleModel>('id', '>', '0').all()
     }
-    console.log("author id", authorId);
-    if (authorId) {
-      id = Number(authorId);
-    }
-    const articles = await ArticleModel
-      .where<ArticleModel>(
-        "author_id",
-        id,
-      ).all();
-    console.log("got the rticles", articles.map((article) => article.id));
     const username = request.queryParam("favorited_by");
     const result = [];
     for (const article of articles) {

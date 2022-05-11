@@ -7,9 +7,6 @@ services:
     build:
       context: .
       dockerfile: .docker/apache.dockerfile
-    volumes:
-      - ./src:/var/www/src
-    working_dir: /var/www/src
     depends_on:
       - drash
     ports:
@@ -53,6 +50,7 @@ services:
       - ./src/package-lock.json:/var/www/src/package-lock.json
       - ./src/server.ts:/var/www/src/server.ts
       - ./src/webpack.config.js:/var/www/src/webpack.config.js
+      - ./src/.env:/var/www/src/.env
     ports:
       - "1667:1667"
     networks:

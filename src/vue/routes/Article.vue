@@ -54,7 +54,7 @@
 <script>
 import { mapGetters } from "vuex";
 import { store } from "../../public/js/_app.js";
-import marked from "marked";
+import { marked } from "marked";
 import ArticleMeta from "@/components/ArticleMeta.vue";
 import Comment from "@/components/Comment.vue";
 import CommentEditor from "@/components/CommentEditor.vue";
