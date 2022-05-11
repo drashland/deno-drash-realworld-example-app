@@ -238,13 +238,14 @@ class ArticlesResource extends BaseResource {
         authorParam,
       ).first();
       if (author) {
-        articles = await author.articles().all()
+        articles = await author.articles().all();
       }
     } else if (authorId) {
-      articles = await ArticleModel.where<ArticleModel>('author_id', authorId).all()
+      articles = await ArticleModel.where<ArticleModel>("author_id", authorId)
+        .all();
     } else {
       // TODO :: Using the where here cause vital doesnt support `Model.all()`
-      articles = await ArticleModel.where<ArticleModel>('id', '>', '0').all()
+      articles = await ArticleModel.where<ArticleModel>("id", ">", "0").all();
     }
     const username = request.queryParam("favorited_by");
     const result = [];
