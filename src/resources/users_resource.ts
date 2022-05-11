@@ -1,6 +1,6 @@
 import { bcrypt } from "../deps.ts";
 import BaseResource from "./base_resource.ts";
-import { UserEntity, UserModel } from "../models/user_model.ts";
+import { UserModel } from "../models/user_model.ts";
 import SessionModel from "../models/session_model.ts";
 import ValidationService from "../services/validation_service.ts";
 import { Drash } from "../deps.ts";

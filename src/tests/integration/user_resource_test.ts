@@ -2,7 +2,7 @@
 
 // import { server } from "../../server.ts";
 
-Deno.test("POST /user", async (t) => {
+Deno.test("POST /user", async (_t) => {
   // TODO(any) Not completing for the v1 release as it isn't needed, but nice to have
   // Rhum.testCase("Responds with 404 when no id was passed in with body", () => {
   //
