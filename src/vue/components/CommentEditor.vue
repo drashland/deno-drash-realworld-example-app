@@ -1,7 +1,7 @@
 <template>
   <div>
     <ListErrors :errors="errors" />
-    <form class="card comment-form" @submit.prevent="onSubmit(slug, comment)">
+    <form class="card comment-form" @submit.prevent="onSubmit(id, comment)">
       <div class="card-block">
         <textarea
           class="form-control"
@@ -25,7 +25,7 @@ export default {
   name: "CommentEditor",
   components: { ListErrors },
   props: {
-    slug: { type: String, required: true },
+    id: { type: Number, required: true },
     content: { type: String, required: false },
     userImage: { type: String, required: false }
   },
@@ -36,10 +36,10 @@ export default {
     };
   },
   methods: {
-    onSubmit(slug, comment) {
+    onSubmit(id, comment) {
       console.log("Dispatching event: createArticleComment")
       this.$store
-        .dispatch("createArticleComment", { slug, comment })
+        .dispatch("createArticleComment", { id, comment })
         .then(() => {
           this.comment = null;
           this.errors = {};

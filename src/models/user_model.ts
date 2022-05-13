@@ -1,50 +1,18 @@
-import BaseModel from "./base_model.ts";
+import { ArticleModel } from "./article_model.ts";
+import { SessionModel } from "./session_model.ts";
+import { ArticlesFavoritesModel } from "./articles_favorites_model.ts";
+import { Model, QueryBuilder } from "../deps.ts";
 
 export type UserEntity = {
-  bio?: string;
+  bio: string;
   email: string;
-  id?: number;
-  image?: string;
-  password?: string;
+  id: number;
+  image: string;
+  password: string;
   username: string;
-  token?: null | string;
 };
 
-/**
- * @description
- * Creates a instance of the user model with the properties populated
- *
- * @param object user
- * @param string user.username
- * @param string user.password
- * @param string user.email
- * @param string user.bio
- * @param string user.image
- * @param number user.id
- *
- * @return UserModel
- */
-export function createUserModelObject(user: {
-  username: string;
-  password: string;
-  email: string;
-  bio: string;
-  image: string;
-  id: number;
-}): UserModel {
-  return new UserModel(
-    user.username,
-    user.password,
-    user.email,
-    user.bio,
-    user.image,
-    user.id,
-  );
-}
-
-//@ts-ignore UserModel defines a where method that has different params than base models
-// where method. Might need to investigate the naming usage
-export class UserModel extends BaseModel {
+export class UserModel extends Model {
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - PROPERTIES //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -54,243 +22,72 @@ export class UserModel extends BaseModel {
    *
    * Bio associated with the given user
    */
-  public bio: string;
+  public bio = "";
 
   /**
    * @var string
    *
    * Email address for the given user
    */
-  public email: string;
+  public email = "";
 
   /**
    * @var number
    *
    * Associated row id for the database entry
    */
-  public id: number;
+  public id = 0;
 
   /**
    * @var string
    *
    * Path to where the profile picture resides for the user
    */
-  public image: string;
+  public image = "";
 
   /**
    * @var string
    *
    * Password for the given user. Hashed if pulled from the database
    */
-  public password: string;
+  public password = "";
 
   /**
    * @var string
    *
    * Username for the user
    */
-  public username: string;
+  public username = "";
 
-  //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - CONSTRCUTOR /////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * @param string username
-   * @param string password
-   * @param string email
-   * @param string bio=""
-   * @param string image="https://static.productionready.io/images/smiley-cyrus.jpg"
-   * @param number id=-1
-   */
-  constructor(
-    username: string,
-    password: string,
-    email: string,
-    bio: string = "",
-    image: string = "https://static.productionready.io/images/smiley-cyrus.jpg",
-    id: number = -1,
-  ) {
-    super();
-    this.id = id;
-    this.username = username;
-    this.password = password;
-    this.email = email;
-    this.bio = bio;
-    this.image = image;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - METHODS - CRUD //////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * Delete this model.
-   *
-   * @return Promise<boolean> False if the query failed to delete
-   */
-  public async delete(): Promise<boolean> {
-    const query = `DELETE FROM users WHERE id = $1`;
-    const dbResult = await BaseModel.query(query, this.id);
-    if (dbResult.rowCount! < 1) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Save this model.
-   *
-   * @return Promise<UserModel|null> Empty array if no data was found
-   */
-  public async save(): Promise<UserModel | null> {
-    // If this model already has an ID, then that means we're updating the model
-    if (this.id != -1) {
-      return this.update();
-    }
-
-    const query =
-      "INSERT INTO users (username, email, password, bio, image) VALUES ($1, $2, $3, $4, $5);";
-    const dbResult = await BaseModel.query(
-      query,
-      this.username,
-      this.email,
-      this.password,
-      this.bio,
-      this.image,
-    );
-    if (dbResult.rowCount < 1) {
-      return null;
-    }
-
-    // (crookse) We ignore this because this will never return null.
-    const savedResult = await UserModel.where({ email: this.email });
-    if (savedResult.length === 0) {
-      return null;
-    }
-    return savedResult[0];
-  }
-
-  /**
-   * Update this model.
-   *
-   * @return Promise<UserModel|null> False if no results were found
-   */
-  public async update(): Promise<UserModel | null> {
-    const query = "UPDATE users SET " +
-      "username = $1, password = $2, email = $3, bio = $4, image = $5 " +
-      `WHERE id = $6;`;
-    const dbResult = await BaseModel.query(
-      query,
-      this.username,
-      this.password,
-      this.email,
-      this.bio,
-      this.image,
-      this.id,
-    );
-    if (dbResult.rowCount! < 1) {
-      return null;
-    }
-
-    const updatedResult = await UserModel.where({ email: this.email });
-    if (updatedResult.length === 0) {
-      return null;
-    }
-    return updatedResult[0];
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // FILE MARKER - METHODS - STATIC ////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * @description
-   *     See BaseModel.Where()
-   *
-   * @param {[key: string]: string} fields
-   *
-   * @return Promise<UserModel[]|[]>
-   */
-  static async where(
-    fields: { [key: string]: string | number },
-  ): Promise<UserModel[] | []> {
-    const results = await BaseModel.Where("users", fields);
-
-    if (results.length <= 0) {
-      return [];
-    }
-
-    //@ts-ignore Nothing we can do about this.. the createUserModelObject expect
-    // a user object type, but there's no way to type it like that the return type of whereIn can't be user
-    return results.map((result) => {
-      return createUserModelObject(
-        result as {
-          username: string;
-          password: string;
-          email: string;
-          bio: string;
-          image: string;
-          id: number;
-        },
-      );
-    });
-  }
-
-  /**
-   * @description
-   *     See BaseModel.WhereIn()
-   *
-   * @param string column
-   * @param any values
-   *
-   * @return Promise<UserModel[]> | []
-   */
-  static async whereIn(
-    column: string,
-    values: string[] | number[],
-  ): Promise<UserModel[] | []> {
-    const results = await BaseModel.WhereIn("users", {
-      column,
-      values,
-    });
-
-    if (results.length <= 0) {
-      return [];
-    }
-
-    //@ts-ignore Nothing we can do about this.. the createUserModelObject expect
-    // a user object type, but there's no way to type it like that the return type of whereIn can't be user
-    return results.map((result) => {
-      return createUserModelObject(
-        result as {
-          username: string;
-          password: string;
-          email: string;
-          bio: string;
-          image: string;
-          id: number;
-        },
-      );
-    });
-  }
+  public tablename = "users";
 
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - METHODS - PUBLIC ////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  /**
-   * @return UserEntity
-   */
-  public toEntity(): UserEntity {
+  public factoryDefaults(params: Partial<UserEntity> = {}) {
     return {
-      id: this.id,
-      username: this.username,
-      email: this.email,
-      bio: this.bio,
-      image: this.image,
-      token: null,
+      email: params.email ?? "test@hotmail.com",
+      username: params.username ?? "drash",
+      password: params.password ?? "admin",
+      image: params.image ?? "https:?/drash.land/favicon.ico",
+      bio: params.bio ?? "the bio",
     };
+  }
+
+  public articles(): QueryBuilder<ArticleModel> {
+    return ArticleModel.where("author_id", this.id);
+  }
+
+  public async session(): Promise<SessionModel | null> {
+    return await SessionModel.where(
+      "user_id",
+      this.id,
+    ).first();
+  }
+
+  public articleFavorites(): QueryBuilder<ArticlesFavoritesModel> {
+    return ArticlesFavoritesModel.where("user_id", this.id);
   }
 }
 

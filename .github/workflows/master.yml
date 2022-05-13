@@ -19,15 +19,11 @@ jobs:
       - name: Builds and Starts
         run: |
           docker-compose up -d
-          docker-compose exec -T drash bash -c "/root/.deno/bin/nessie migrate && /root/.deno/bin/nessie seed"
+          docker-compose exec -T drash bash -c "deno task prepare"
 
       - name: Run Integration Tests
         run: |
-          docker exec realworld_drash deno test -A --unstable tests/integration/test.ts
-
-      - name: Run Unit Tests
-        run: |
-          docker exec realworld_drash deno test -A --unstable tests/unit/models/base_model_test.ts
+          docker exec realworld_drash deno task test
 
   linter:
       # Only one OS is required since fmt is cross platform
@@ -37,7 +33,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install Deno
-        uses: denolib/setup-deno@master
+        uses: denoland/setup-deno@v1
 
       - name: Formatter
         run: deno fmt --check --ignore='src/public,src/vue,src/package.json,src/webpack.config.js'

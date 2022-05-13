@@ -28,7 +28,7 @@
         <div class="col-xs-12 col-md-8 offset-md-2">
           <CommentEditor
             v-if="is_authenticated"
-            :slug="slug"
+            :id="id"
             :userImage="user.image"
           >
           </CommentEditor>
@@ -40,7 +40,7 @@
           </p>
           <Comment
             v-for="(comment, index) in comments"
-            :slug="slug"
+            :id="id"
             :comment="comment"
             :key="index"
           >
@@ -54,7 +54,7 @@
 <script>
 import { mapGetters } from "vuex";
 import { store } from "../../public/js/_app.js";
-import marked from "marked";
+import { marked } from "marked";
 import ArticleMeta from "@/components/ArticleMeta.vue";
 import Comment from "@/components/Comment.vue";
 import CommentEditor from "@/components/CommentEditor.vue";
@@ -62,8 +62,8 @@ import Tag from "@/components/Tag.vue";
 export default {
   name: "Article",
   props: {
-    slug: {
-      type: String,
+    id: {
+      type: Number,
       required: true
     }
   },
@@ -75,8 +75,9 @@ export default {
   },
   async beforeRouteEnter(to, from, next) {
     next((vm) => {
-      vm.$store.dispatch("fetchArticle", to.params.slug);
-      vm.$store.dispatch("fetchArticleComments", to.params.slug);
+      console.log('nfroe route enter article route', to)
+      vm.$store.dispatch("fetchArticle", to.params.id);
+      vm.$store.dispatch("fetchArticleComments", to.params.id);
     });
   },
   computed: {

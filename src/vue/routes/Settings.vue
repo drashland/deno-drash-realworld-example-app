@@ -42,8 +42,8 @@
                 <input
                   class="form-control form-control-lg"
                   type="password"
-                  v-model="user.password"
-                  placeholder="Password"
+                  placeholder="*****"
+                  ref="password"
                 />
               </fieldset>
               <button class="btn btn-lg btn-primary pull-xs-right">
@@ -77,13 +77,17 @@ export default {
   },
   methods: {
     updateSettings() {
+      const userToPost = {
+        ...this.user,
+        password: this.$refs.password.value
+      };
       swal({
           text: "Updating your information... Please wait...",
           timer: 500,
           buttons: false,
         })
         .then(async () => {
-          return await this.$store.dispatch("updateUser", this.user);
+          return await this.$store.dispatch("updateUser", userToPost);
         })
         .then((response) => {
           if (response === true) {

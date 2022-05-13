@@ -119,14 +119,14 @@ const routesDef = [
   },
   {
     name: "article",
-    path: "/articles/:slug",
+    path: "/articles/:id",
     component: Article,
     props: true,
   },
   {
     name: "article-edit",
     protected: true,
-    path: "/editor/:slug?",
+    path: "/editor/:id?",
     props: true,
     component: ArticleEdit,
   },

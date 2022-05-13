@@ -9,7 +9,6 @@ class FilesResource extends BaseResource {
 
   public GET(request: Drash.Request, response: Drash.Response) {
     const url = new URL(request.url);
-    console.log(url.pathname);
     return response.file(`.${url.pathname}`);
   }
 }

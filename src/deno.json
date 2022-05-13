@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "prepare": "/root/.deno/bin/nessie migrate && /root/.deno/bin/nessie seed",
+    "test": "deno test -A --unstable tests/integration"
+  }
+}

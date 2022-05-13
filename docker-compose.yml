@@ -7,9 +7,6 @@ services:
     build:
       context: .
       dockerfile: .docker/apache.dockerfile
-    volumes:
-      - ./src:/var/www/src
-    working_dir: /var/www/src
     depends_on:
       - drash
     ports:
@@ -35,7 +32,7 @@ services:
     build:
       context: .
       dockerfile: .docker/drash.dockerfile
-    command: bash -c "cd /var/www/src && deno run -A --unstable app.ts"
+    command: bash -c "cd /var/www/src && deno run -A --watch --unstable app.ts"
     volumes:
       - ./src/config:/var/www/src/config
       - ./src/db:/var/www/src/db
@@ -47,13 +44,13 @@ services:
       - ./src/vue:/var/www/src/vue
       - ./src/config.ts:/var/www/src/config.ts
       - ./src/app.ts:/var/www/src/app.ts
-      - ./src/db.ts:/var/www/src/db.ts
       - ./src/deps.ts:/var/www/src/deps.ts
       - ./src/nessie.config.ts:/var/www/src/nessie.config.ts
       - ./src/package.json:/var/www/src/package.json
       - ./src/package-lock.json:/var/www/src/package-lock.json
       - ./src/server.ts:/var/www/src/server.ts
       - ./src/webpack.config.js:/var/www/src/webpack.config.js
+      - ./src/.env:/var/www/src/.env
     ports:
       - "1667:1667"
     networks:

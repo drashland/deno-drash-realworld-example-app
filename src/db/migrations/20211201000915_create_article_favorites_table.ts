@@ -6,9 +6,8 @@ export default class extends AbstractMigration<ClientPostgreSQL> {
     await this.client.queryObject(`
       CREATE TABLE articles_favorites (
           id SERIAL PRIMARY KEY,
-          article_id integer NOT NULL,
-          user_id integer NOT NULL,
-          value boolean NOT NULL
+          article_id integer NOT NULL REFERENCES articles ON DELETE CASCADE,
+          user_id integer NOT NULL REFERENCES users ON DELETE CASCADE
       );
     `);
   }
@@ -16,7 +15,7 @@ export default class extends AbstractMigration<ClientPostgreSQL> {
   /** Runs on rollback */
   async down(): Promise<void> {
     await this.client.queryObject(`
-            DROP TABLE article_favorites
+            DROP TABLE articles_favorites
         `);
   }
 }

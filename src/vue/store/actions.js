@@ -58,10 +58,10 @@ export default {
   },
 
   createArticleComment(context, params) {
-    console.log(`Handling action: createArticleComment (${params.slug})`);
+    console.log(`Handling action: createArticleComment (${params.id})`);
     return new Promise((resolve, reject) => {
       axios
-        .post(`/articles/${params.slug}/comments`, {
+        .post(`/articles/${params.id}/comments`, {
           comment: params.comment,
         })
         .then(async (response) => {
@@ -86,15 +86,15 @@ export default {
 
   deleteArticle(context, data) {
     console.log("Handling action: deleteArticle");
-    const slug = data.article_slug;
+    const id = data.article_id;
     return new Promise((resolve) => {
       axios
-        .delete("/articles/" + slug)
+        .delete("/articles/" + id)
         .then((response) => {
           if (response.data.success === true) {
             let articles = context.getters.articles;
             articles.forEach((article, i) => {
-              if (article.slug === slug) {
+              if (article.id === id) {
                 articles.splice(i, 1);
               }
             });
@@ -121,9 +121,9 @@ export default {
     context.commit("setArticle", article);
   },
 
-  deleteComment(context, { slug, commentId }) {
+  deleteComment(context, { id, commentId }) {
     console.log("Handling action: deleteComment");
-    console.log(slug, commentId);
+    console.log(id, commentId);
     return new Promise((resolve) => {
       axios
         .delete(`/articles/comment/${commentId}`)
@@ -146,11 +146,12 @@ export default {
     });
   },
 
-  fetchArticle(context, slug) {
+  fetchArticle(context, id) {
+    console.log("fetching article", id);
     console.log("Handling action: fetchArticle");
     return new Promise((resolve) => {
       axios
-        .get(`/articles/${slug}`, {
+        .get(`/articles/${id}`, {
           params: {
             user_id: context.getters.user.id,
           },
@@ -166,11 +167,11 @@ export default {
     });
   },
 
-  fetchArticleComments({ commit }, slug) {
+  fetchArticleComments({ commit }, id) {
     console.log("Handling action: fetchArticleComments");
     return new Promise((resolve) => {
       axios
-        .get(`/articles/${slug}/comments`)
+        .get(`/articles/${id}/comments`)
         .then((response) => {
           commit("setComments", response.data.data);
           resolve(response);
@@ -194,6 +195,7 @@ export default {
           },
         })
         .then((response) => {
+          console.log("Dispatching setArticles", response.data.articles);
           context.dispatch("setArticles", response.data.articles);
           resolve(response);
         })
@@ -268,7 +270,10 @@ export default {
         .then((response) => {
           console.log("Registration successful.");
           console.log(response);
-          context.dispatch("setUser", response.data.user);
+          context.dispatch("setUser", {
+            ...response.data.user,
+            token: response.data.token,
+          });
           resolve(true);
         })
         .catch((error) => {
@@ -298,13 +303,7 @@ export default {
   },
 
   setArticles(context, articles) {
-    articles.forEach((article) => {
-      if (article.tags.length > 0) {
-        article.tags = article.tags.split(",");
-      } else {
-        article.tags = [];
-      }
-    });
+    console.log("actions for articles", articles);
     context.commit("setArticles", articles);
   },
 
@@ -334,6 +333,7 @@ export default {
   setUser(context, user) {
     context.commit("setIsAuthenticated", true);
     context.commit("setUser", user);
+    console.log("setting drash ess", user);
     setCookie("drash_sess", user.token, 1);
   },
 
@@ -341,7 +341,7 @@ export default {
     console.log(`Handling action: toggleArticleFavorite (${params.action})`);
     return new Promise((resolve) => {
       axios
-        .post(`/articles/${params.slug}/favorite`, {
+        .post(`/articles/${params.id}/favorite`, {
           action: params.action,
           user_id: context.getters.user.id,
         })
@@ -362,6 +362,7 @@ export default {
   },
 
   unsetUser(context) {
+    console.log("unsetting user");
     context.commit("setIsAuthenticated", false);
     context.commit("setUser", userDefault);
     setCookie("drash_sess", null);

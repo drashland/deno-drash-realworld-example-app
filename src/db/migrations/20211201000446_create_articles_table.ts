@@ -6,14 +6,13 @@ export default class extends AbstractMigration<ClientPostgreSQL> {
     await this.client.queryObject(`
       CREATE TABLE articles (
           id SERIAL PRIMARY KEY,
-          author_id integer NOT NULL,
+          author_id integer NOT NULL REFERENCES users ON DELETE CASCADE,
           title character varying(255) NOT NULL,
           description character varying(255) NOT NULL,
           body character varying(255) NOT NULL,
-          slug character varying(255) NOT NULL,
-          created_at timestamp without time zone NOT NULL,
-          updated_at timestamp without time zone NOT NULL,
-          tags character varying(255)
+          created_at timestamp without time zone NOT NULL default now(),
+          updated_at timestamp without time zone default now(),
+          tags text[]
       );
     `);
   }

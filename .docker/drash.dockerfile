@@ -1,15 +1,15 @@
 FROM debian:stable-slim
 
-RUN apt update -y \
-  && apt clean \
-  && apt install bash curl unzip -y \
-  && apt install -y --no-install-recommends npm \
+RUN apt-get update -y \
+  && apt-get clean \
+  && apt-get install bash curl unzip -y \
+  && apt-get install -y --no-install-recommends npm \
   && npm install -g npm@latest
 
-RUN curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=/usr/local sh -s v1.16.3
-RUN export DENO_INSTALL="/root/.local"
-RUN export PATH="$DENO_INSTALL/bin:$PATH"
-RUN deno install --unstable --allow-net=realworld_postgres:5432,deno.land --no-check --allow-read=. --allow-write=nessie.config.ts,db --name nessie  https://deno.land/x/nessie/cli.ts
+RUN curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=/usr/local sh -s v1.20.3 \
+  && export DENO_INSTALL="/root/.local" \
+  && export PATH="$DENO_INSTALL/bin:$PATH" \
+  && deno install --unstable --allow-net=realworld_postgres:5432,deno.land --no-check --allow-env=PGDATABASE,PGHOST,PGPORT,PGUSER,PGPASSWORD,PGAPPNAME --allow-read=. --allow-write=nessie.config.ts,db --name nessie  https://deno.land/x/nessie@2.0.5/cli.ts
 
 WORKDIR /var/www/src
 
@@ -17,7 +17,7 @@ WORKDIR /var/www/src
 COPY src/package.json src/package-lock.json src/webpack.config.js ./
 COPY src/public public
 COPY src/vue vue
-RUN npm ci --prefer-offline --no-audit --progress=false && npm run webpack
+RUN npm i && npm run webpack
 
 # Copy over other src code
 COPY src/. .

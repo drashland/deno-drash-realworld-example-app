@@ -1,5 +1,6 @@
 import { Drash } from "../deps.ts";
 import UserModel from "../models/user_model.ts";
+import { SessionModel } from "../models/session_model.ts";
 
 class BaseResource extends Drash.Resource {
   public current_user: UserModel | null = null;
@@ -43,37 +44,58 @@ class BaseResource extends Drash.Resource {
   }
 
   /**
-   * @description
-   * Returns a user by the user id within the url query or body
+   * Get a user by:
+   *   - session (logged in user using token)
+   *   - query param
+   *   - user id
    *
-   * @return
+   * @param type
+   * @param request
+   * @returns
    */
-  protected async getCurrentUser(
-    request: Drash.Request,
-  ): Promise<UserModel | null> {
-    console.log("Getting the current user.");
-    if (this.current_user) {
-      console.log(`Using cached User #${this.current_user.id}.`);
-      return this.current_user;
+  protected async getUser(type: {
+    session?: boolean;
+    query?: boolean;
+    body?: boolean;
+  }, request: Drash.Request): Promise<UserModel | false> {
+    let userId = "";
+    if (type.session) {
+      const sessionValues = request.getCookie("drash_sess");
+      if (!sessionValues) {
+        return false;
+      }
+      const sessionValuesSplit = sessionValues.split("|::|");
+      const sessionOne = sessionValuesSplit[0];
+      const sessionTwo = sessionValuesSplit[1];
+      const session = await SessionModel.where(
+        "session_one",
+        sessionOne,
+      )
+        .where("session_two", sessionTwo)
+        .first();
+      if (!session) {
+        return false;
+      }
+      const user = await session.user();
+      if (!user) {
+        return false;
+      }
+      return user;
     }
-
-    const userId = (request.queryParam("user_id") as string) ||
-      (request.bodyParam("user_id") as string);
-
-    if (!userId) {
-      return null;
+    if (type.query) {
+      userId = request.queryParam("user_id") ?? "";
     }
-
-    const user = await UserModel.where({ id: userId });
-
-    if (user.length <= 0) {
-      this.current_user = null;
+    if (type.body) {
+      userId = request.bodyParam<string>("user_id") ?? "";
     }
-
-    this.current_user = user[0];
-
-    console.log(`Setting User #${this.current_user.id} as current user.`);
-    return this.current_user;
+    const user = await UserModel.where(
+      "id",
+      userId,
+    ).first();
+    if (!user) {
+      return false;
+    }
+    return user;
   }
 }
 

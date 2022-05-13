@@ -1,21 +1,30 @@
 import { ArticleModel } from "../models/article_model.ts";
-import { ArticleCommentsModel } from "../models/article_comments_model.ts";
+import { ArticleCommentModel } from "../models/article_comment_model.ts";
 import { Drash } from "../deps.ts";
-import UserService from "../services/user_service.ts";
 import BaseResource from "./base_resource.ts";
+import { AuthenticateService } from "../services/authenticate_service.ts";
+const authenticateService = new AuthenticateService();
 // import ArticleService from "../services/article_service.ts";
 
-export default class ArticleCommentsResource extends BaseResource {
+export default class ArticleCommentResource extends BaseResource {
   paths = [
-    "/articles/:slug/comments",
+    "/articles/:id/comments",
     "/articles/comment/:id", // Only for deleting
   ];
 
+  public services = {
+    "POST": [authenticateService],
+    "DELETE": [authenticateService],
+  };
+
   public async GET(request: Drash.Request, response: Drash.Response) {
-    const slug = request.pathParam("slug") || "";
-    const articles = await ArticleModel.where({ slug });
-    if (!articles.length) {
-      console.error("No article was found with the slug of: " + slug);
+    const id = request.pathParam("id") || "";
+    const article = await ArticleModel.where(
+      "id",
+      id,
+    ).first();
+    if (!article) {
+      console.error("No article was found with the id of: " + id);
       response.status = 404;
       return response.json({
         errors: {
@@ -23,11 +32,7 @@ export default class ArticleCommentsResource extends BaseResource {
         },
       });
     }
-    const article = articles[0];
-    const comments = await ArticleCommentsModel.whereIn(
-      "article_id",
-      [article.id],
-    );
+    const comments = await article.comments().all();
     if (!comments.length) {
       console.log(
         "No comments were found for the article with id: " + article.id,
@@ -45,16 +50,18 @@ export default class ArticleCommentsResource extends BaseResource {
   }
 
   public async POST(request: Drash.Request, response: Drash.Response) {
-    console.log("Handling ArticleCommentsResource POST.");
+    console.log("Handling ArticleCommentResource POST.");
     const comment = (request.bodyParam("comment") as string);
-    const slug = request.pathParam("slug") || "";
-    console.log("The slug for the article: " + slug);
-    // First find an article by that slug. The article should exist.
-    const articles = await ArticleModel.where({ slug });
-    if (!articles.length) {
+    const id = request.pathParam("id") || "";
+    console.log("The id for the article: " + id);
+    // First find an article by that id. The article should exist.
+    const article = await ArticleModel.where(
+      "id",
+      id,
+    ).first();
+    if (!article) {
       return this.errorResponse(404, "No article was found.", response);
     }
-    const article = articles[0];
     // Get user and validation check
     if (!comment) {
       return this.errorResponse(
@@ -63,8 +70,9 @@ export default class ArticleCommentsResource extends BaseResource {
         response,
       );
     }
-    const cookie = request.getCookie("drash_sess");
-    const user = await UserService.getLoggedInUser(cookie || "");
+    const user = await this.getUser({
+      session: true,
+    }, request);
     if (typeof user === "boolean") {
       return this.errorResponse(
         403,
@@ -73,19 +81,13 @@ export default class ArticleCommentsResource extends BaseResource {
       );
     }
     // save the comment
-    const articleComment = new ArticleCommentsModel(
-      article.id,
-      comment,
-      user.image,
-      user.id,
-      user.username,
-    );
-    const savedArticleComment: ArticleCommentsModel = await articleComment
+    const articleComment = new ArticleCommentModel();
+    articleComment.article_id = article.id,
+      articleComment.body = comment,
+      articleComment.author_id = user.id;
+    await articleComment
       .save();
-    if (!savedArticleComment) {
-      return this.errorResponse(500, "Failed to save the comment.", response);
-    }
-    const articleEntity = savedArticleComment.toEntity();
+    const articleEntity = await articleComment.toEntity();
     response.status = 200;
     return response.json({
       success: true,
@@ -94,12 +96,13 @@ export default class ArticleCommentsResource extends BaseResource {
   }
 
   public async DELETE(request: Drash.Request, response: Drash.Response) {
-    console.log("Handling ArticleCommentsResource DELETE.");
+    console.log("Handling ArticleCommentResource DELETE.");
 
     // make sure they are authorised to do so
-    const cookie = request.getCookie("drash_sess");
-    const user = await UserService.getLoggedInUser(cookie || "");
-    if (typeof user === "boolean") {
+    const user = await this.getUser({
+      session: true,
+    }, request);
+    if (user === false) {
       return this.errorResponse(
         403,
         "You are unauthorised to do this action.",
@@ -109,8 +112,10 @@ export default class ArticleCommentsResource extends BaseResource {
 
     // Make sure they are the author of the comment
     const commentId = Number(request.pathParam("id")) || 0;
-    console.log("going to get comments");
-    const comments = await ArticleCommentsModel.where({ author_id: user.id });
+    const comments = await ArticleCommentModel.where(
+      "author_id",
+      user.id,
+    ).all();
     const isTheirComment = comments.filter((comment) => {
       return comment.id == Number(commentId);
     }).length >= 0;
@@ -122,18 +127,11 @@ export default class ArticleCommentsResource extends BaseResource {
       );
     }
     // Delete the comment
-    const articleCommentsModel = new ArticleCommentsModel(
-      0,
-      ", ",
-      "",
-      0,
-      ", ",
-      0,
-      0,
+    const articleCommentModel = await ArticleCommentModel.where(
+      "id",
       commentId,
-    );
-    articleCommentsModel.id = Number(commentId);
-    await articleCommentsModel.delete();
+    ).first() as ArticleCommentModel;
+    await articleCommentModel.delete();
     return response.json({
       message: "Deleted the comment",
       success: true,
