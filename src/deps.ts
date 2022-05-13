@@ -7,4 +7,4 @@ export {
   ClientPostgreSQL,
 } from "https://deno.land/x/nessie@2.0.4/mod.ts";
 export type { Info } from "https://deno.land/x/nessie@2.0.4/mod.ts";
-export { Model, QueryBuilder } from "https://deno.land/x/vital@v1.1.0/mod.ts";
+export { Model, QueryBuilder } from "https://deno.land/x/vital@v1.1.1/mod.ts";
