@@ -95,7 +95,7 @@ export class ArticleModel extends Model {
   }
 
   public async author() {
-    return await UserModel.where<UserModel>(
+    return await UserModel.where(
       "id",
       this.author_id,
     ).first();

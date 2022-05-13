@@ -19,7 +19,7 @@ export default class ArticleCommentResource extends BaseResource {
 
   public async GET(request: Drash.Request, response: Drash.Response) {
     const id = request.pathParam("id") || "";
-    const article = await ArticleModel.where<ArticleModel>(
+    const article = await ArticleModel.where(
       "id",
       id,
     ).first();
@@ -55,7 +55,7 @@ export default class ArticleCommentResource extends BaseResource {
     const id = request.pathParam("id") || "";
     console.log("The id for the article: " + id);
     // First find an article by that id. The article should exist.
-    const article = await ArticleModel.where<ArticleModel>(
+    const article = await ArticleModel.where(
       "id",
       id,
     ).first();

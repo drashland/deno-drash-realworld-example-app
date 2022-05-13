@@ -53,7 +53,7 @@ export class SessionModel extends Model {
   }
 
   public async user(): Promise<UserModel | null> {
-    return await UserModel.where<UserModel>(
+    return await UserModel.where(
       "id",
       this.user_id,
     ).first();

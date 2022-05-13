@@ -175,7 +175,7 @@ class ArticlesResource extends BaseResource {
 
   protected async getArticle(request: Drash.Request, response: Drash.Response) {
     const id = request.pathParam("id") || "";
-    const article = await ArticleModel.where<ArticleModel>(
+    const article = await ArticleModel.where(
       "id",
       id,
     ).first();
@@ -188,7 +188,7 @@ class ArticlesResource extends BaseResource {
       );
     }
 
-    const user = await UserModel.where<UserModel>(
+    const user = await UserModel.where(
       "id",
       article.author_id,
     ).first();
@@ -233,7 +233,7 @@ class ArticlesResource extends BaseResource {
     // { author: user where username is queryparam author } | {}
     let articles: ArticleModel[] = [];
     if (authorParam) {
-      const author = await UserModel.where<UserModel>(
+      const author = await UserModel.where(
         "username",
         authorParam,
       ).first();
@@ -241,11 +241,10 @@ class ArticlesResource extends BaseResource {
         articles = await author.articles().all();
       }
     } else if (authorId) {
-      articles = await ArticleModel.where<ArticleModel>("author_id", authorId)
+      articles = await ArticleModel.where("author_id", authorId)
         .all();
     } else {
-      // TODO :: Using the where here cause vital doesnt support `Model.all()`
-      articles = await ArticleModel.where<ArticleModel>("id", ">", "0").all();
+      articles = await ArticleModel.all();
     }
     const username = request.queryParam("favorited_by");
     const result = [];
@@ -298,7 +297,7 @@ class ArticlesResource extends BaseResource {
     console.log("Handling action: toggleFavorite.");
     const id = request.pathParam("id") || 0;
 
-    const result = await ArticleModel.where<ArticleModel>(
+    const result = await ArticleModel.where(
       "id",
       id,
     ).first();

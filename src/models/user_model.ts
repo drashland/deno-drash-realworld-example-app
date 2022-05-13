@@ -80,7 +80,7 @@ export class UserModel extends Model {
   }
 
   public async session(): Promise<SessionModel | null> {
-    return await SessionModel.where<SessionModel>(
+    return await SessionModel.where(
       "user_id",
       this.id,
     ).first();
