@@ -168,8 +168,8 @@ export const fetchProfile = async (params: any) => {
 };
 
 export const setProfile = (newProfile: any) => {
-  // @ts-ignore
   Object.entries(newProfile).forEach(([key, value]) =>
+    // @ts-ignore
     profile[key].value = value
   );
 };
