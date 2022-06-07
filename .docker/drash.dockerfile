@@ -14,7 +14,7 @@ RUN curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=/usr/local 
 WORKDIR /var/www/src
 
 # npm i and build client
-COPY src/tsconfig.json ./
+COPY src/tsconfig.json src/deno.json ./
 COPY src/public public
 RUN deno task build
 

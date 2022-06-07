@@ -1,5 +1,5 @@
-import { Component, html } from "../deps.ts"
+import { Component, html } from "../deps.ts";
 
 export class Tag extends Component {
-    override template = this.html(html``)
+  override template = this.html(html``);
 }

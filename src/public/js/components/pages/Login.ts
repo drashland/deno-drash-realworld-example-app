@@ -1,52 +1,61 @@
-import { Component, html, reactive, swal, classNames, css, computed } from "../deps.ts"
-import { logIn } from "../../state.ts"
+import {
+  classNames,
+  Component,
+  computed,
+  css,
+  html,
+  reactive,
+  swal,
+} from "../deps.ts";
+import { logIn } from "../../state.ts";
 
 export class Login extends Component {
+  #errors = reactive<string[]>([]);
 
-    #errors = reactive<string[]>([])
+  #email = reactive("");
 
-    #email = reactive("")
+  #password = reactive("");
 
-    #password = reactive("")
+  async #onSubmit() {
+    this.#errors.value = [];
+    swal({
+      text: "Logging you in... Please wait...",
+      buttons: false,
+    });
 
-    async #onSubmit() {
-        this.#errors.value = []
-        swal({
-            text: "Logging you in... Please wait...",
-            buttons: false,
-          });
-  
+    const response = await logIn({
+      email: this.#email.value,
+      password: this.#password.value,
+    });
 
-        const response = await logIn({ email: this.#email.value, password: this.#password.value });
-  
-        if (response === true) {
-          swal.close();
-          this.#email.value = "";
-          this.#password.value = ""
-          return window.location.href = "/"
-        }
-
-        const errors: string[] = []
-        Object.keys(response).forEach(field => {
-            for (const error of response[field]) {
-                errors.push(error)
-            }
-        })
-        this.#errors.value = errors
-  
-        swal({
-          title: "Login failed!",
-          icon: "error"
-        });
+    if (response === true) {
+      swal.close();
+      this.#email.value = "";
+      this.#password.value = "";
+      return window.location.href = "/";
     }
 
-    static styles = css`
+    const errors: string[] = [];
+    Object.keys(response).forEach((field) => {
+      for (const error of response[field]) {
+        errors.push(error);
+      }
+    });
+    this.#errors.value = errors;
+
+    swal({
+      title: "Login failed!",
+      icon: "error",
+    });
+  }
+
+  static styles = css`
         .d-none {
             display: none !important;
         }
-    `
+    `;
 
-    override template = this.html(html`
+  override template = this.html(html`
         <div class="auth-page">
             <div class="container page">
                 <div class="row">
@@ -57,10 +66,14 @@ export class Login extends Component {
                                 Need an account?
                             </a>
                         </p>
-                        <ul class=${classNames({
-                            'error-messages': true,
-                        })}>
-                            ${computed(() => this.#errors.value.map(v => html`<li>${v}</li>`))}
+                        <ul class=${
+    classNames({
+      "error-messages": true,
+    })
+  }>
+                            ${
+    computed(() => this.#errors.value.map((v) => html`<li>${v}</li>`))
+  }
                         </ul>
                         <form>
                             <fieldset class="form-group">
@@ -79,7 +92,8 @@ export class Login extends Component {
                                     placeholder="Password"
                                 />
                             </fieldset>
-                            <button type="button" on:click=${() => this.#onSubmit()} class="btn btn-lg btn-primary pull-xs-right">
+                            <button type="button" on:click=${() =>
+    this.#onSubmit()} class="btn btn-lg btn-primary pull-xs-right">
                                 Sign in
                             </button>
                         </form>
@@ -87,5 +101,5 @@ export class Login extends Component {
                 </div>
             </div>
         </div>
-    `)
+    `);
 }

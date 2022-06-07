@@ -1,4 +1,4 @@
-import { Component, html, css, reactive, ReactiveArray } from "./deps.ts"
+import { Component, css, html, reactive, ReactiveArray } from "./deps.ts";
 
 /**
  * Taken from https://github.com/RevillWeb/rebel-tag-input/blob/master/lib/rebel-tag-input.js
@@ -6,15 +6,14 @@ import { Component, html, css, reactive, ReactiveArray } from "./deps.ts"
  */
 
 export interface TagInput {
-    tags: ReactiveArray<string>,
-    class?: string,
-    placeholder?: string
+  tags: ReactiveArray<string>;
+  class?: string;
+  placeholder?: string;
 }
 export class TagInput extends Component {
+  tags = this.tags ?? reactive([]);
 
-    tags = this.tags ?? reactive([])
-
-    static styles = css`
+  static styles = css`
     .rebel-tag-input {
         font-family: 'Helvetica Neue', 'Lucida Grande', sans-serif;
         max-width: 100%;
@@ -77,102 +76,116 @@ export class TagInput extends Component {
     }
     .rebel-tag-input div.tag:hover .remove {
         right: 0;
-    }`
+    }`;
 
-    #value = reactive('')
+  #value = reactive("");
 
-    addTag() {
-        const tag = this.#value.value
-        if (!tag.length) {
-            return;
-        }
-        if (!this.tags.value.includes(tag)) {
-            this.tags.push(tag);
-            this.#value.value = ''
-            this.render()
-            return;
-        }
-        const $element = this.shadowRoot!.querySelector('[data-index="' + this.tags.indexOf(tag) + '"]');
-        if ($element) {
-            $element.className = ($element.className + " duplicate");
-            setTimeout(function () {
-                $element.className = $element.className.replace("duplicate", "");
-            }, 500);
-        }
+  addTag() {
+    const tag = this.#value.value;
+    if (!tag.length) {
+      return;
     }
-
-    empty() {
-        this.clear();
-        this.tags.value = [];
+    if (!this.tags.value.includes(tag)) {
+      this.tags.push(tag);
+      this.#value.value = "";
+      this.render();
+      return;
     }
-    deleteTag(index: number) {
-        const newTags: string[] = [];
-        this.tags.forEach((tag, idx) => {
-            if (idx !== index) {
-                newTags.push(tag);
-            }
-        });
-        this.tags.value = newTags;
-        this.render();
+    const $element = this.shadowRoot!.querySelector(
+      '[data-index="' + this.tags.indexOf(tag) + '"]',
+    );
+    if ($element) {
+      $element.className = $element.className + " duplicate";
+      setTimeout(function () {
+        $element.className = $element.className.replace("duplicate", "");
+      }, 500);
     }
+  }
 
-    render() {
-        this.clear();
-        this.tags.forEach((tag, idx) => {
-            let $tag = document.createElement("div");
-            $tag.className = "tag";
-            let $remove = document.createElement("div");
-            $remove.className = "remove";
-            $remove.innerHTML = "x";
-            $remove.addEventListener("click", () => {
-                this.deleteTag(idx);
-            });
-            $tag.dataset.index = idx.toString();
-            $tag.innerHTML = tag;
-            $tag.appendChild($remove);
-            this.shadowRoot!.querySelector('.rebel-tag-input')!.appendChild($tag);
-        });
+  empty() {
+    this.clear();
+    this.tags.value = [];
+  }
+  deleteTag(index: number) {
+    const newTags: string[] = [];
+    this.tags.forEach((tag, idx) => {
+      if (idx !== index) {
+        newTags.push(tag);
+      }
+    });
+    this.tags.value = newTags;
+    this.render();
+  }
+
+  render() {
+    this.clear();
+    this.tags.forEach((tag, idx) => {
+      let $tag = document.createElement("div");
+      $tag.className = "tag";
+      let $remove = document.createElement("div");
+      $remove.className = "remove";
+      $remove.innerHTML = "x";
+      $remove.addEventListener("click", () => {
+        this.deleteTag(idx);
+      });
+      $tag.dataset.index = idx.toString();
+      $tag.innerHTML = tag;
+      $tag.appendChild($remove);
+      this.shadowRoot!.querySelector(".rebel-tag-input")!.appendChild($tag);
+    });
+  }
+
+  clear() {
+    var tagElements = this.shadowRoot!.querySelectorAll(".tag");
+    if (tagElements.length > 0) {
+      for (var i = 0; i < tagElements.length; i++) {
+        this.shadowRoot!.querySelector(".rebel-tag-input")!.removeChild(
+          tagElements[i],
+        );
+      }
     }
+  }
 
-    clear() {
-        var tagElements = this.shadowRoot!.querySelectorAll('.tag');
-        if (tagElements.length > 0) {
-            for (var i = 0; i < tagElements.length; i++) {
-                this.shadowRoot!.querySelector('.rebel-tag-input')!.removeChild(tagElements[i]);
-            }
-        }
+  #allowDelete = false;
+
+  #onKeydown(event: any) {
+    const tag = this.#value.value;
+    if (event.keyCode === 13) {
+      this.addTag();
+    } else if (event.keyCode === 188) {
+      event.preventDefault();
+      this.addTag();
+    } else if (event.keyCode === 8 && tag.length === 0) {
+      if (this.#allowDelete) {
+        this.deleteTag(this.tags.length.value - 1);
+        this.#allowDelete = false;
+      } else {
+        this.#allowDelete = true;
+      }
     }
+  }
 
-    #allowDelete = false
-
-    #onKeydown(event: any) {
-        const tag = this.#value.value;
-        if (event.keyCode === 13) {
-            this.addTag();
-        } else if (event.keyCode === 188) {
-            event.preventDefault();
-            this.addTag();
-        } else if (event.keyCode === 8 && tag.length === 0) {
-            if (this.#allowDelete) {
-                this.deleteTag(this.tags.length.value - 1);
-                this.#allowDelete = false;
-            } else {
-                this.#allowDelete = true;
-            }
-        }
-    }
-
-    override template = this.html(html`
+  override template = this.html(html`
         <div class="rebel-tag-input">
-            <input class=${"form-control " + this.class ?? ''} type="text" placeholder=${this.placeholder ?? 'Tags...'} id="tag-input" on:keydown=${(e: Event) => this.#onKeydown(e)} prop:value=${this.#value} />
-            ${this.tags.map((tag, i) => html`
+            <input class=${
+    "form-control " + this.class ?? ""
+  } type="text" placeholder=${
+    this.placeholder ?? "Tags..."
+  } id="tag-input" on:keydown=${(e: Event) =>
+    this.#onKeydown(e)} prop:value=${this.#value} />
+            ${
+    this.tags.map((tag, i) =>
+      html`
                 <div class="tag" data-index=${i}>
                     ${tag}
-                    <div class="remove" on:click=${() => this.deleteTag(i.value)}>
+                    <div class="remove" on:click=${() =>
+        this.deleteTag(i.value)}>
                         x
                     </div>
                 </div>
-            `)}
+            `
+    )
+  }
         </div>
-    `)
+    `);
 }

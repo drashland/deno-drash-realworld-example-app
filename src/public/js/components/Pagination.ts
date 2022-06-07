@@ -1,24 +1,26 @@
-import { Component, html } from "./deps.ts"
+import { Component, html } from "./deps.ts";
 
 export interface Pagination {
-    pages: any[]
-    currentPage: number
+  pages: any[];
+  currentPage: number;
 }
 export class Pagination extends Component {
-    changePage(goToPage: number) {
-        if (goToPage === this.currentPage) return;
-        //this.$emit("update:currentPage", goToPage);
-      }
-      paginationClass(page: number) {
-        return {
-          "page-item": true,
-          active: this.currentPage === page
-        };
-      }
+  changePage(goToPage: number) {
+    if (goToPage === this.currentPage) return;
+    //this.$emit("update:currentPage", goToPage);
+  }
+  paginationClass(page: number) {
+    return {
+      "page-item": true,
+      active: this.currentPage === page,
+    };
+  }
 
-    override template = this.html(html`
+  override template = this.html(html`
         <ul class="pagination">
-        ${this.pages.map(page => html`
+        ${
+    this.pages.map((page) =>
+      html`
             <li data-test=${`page-link-${page}`}
                 class=${this.paginationClass(page)}
                 on:click=${() => this.changePage(page)}
@@ -27,7 +29,9 @@ export class Pagination extends Component {
                     ${page}
                 </a>
             </li>
-        `)}
+        `
+    )
+  }
         </ul>
-    `)
+    `);
 }

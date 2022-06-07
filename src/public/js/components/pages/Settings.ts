@@ -1,43 +1,42 @@
-import { Component, html, swal, reactive } from "../deps.ts"
-import { user, logOut, updateUser } from "../../state.ts"
+import { Component, html, reactive, swal } from "../deps.ts";
+import { logOut, updateUser, user } from "../../state.ts";
 
 export class Settings extends Component {
+  #user = reactive(user);
 
-    #user = reactive(user);
+  async #logout() {
+    await logOut();
+    window.location.href = "/";
+  }
 
-    async #logout() {
-        await logOut();
-        window.location.href = "/"
-      }
-
-    async #updateSettings() {
-        const userToPost = {
-            ...this.#user,
-          };
-        swal({
-            text: "Updating your information... Please wait...",
-            timer: 500,
-            buttons: false,
-        })
-        const response = await updateUser(userToPost)
-        if (response === true) {
-            return swal({
-                title: "Update successful!",
-                icon: "success"
-            });
-        }
-        let error = "";
-        for (const key in response.errors) {
-        error += `${response.errors[key]} `;
-        }
-        swal({
-        title: "Update failed!",
-        text: error,
-        icon: "error"
-        });
+  async #updateSettings() {
+    const userToPost = {
+      ...this.#user,
+    };
+    swal({
+      text: "Updating your information... Please wait...",
+      timer: 500,
+      buttons: false,
+    });
+    const response = await updateUser(userToPost);
+    if (response === true) {
+      return swal({
+        title: "Update successful!",
+        icon: "success",
+      });
     }
+    let error = "";
+    for (const key in response.errors) {
+      error += `${response.errors[key]} `;
+    }
+    swal({
+      title: "Update failed!",
+      text: error,
+      icon: "error",
+    });
+  }
 
-    override template = this.html(html`
+  override template = this.html(html`
 <div class="settings-page">
     <div class="container page">
       <div class="row">
@@ -85,19 +84,21 @@ export class Settings extends Component {
                   prop:value=${this.#user.password}
                 />
               </fieldset>
-              <button type="button" on:click=${() => this.#updateSettings()} class="btn btn-lg btn-primary pull-xs-right">
+              <button type="button" on:click=${() =>
+    this.#updateSettings()} class="btn btn-lg btn-primary pull-xs-right">
                 Update Settings
               </button>
             </fieldset>
           </form>
           <!-- Line break for logout button -->
           <hr />
-          <button on:click=${() => this.#logout()} class="btn btn-outline-danger">
+          <button on:click=${() =>
+    this.#logout()} class="btn btn-outline-danger">
             Or click here to logout.
           </button>
         </div>
       </div>
     </div>
   </div>
-    `)
+    `);
 }

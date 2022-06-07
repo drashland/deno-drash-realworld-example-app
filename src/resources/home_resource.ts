@@ -13,7 +13,7 @@ class PageResource extends BaseResource {
     "/profile/:username",
     "/profile/:username/favorites",
     "/articles/:id",
-    "/editor/:id?"
+    "/editor/:id?",
   ];
 
   services = {

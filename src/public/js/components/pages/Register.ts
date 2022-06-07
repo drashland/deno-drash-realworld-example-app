@@ -1,62 +1,62 @@
-import { Component, html, reactive, swal, computed, classNames } from "../deps.ts"
-import { register } from "../../state.ts"
-
-/**
- * todo this is where i got to
- * 
- * just finishing up logina nd register pages, should be good to move
- * onto othr stuff now
- */
+import {
+  classNames,
+  Component,
+  computed,
+  html,
+  reactive,
+  swal,
+} from "../deps.ts";
+import { register } from "../../state.ts";
 
 export class Register extends Component {
-    #errors = reactive<string[]>([]);
+  #errors = reactive<string[]>([]);
 
-    #username = reactive('')
+  #username = reactive("");
 
-    #email = reactive('')
+  #email = reactive("");
 
-    #password = reactive('')
+  #password = reactive("");
 
-    async #onSubmit() {
-        swal({
-            text: "Please wait...",
-            timer: 500,
-            buttons: false,
-          })
-              
-        const response = await register({
-            email: this.#email.value,
-            password: this.#password.value,
-            username: this.#username.value
-        });
-        this.#email.value = ""
-        this.#username.value = ""
-        this.#password.value = ""
-        if (response === true) {
-            swal({
-                title: "Welcome!",
-                text: "Your registration was successful!",
-                icon: "success",
-            });
-            return window.location.href = "/"
-        }
-        let error = "";
-        const errors = []
-        for (const key in response.errors) {
-            for (const error of response.errors[key]) {
-                errors.push(error)
-            }
-            error += `${response.errors[key]} `;
-        }
-        this.#errors.value = errors
-        swal({
-            title: "Registration failed!",
-            text: error,
-            icon: "error"
-        });
+  async #onSubmit() {
+    swal({
+      text: "Please wait...",
+      timer: 500,
+      buttons: false,
+    });
+
+    const response = await register({
+      email: this.#email.value,
+      password: this.#password.value,
+      username: this.#username.value,
+    });
+    this.#email.value = "";
+    this.#username.value = "";
+    this.#password.value = "";
+    if (response === true) {
+      swal({
+        title: "Welcome!",
+        text: "Your registration was successful!",
+        icon: "success",
+      });
+      return window.location.href = "/";
+    }
+    let error = "";
+    const errors = [];
+    for (const key in response.errors) {
+      for (const error of response.errors[key]) {
+        errors.push(error);
       }
+      error += `${response.errors[key]} `;
+    }
+    this.#errors.value = errors;
+    swal({
+      title: "Registration failed!",
+      text: error,
+      icon: "error",
+    });
+  }
 
-    override template = this.html(html`
+  override template = this.html(html`
         <div class="auth-page">
             <div class="container page">
                 <div class="row">
@@ -67,14 +67,22 @@ export class Register extends Component {
                             Have an account?
                             </a>
                         </p>
-                        ${this.#errors.value.length ? html`
-                        <ul class=${classNames({
-                            'error-messages': true,
-                            'd-none': this.#errors.value.length === 0
-                        })}>
-                            ${computed(() => this.#errors.value.map(v => html`<li>${v}</li>`))}
+                        ${
+    this.#errors.value.length
+      ? html`
+                        <ul class=${
+        classNames({
+          "error-messages": true,
+          "d-none": this.#errors.value.length === 0,
+        })
+      }>
+                            ${
+        computed(() => this.#errors.value.map((v) => html`<li>${v}</li>`))
+      }
                         </ul>
-                        ` : ''}
+                        `
+      : ""
+  }
                         <form>
                             <fieldset class="form-group">
                                 <input
@@ -100,7 +108,9 @@ export class Register extends Component {
                                     placeholder="Password"
                                 />
                             </fieldset>
-                            <button on:click=${() => this.#onSubmit()} type="button" class="btn btn-lg btn-primary pull-xs-right">
+                            <button on:click=${() =>
+    this
+      .#onSubmit()} type="button" class="btn btn-lg btn-primary pull-xs-right">
                                 Sign up
                             </button>
                         </form>
@@ -108,5 +118,5 @@ export class Register extends Component {
                 </div>
             </div>
         </div>
-    `)
+    `);
 }

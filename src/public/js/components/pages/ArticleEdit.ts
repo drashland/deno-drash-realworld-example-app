@@ -1,77 +1,83 @@
-import { Component, html, reactive, swal, computed } from "../deps.ts"
-import { ListErrors }  from "../ListErrors.ts"
-import { TagInput } from "../TagInput.ts"
-import { article, fetchArticle, setArticle, updateArticle, createArticle, unsetArticle, setTags } from "../../state.ts"
+import { Component, computed, html, reactive, swal } from "../deps.ts";
+import { ListErrors } from "../ListErrors.ts";
+import { TagInput } from "../TagInput.ts";
+import {
+  article,
+  createArticle,
+  fetchArticle,
+  setArticle,
+  setTags,
+  unsetArticle,
+  updateArticle,
+} from "../../state.ts";
 
 export interface ArticleEdit {
-    pathParams: {
-        id?: number
-    }
+  pathParams: {
+    id?: number;
+  };
 }
 export class ArticleEdit extends Component {
+  #article = reactive(article);
 
-  #article = reactive(article)
+  #new = window.location.search.includes("new=true");
 
-    #new = window.location.search.includes('new=true')
+  #loading = reactive(this.#new === false);
 
-    #loading = reactive(this.#new === false)
+  #publishing_article = reactive(false);
 
-    #publishing_article = reactive(false)
+  #errors = reactive<{
+    [key: string]: string[];
+  }>({});
 
-    #errors = reactive<{
-        [key: string]: string[]
-    }>({})
-
-    connectedCallback() {
-        if (this.#new) {
-            unsetArticle()
-            setTags([]);
-        }
-        if (this.pathParams.id) {
-          fetchArticle(Number(this.pathParams.id)).then(() => {
-            this.#article = reactive(article)
-            this.#loading.value = false
-          })
-        }
+  connectedCallback() {
+    if (this.#new) {
+      unsetArticle();
+      setTags([]);
     }
+    if (this.pathParams.id) {
+      fetchArticle(Number(this.pathParams.id)).then(() => {
+        this.#article = reactive(article);
+        this.#loading.value = false;
+      });
+    }
+  }
 
-    async #onPublish(id?: any) {
-        // If the article has a id, then it already exists in the database; and
-        // that means we're updating the article--not creating a new one.
-        swal({
-          text: "Please wait...",
-          buttons: false,
-        });
-        this.#publishing_article.value = true;
-        const response = id && id.value ?  await updateArticle(this.#article) : await createArticle(this.#article)
-        swal.close();
-        this.#publishing_article.value = false;
-        unsetArticle()
-        if (response.article) {
-            setArticle(response.article)
-            return window.location.href = `/articles/${response.article.id}`
-        }
-        let error = "";
-        for (const key in response.errors) {
-            error += `${response.errors[key]} `;
-        }
-        swal({
-            title: "Oops!",
-            text: error,
-            icon: "error"
-        });
-      }
-    
-      // TODO :: Got here, just need to test this page, and try get tags input working
-      // without jquery, then test viewing and editing an article,
-      // and that we can view articles etc
-    override template = computed(() => {
-      if (this.#loading.value) {
-        return this.html(html`
-          <p class="article-page">Loading...</p>
-        `)
-      }
+  async #onPublish(id?: any) {
+    // If the article has a id, then it already exists in the database; and
+    // that means we're updating the article--not creating a new one.
+    swal({
+      text: "Please wait...",
+      buttons: false,
+    });
+    this.#publishing_article.value = true;
+    const response = id && id.value
+      ? await updateArticle(this.#article)
+      : await createArticle(this.#article);
+    swal.close();
+    this.#publishing_article.value = false;
+    unsetArticle();
+    if (response.article) {
+      setArticle(response.article);
+      return window.location.href = `/articles/${response.article.id}`;
+    }
+    let error = "";
+    for (const key in response.errors) {
+      error += `${response.errors[key]} `;
+    }
+    swal({
+      title: "Oops!",
+      text: error,
+      icon: "error",
+    });
+  }
+
+  override template = computed(() => {
+    if (this.#loading.value) {
       return this.html(html`
+          <p class="article-page">Loading...</p>
+        `);
+    }
+    return this.html(html`
     <div class="editor-page">
     <div class="container page">
       <div class="row">
@@ -121,5 +127,6 @@ export class ArticleEdit extends Component {
       </div>
     </div>
   </div>
-    `)})
+    `);
+  });
 }

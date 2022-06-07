@@ -41,6 +41,7 @@ services:
       - ./src/resources:/var/www/src/resources
       - ./src/services:/var/www/src/services
       - ./src/tests:/var/www/src/tests
+      - ./src/deno.json:/var/www/src/deno.json
       - ./src/config.ts:/var/www/src/config.ts
       - ./src/app.ts:/var/www/src/app.ts
       - ./src/deps.ts:/var/www/src/deps.ts

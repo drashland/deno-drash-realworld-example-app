@@ -1,6 +1,6 @@
-import { Component, html } from "./deps.ts"
+import { Component, html } from "./deps.ts";
 export class Footer extends Component {
-    override template = this.html(html`
+  override template = this.html(html`
         <footer>
             <div class="container">
             <a class="logo-font" href="/">
@@ -14,5 +14,5 @@ export class Footer extends Component {
             </span>
             </div>
         </footer>
-    `)
+    `);
 }

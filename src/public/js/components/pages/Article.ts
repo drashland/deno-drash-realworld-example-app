@@ -1,38 +1,46 @@
-import { html, Component, marked, reactive, computed, Ref } from "../deps.ts"
-import { article, fetchArticle, user, fetchArticleComments, isAuthenticated, comments } from "../../state.ts"
-import { ArticleMeta } from "../ArticleMeta.ts"
-import { Tag } from "../Tag.ts"
-import { CommentEditor } from "../CommentEditor.ts"
-import { Comment } from "../Comment.ts"
+import { Component, computed, html, marked, reactive, Ref } from "../deps.ts";
+import {
+  article,
+  comments,
+  fetchArticle,
+  fetchArticleComments,
+  isAuthenticated,
+  user,
+} from "../../state.ts";
+import { ArticleMeta } from "../ArticleMeta.ts";
+import { Tag } from "../Tag.ts";
+import { CommentEditor } from "../CommentEditor.ts";
+import { Comment } from "../Comment.ts";
 
 export interface Article {
-    pathParams: {
-      id: number
-    }
+  pathParams: {
+    id: number;
+  };
 }
 export class Article extends Component {
+  #id = Number(this.pathParams.id);
 
-  #id = Number(this.pathParams.id)
+  #loading = reactive(true);
 
-  #loading = reactive(true)
+  connectedCallback() {
+    Promise.all([
+      fetchArticle(this.#id),
+      fetchArticleComments(this.#id),
+    ]).then(() => {
+      this.#loading.value = false;
+      this.shadowRoot!.querySelector("#markdown")!.innerHTML = marked.parse(
+        article.body.value,
+      );
+    });
+  }
 
-    connectedCallback() {
-        Promise.all([
-          fetchArticle(this.#id),
-          fetchArticleComments(this.#id)
-        ]).then(() => {
-          this.#loading.value = false
-          this.shadowRoot!.querySelector('#markdown')!.innerHTML = marked.parse(article.body.value)
-    })
-    }
-
-    override template = computed(() => {
-      if (this.#loading.value) {
-        return this.html(html`
-          <p class="article-page">Loading article...</p>
-        `)
-      }
+  override template = computed(() => {
+    if (this.#loading.value) {
       return this.html(html`
+          <p class="article-page">Loading article...</p>
+        `);
+    }
+    return this.html(html`
       <div class="article-page">
       <div class="banner">
         <div class="container">
@@ -45,14 +53,18 @@ export class Article extends Component {
           <div class="col-xs-12">
             <div id="markdown"></div>
             <ul class="tag-list">
-            ${article.tags.map((tag: string) => html`
+            ${
+      article.tags.map((tag: string) =>
+        html`
             <li>
                 <${Tag}
                   prop:name=${tag}
                   className="tag-default tag-pill tag-outline"
                 />
               </li>
-              `)}
+              `
+      )
+    }
             </ul>
           </div>
         </div>
@@ -62,28 +74,38 @@ export class Article extends Component {
         </div>
         <div class="row">
           <div class="col-xs-12 col-md-8 offset-md-2">
-          ${isAuthenticated.truthy(html`  
+          ${
+      isAuthenticated.truthy(
+        html`  
               <${CommentEditor}
               prop:id=${this.#id}
               prop:userImage=${user.image.value}
             />
-          `, html`
+          `,
+        html`
             <p>
               <a href="/login">Sign in</a>
               or
               <a href="/register">sign up</a>
               to add comments on this article.
-            </p>`)}
-            ${comments.map(comment => html`
+            </p>`,
+      )
+    }
+            ${
+      comments.map((comment) =>
+        html`
             <${Comment}
               prop:id=${this.#id}
               prop:comment=${comment}
             />
             
-          `)}
+          `
+      )
+    }
           </div>
         </div>
       </div>
     </div>
-    `)})
+    `);
+  });
 }
