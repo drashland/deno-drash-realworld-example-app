@@ -6,6 +6,7 @@ import { AuthenticateService } from "../services/authenticate_service.ts";
 const authenticateService = new AuthenticateService();
 // import ArticleService from "../services/article_service.ts";
 
+
 export default class ArticleCommentResource extends BaseResource {
   paths = [
     "/articles/:id/comments",
@@ -37,15 +38,22 @@ export default class ArticleCommentResource extends BaseResource {
       console.log(
         "No comments were found for the article with id: " + article.id,
       );
-      return response.json([]);
+      return response.json({
+        success: true,
+        data: []
+    });
     }
     console.log(
       "Returning comments (length of " + comments.length +
         ") for article with id: " + article.id,
     );
+    const data = []
+    for (const comment of comments) {
+      data.push(await comment.toEntity())
+    }
     response.json({
       success: true,
-      data: comments,
+      data
     });
   }
 

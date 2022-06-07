@@ -10,8 +10,8 @@ and docker-compose.
 ```
 $ docker-compose build && docker-compose up -d
 $ docker-compose exec drash bash
-# /root/.deno/bin/nessie migrate
-# /root/.deno/bin/nessie seed
+# deno task prepare
+# deno task build
 ```
 
 Navigate to `localhost:1667`
@@ -30,7 +30,7 @@ Navigate to `localhost:1667`
 - [ ] API container?
 - [ ] Web socket?
 - [x] Database model representations
-- [x] Vue (built with webpack using Vue Single File Components)
+- [x] Destiny as the frontend reactive UI library
 - [ ] Cypress
 
 # Frontend login
@@ -51,8 +51,7 @@ Email: user32@hotmail.com
   proxy server for Drash
 - [Deno](https://deno.land) - Javascript and Typescript runtime
 - [Drash](https://drash.land/drash) - Web server
-- [Vue](https://vuejs.org/) - Frontend framework
-- [Webpack](https://webpack.js.org/) - Bundling Vue
+- [Destiny](https://github.com/ebebbington/destiny) - Frontend framework
 - [Postgres](https://github.com/deno-postgres/deno-postgres) - Postgres driver
   for the applications database
 - [Bcrypt](https://github.com/jamesbroadberry/deno-bcrypt/tree/master) - Hashing
@@ -60,7 +59,3 @@ Email: user32@hotmail.com
 - [Rhum](https://github.com/drashland/rhum) - Testing framework
 - [Dmm](https://github.com/drashland/dmm) - Module Manager for Deno to update
   our dependencies
-- [Vue-input](https://www.npmjs.com/package/@johmun/vue-tags-input) - Library
-  used to help the display of article tags as 'pills', allowing them to be
-  removed and added like a shopping cart
-- [Cypress](https://cypress.io/) - Browser testing framework

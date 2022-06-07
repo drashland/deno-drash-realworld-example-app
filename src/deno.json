@@ -1,6 +1,7 @@
 {
   "tasks": {
     "prepare": "/root/.deno/bin/nessie migrate && /root/.deno/bin/nessie seed",
-    "test": "deno test -A --unstable tests/integration"
+    "test": "deno test -A --unstable tests/integration",
+    "build": "deno bundle -c tsconfig.json public/js/app.ts public/js/app.js"
   }
 }

@@ -2,9 +2,18 @@ import { Drash } from "../deps.ts";
 import BaseResource from "./base_resource.ts";
 import { tengine } from "../middlewares/tengine.ts";
 
-class HomeResource extends BaseResource {
+class PageResource extends BaseResource {
   paths = [
     "/",
+    "/my-feed",
+    "/tag/:tag",
+    "/login",
+    "/register",
+    "/settings",
+    "/profile/:username",
+    "/profile/:username/favorites",
+    "/articles/:id",
+    "/editor/:id?"
   ];
 
   services = {
@@ -19,4 +28,4 @@ class HomeResource extends BaseResource {
   }
 }
 
-export default HomeResource;
+export default PageResource;
