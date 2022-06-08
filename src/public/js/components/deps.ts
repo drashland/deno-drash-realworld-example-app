@@ -10,13 +10,13 @@ export {
   Ref,
   register,
   Router,
-} from "https://raw.githubusercontent.com/ebebbington/destiny/master/src/mod.ts";
-export type { TReactiveProperties } from "https://raw.githubusercontent.com/ebebbington/destiny/master/src/mod.ts";
+} from "https://raw.githubusercontent.com/ebebbington/destiny/v0.4.2/src/mod.ts";
+export type { TReactiveProperties } from "https://raw.githubusercontent.com/ebebbington/destiny/v0.4.2/src/mod.ts";
 import {
   Component as C,
   html,
   TemplateResult,
-} from "https://raw.githubusercontent.com/ebebbington/destiny/master/src/mod.ts";
+} from "https://raw.githubusercontent.com/ebebbington/destiny/v0.4.2/src/mod.ts";
 export class Component extends C {
   protected html(input: TemplateResult) {
     return html`

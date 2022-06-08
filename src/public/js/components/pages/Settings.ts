@@ -10,15 +10,12 @@ export class Settings extends Component {
   }
 
   async #updateSettings() {
-    const userToPost = {
-      ...this.#user,
-    };
     swal({
       text: "Updating your information... Please wait...",
       timer: 500,
       buttons: false,
     });
-    const response = await updateUser(userToPost);
+    const response = await updateUser(this.#user);
     if (response === true) {
       return swal({
         title: "Update successful!",

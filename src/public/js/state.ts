@@ -1,12 +1,48 @@
 import { reactive, ReactiveArray } from "./components/deps.ts";
+import type { TReactiveProperties } from "./components/deps.ts"
 
-const userDefault = {
-  created_on: null,
-  email: null,
-  id: null,
-  last_login: null,
-  password: null,
-  username: null,
+type Comment = {
+  id: number,
+  author_image: string,
+  author_username: string,
+  updated_at: string,
+  author_id: number,
+  body: string,
+  created_at: string,
+  article_id: number,
+  tablename: string
+}
+const commentDefault = {
+  id: 0,
+  author_image: "",
+  author_username: "",
+  updated_at: "",
+  author_id: 0,
+  body: "",
+  created_at: "",
+  article_id: 0,
+  tablename: ""
+}
+type User = {
+  created_on: string,
+  email: string,
+  id: number,
+  last_login: string,
+  password: string,
+  username: string,
+  token: string,
+  following: boolean,
+  image: string,
+  bio: string,
+  tablename: string,
+}
+const userDefault: User = {
+  created_on: '',
+  email: '',
+  id: 0,
+  last_login: '',
+  password: '',
+  username: '',
   token: "",
   following: false,
   image: "",
@@ -14,12 +50,27 @@ const userDefault = {
   tablename: "",
 };
 
-const defaultArticle = {
+export type Article = {
+  title: string,
+  description: string,
+  body: string,
+  tags: [],
+  author_id: number,
+  tablename: string,
+  created_at: string,
+  id: number,
+  updated_at: string,
+  author: User,
+  favoritesCount: number,
+  favorited: boolean
+  following: boolean
+}
+const defaultArticle: Article = {
   title: "",
   description: "",
   body: "",
   tags: [],
-  author_id: "",
+  author_id: 0,
   tablename: "",
   created_at: "",
   id: 0,
@@ -27,19 +78,19 @@ const defaultArticle = {
   following: false,
   favorited: false,
   favoritesCount: 0,
-  author: null,
+  author: userDefault,
 };
 
-export const profile = reactive(userDefault);
-export const comment = reactive("");
+export const profile = reactive<User>(userDefault);
+export let comment = reactive<Comment>(commentDefault);
 export const tags = reactive<string[]>([]);
-export const user = reactive(userDefault);
+export const user = reactive<User>(userDefault);
 export const comments = reactive([]) as unknown as ReactiveArray<
   Record<string, unknown>
 >;
 export const isAuthenticated = reactive(false);
-export const articles = reactive([]) as unknown as ReactiveArray<any>;
-export let article = reactive<any>(defaultArticle);
+export const articles = reactive<Article[]>([]);
+export let article = reactive<Article>(defaultArticle);
 
 const setCookie = (cname: string, cvalue: string | null) => {
   const d = new Date();
@@ -48,9 +99,9 @@ const setCookie = (cname: string, cvalue: string | null) => {
   document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 };
 
-export const setUser = (newUser: any) => {
+export const setUser = (newUser: User) => {
   Object.entries(newUser)
-    //@ts-ignore
+    //@ts-ignore: 
     .forEach(([key, value]) => user[key].value = value);
   isAuthenticated.value = true;
   setCookie("drash_sess", user.token.value);
@@ -64,7 +115,13 @@ export const fetchTags = async () => {
   return await res.json();
 };
 
-export const fetchArticles = async (params: any) => {
+export const fetchArticles = async (params: {
+  author?: string,
+  favorited_by?: string,
+  offset?: string,
+  tag?: string,
+  user_id?: string,
+}) => {
   const query = new URLSearchParams();
   if (params.author) {
     query.set("author", params.author);
@@ -91,11 +148,14 @@ export const fetchArticles = async (params: any) => {
   return json;
 };
 
-export const setArticles = (newArticles: any[]) => {
+export const setArticles = (newArticles: Article[]) => {
   articles.value = newArticles;
 };
 
-export const toggleArticleFavorite = async (params: any) => {
+export const toggleArticleFavorite = async (params: {
+  action: string,
+  id: number
+}) => {
   console.log(`Handling action: toggleArticleFavorite (${params.action})`);
   const res = await fetch(`/articles/${params.id}/favorite`, {
     method: "POST",
@@ -116,7 +176,7 @@ export const toggleArticleFavorite = async (params: any) => {
   setArticle(json.article);
 };
 
-export const setArticle = (newArticle: any) => {
+export const setArticle = (newArticle: Article) => {
   console.log("Handling action: setArticle");
   article = reactive(newArticle);
   // todo Below doesn't work with children
@@ -124,7 +184,9 @@ export const setArticle = (newArticle: any) => {
   setArticles([newArticle]);
 };
 
-export const deleteArticle = async (data: any) => {
+export const deleteArticle = async (data: {
+  article_id: number
+}) => {
   console.log("Handling action: deleteArticle");
   const id = data.article_id;
   const res = await fetch("/api/articles/" + id, {
@@ -138,7 +200,7 @@ export const deleteArticle = async (data: any) => {
   };
   if (response.data.success === true) {
     articles.value.forEach((article, i) => {
-      if (article.id === id) {
+      if (article.id.value === id) {
         articles.splice(i, 1);
       }
     });
@@ -153,7 +215,9 @@ export const unsetArticle = () => {
   setArticle(defaultArticle);
 };
 
-export const fetchProfile = async (params: any) => {
+export const fetchProfile = async (params: {
+  username: string
+}) => {
   console.log("Handling action: fetchProfile");
   const res = await fetch(`/profiles/${params.username}`);
   if (res.status !== 200) {
@@ -167,9 +231,9 @@ export const fetchProfile = async (params: any) => {
   return json.profile;
 };
 
-export const setProfile = (newProfile: any) => {
+export const setProfile = (newProfile: User) => {
   Object.entries(newProfile).forEach(([key, value]) =>
-    // @ts-ignore
+    // @ts-ignore: 
     profile[key].value = value
   );
 };
@@ -180,7 +244,7 @@ export const unsetProfile = () => {
 
 export const unsetUser = () => {
   Object.entries(userDefault).forEach(([key, value]) => {
-    //@ts-ignore
+    //@ts-ignore: 
     user[key].value = value;
   });
   isAuthenticated.value = false;
@@ -241,18 +305,19 @@ export const logOut = () => {
   unsetUser();
 };
 
-export const updateUser = async (user: any) => {
+export const updateUser = async (user: TReactiveProperties<User>) => {
   console.log("Handling action: updateUser");
-  let params: any = {
-    id: user.id,
-    username: user.username,
-    email: user.email,
-    bio: user.bio,
-    image: user.image,
-    token: user.token,
+  const params = {
+    id: user.id.value,
+    username: user.username.value,
+    email: user.email.value,
+    bio: user.bio.value,
+    image: user.image.value,
+    token: user.token.value,
+    password: '',
   };
   if (user.password) {
-    params.password = user.password;
+    params.password = user.password.value;
   }
   const res = await fetch("/user", {
     method: "POST",
@@ -310,7 +375,7 @@ export const checkIfUserIsAuthenticated = async () => {
 };
 
 export const deleteComment = async (
-  { id, commentId }: { id: number | string; commentId: number },
+  { commentId }: { id: number | string; commentId: number },
 ) => {
   console.log("Handling action: deleteComment");
   const response = await fetch(`/articles/comment/${commentId}`, {
@@ -354,13 +419,13 @@ export const createArticleComment = async (params: {
   };
 };
 
-export const setComments = (newComments: any[]) => {
+export const setComments = (newComments: Comment[]) => {
   comments.value = newComments;
 };
 
-export const setComment = (newComment: any) => {
+export const setComment = (newComment: Comment) => {
   console.log("Handling action: setComment");
-  comment.value = newComment;
+  comment = reactive(newComment);
   comments.push(newComment);
   if (!comments.value.length) {
     setComments([newComment]);
@@ -369,7 +434,7 @@ export const setComment = (newComment: any) => {
   }
 };
 
-export const updateArticle = async (newArticle: any) => {
+export const updateArticle = async (newArticle: TReactiveProperties<Article>) => {
   console.log("Handling action: updateArticle");
   newArticle.author_id.value = user.id.value;
   const response = await fetch("/articles", {
@@ -385,7 +450,7 @@ export const updateArticle = async (newArticle: any) => {
   return json;
 };
 
-export const createArticle = async (newArticle: any) => {
+export const createArticle = async (newArticle: TReactiveProperties<Article>) => {
   console.log("Handling action: createArticle", newArticle);
   newArticle.author_id.value = user.id.value;
   const response = await fetch("/articles", {

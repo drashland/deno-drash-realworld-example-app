@@ -1,4 +1,4 @@
-import { Component, computed, html, marked, reactive, Ref } from "../deps.ts";
+import { Component, computed, html, marked, reactive } from "../deps.ts";
 import {
   article,
   comments,

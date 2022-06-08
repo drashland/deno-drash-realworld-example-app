@@ -1,4 +1,4 @@
-import { Component, computed, html, reactive, swal } from "../deps.ts";
+import { Component, computed, html, reactive, ReactiveValue, swal, TReactiveProperties } from "../deps.ts";
 import { ListErrors } from "../ListErrors.ts";
 import { TagInput } from "../TagInput.ts";
 import {
@@ -9,6 +9,7 @@ import {
   setTags,
   unsetArticle,
   updateArticle,
+  Article
 } from "../../state.ts";
 
 export interface ArticleEdit {
@@ -17,7 +18,7 @@ export interface ArticleEdit {
   };
 }
 export class ArticleEdit extends Component {
-  #article = reactive(article);
+  #article: TReactiveProperties<Article> = Object.create(article);
 
   #new = window.location.search.includes("new=true");
 
@@ -42,7 +43,7 @@ export class ArticleEdit extends Component {
     }
   }
 
-  async #onPublish(id?: any) {
+  async #onPublish(id: ReactiveValue<number>) {
     // If the article has a id, then it already exists in the database; and
     // that means we're updating the article--not creating a new one.
     swal({

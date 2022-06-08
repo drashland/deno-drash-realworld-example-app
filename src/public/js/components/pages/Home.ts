@@ -12,7 +12,7 @@ export interface Home {
 export class Home extends Component {
   #tags = reactive<string[]>([]);
 
-  #tag: any = this.pathParams.tag;
+  #tag = this.pathParams.tag;
 
   #pages = [
     {

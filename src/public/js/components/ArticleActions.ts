@@ -4,7 +4,7 @@ import {
   computed,
   html,
   reactive,
-  ReactiveValue,
+  TReactiveProperties,
   swal,
 } from "./deps.ts";
 import {
@@ -12,9 +12,10 @@ import {
   isAuthenticated,
   profile,
   toggleArticleFavorite,
+  Article
 } from "../state.ts";
 export interface ArticleActions {
-  article: any;
+  article: TReactiveProperties<Article>;
   canModify: boolean;
 }
 export class ArticleActions extends Component {

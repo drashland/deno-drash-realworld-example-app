@@ -57,14 +57,14 @@ export class ArticleList extends Component {
     }, {
       noFirstRun: true,
     });
-    this.#tag = reactive(this.tag).bind((value) => {
+    this.#tag = reactive(this.tag).bind(() => {
       this.#resetPagination();
       this.#fetchArticles();
     }, {
       noFirstRun: true,
     });
     this.#favorited = reactive<boolean, unknown>(this.favorited ?? false).bind(
-      (value) => {
+      () => {
         this.#resetPagination();
         this.#fetchArticles();
       },
@@ -130,7 +130,7 @@ export class ArticleList extends Component {
           }
           return html`
                 ${
-            articles.value.map((article: any) =>
+            articles.value.map(article =>
               html`
                 <${ArticlePreview}
                     prop:article=${article}

@@ -20,9 +20,6 @@ export class Profile extends Component {
 
   connectedCallback() {
     fetchProfile({ username: this.username });
-    self.addEventListener("hashchange", (e) => {
-      fetchProfile({ username: this.username });
-    });
   }
 
   #isCurrentUser() {

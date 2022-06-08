@@ -120,9 +120,9 @@ export class TagInput extends Component {
   render() {
     this.clear();
     this.tags.forEach((tag, idx) => {
-      let $tag = document.createElement("div");
+      const $tag = document.createElement("div");
       $tag.className = "tag";
-      let $remove = document.createElement("div");
+      const $remove = document.createElement("div");
       $remove.className = "remove";
       $remove.innerHTML = "x";
       $remove.addEventListener("click", () => {
@@ -136,19 +136,16 @@ export class TagInput extends Component {
   }
 
   clear() {
-    var tagElements = this.shadowRoot!.querySelectorAll(".tag");
-    if (tagElements.length > 0) {
-      for (var i = 0; i < tagElements.length; i++) {
+    for (const elem of this.shadowRoot!.querySelectorAll(".tag") ?? []) {
         this.shadowRoot!.querySelector(".rebel-tag-input")!.removeChild(
-          tagElements[i],
+          elem,
         );
-      }
     }
   }
 
   #allowDelete = false;
 
-  #onKeydown(event: any) {
+  #onKeydown(event: KeyboardEvent) {
     const tag = this.#value.value;
     if (event.keyCode === 13) {
       this.addTag();
@@ -171,7 +168,7 @@ export class TagInput extends Component {
     "form-control " + this.class ?? ""
   } type="text" placeholder=${
     this.placeholder ?? "Tags..."
-  } id="tag-input" on:keydown=${(e: Event) =>
+  } id="tag-input" on:keydown=${(e: KeyboardEvent) =>
     this.#onKeydown(e)} prop:value=${this.#value} />
             ${
     this.tags.map((tag, i) =>

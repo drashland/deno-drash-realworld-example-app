@@ -1,7 +1,7 @@
-import { Component, html } from "./deps.ts";
+import { Component, html, ReactiveArray } from "./deps.ts";
 
 export interface Pagination {
-  pages: any[];
+  pages: ReactiveArray<number>;
   currentPage: number;
 }
 export class Pagination extends Component {
