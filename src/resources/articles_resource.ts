@@ -7,7 +7,7 @@ import UserModel from "../models/user_model.ts";
 class ArticlesResource extends BaseResource {
   paths = [
     "/articles",
-    "/articles/:id",
+    "/api/articles/:id",
     "/articles/:id/favorite",
   ];
 
@@ -233,6 +233,7 @@ class ArticlesResource extends BaseResource {
     // { author: user where username is queryparam author } | {}
     let articles: ArticleModel[] = [];
     if (authorParam) {
+      console.log("author", authorParam, typeof authorParam);
       const author = await UserModel.where(
         "username",
         authorParam,
@@ -241,11 +242,14 @@ class ArticlesResource extends BaseResource {
         articles = await author.articles().all();
       }
     } else if (authorId) {
+      console.log("id", authorId);
       articles = await ArticleModel.where("author_id", authorId)
         .all();
     } else {
+      console.log("all");
       articles = await ArticleModel.all();
     }
+    console.log(articles);
     const username = request.queryParam("favorited_by");
     const result = [];
     for (const article of articles) {

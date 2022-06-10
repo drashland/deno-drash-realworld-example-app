@@ -4,7 +4,7 @@ import { Drash } from "../deps.ts";
 
 class ProfilesResource extends BaseResource {
   paths = [
-    "/profiles/:username",
+    "/api/profiles/:username",
   ];
 
   public async GET(request: Drash.Request, response: Drash.Response) {
@@ -19,7 +19,6 @@ class ProfilesResource extends BaseResource {
           username: ["Username path param is required."],
         },
       });
-      // TODO(ebebbington) Return response
     }
 
     response.json({

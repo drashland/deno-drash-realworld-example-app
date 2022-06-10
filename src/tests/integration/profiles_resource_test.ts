@@ -3,7 +3,7 @@ import { test } from "./utils.ts";
 import { assertEquals } from "../deps.ts";
 import { server } from "../../server.ts";
 
-Deno.test("GET /profiles/:username", async (t) => {
+Deno.test("GET /api/profiles/:username", async (t) => {
   // TODO(any) Not completing for the v1 release as it isn't needed, but nice to have
   // Rhum.testCase("Responds with 422 when no username param", () => {
   //
@@ -16,7 +16,7 @@ Deno.test("GET /profiles/:username", async (t) => {
     const user = await UserModel.factory();
 
     const res = await fetch(
-      `${server.address}/profiles/${user.username}`,
+      `${server.address}/api/profiles/${user.username}`,
     );
     const body = await res.json();
 

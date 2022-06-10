@@ -41,16 +41,18 @@ services:
       - ./src/resources:/var/www/src/resources
       - ./src/services:/var/www/src/services
       - ./src/tests:/var/www/src/tests
-      - ./src/vue:/var/www/src/vue
+      - ./src/deno.json:/var/www/src/deno.json
       - ./src/config.ts:/var/www/src/config.ts
       - ./src/app.ts:/var/www/src/app.ts
       - ./src/deps.ts:/var/www/src/deps.ts
       - ./src/nessie.config.ts:/var/www/src/nessie.config.ts
-      - ./src/package.json:/var/www/src/package.json
-      - ./src/package-lock.json:/var/www/src/package-lock.json
       - ./src/server.ts:/var/www/src/server.ts
-      - ./src/webpack.config.js:/var/www/src/webpack.config.js
       - ./src/.env:/var/www/src/.env
+      - ./src/public/views/index.html:/var/www/src/public/views/index.html
+      - ./src/tsconfig.json:/var/www/src/tsconfig.json
+      - ./src/public/js/components:/var/www/src/public/js/components
+      - ./src/public/js/app.ts:/var/www/src/public/js/app.ts
+      - ./src/public/js/state.ts:/var/www/src/public/js/state.ts
     ports:
       - "1667:1667"
     networks:

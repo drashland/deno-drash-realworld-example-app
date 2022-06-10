@@ -14,10 +14,9 @@ RUN curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL=/usr/local 
 WORKDIR /var/www/src
 
 # npm i and build client
-COPY src/package.json src/package-lock.json src/webpack.config.js ./
+COPY src/tsconfig.json src/deno.json ./
 COPY src/public public
-COPY src/vue vue
-RUN npm i && npm run webpack
+RUN deno task build
 
 # Copy over other src code
 COPY src/. .

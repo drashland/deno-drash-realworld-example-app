@@ -5,7 +5,7 @@ Deno.test("GET /articles", async (t) => {
     // TODO(any) Assert response
   });
 });
-Deno.test("GET /article/:id", async (t) => {
+Deno.test("GET /api/article/:id", async (t) => {
   await test(
     t,
     "Responds with 200 on valid id and returns the article",
