@@ -1,7 +1,8 @@
-import { classNames, Component, HashRouter, html, reactive } from "../deps.ts";
+import { classNames, Component, computed, html, reactive } from "../deps.ts";
 import { fetchTags, isAuthenticated } from "../../state.ts";
 import { Global } from "./Home/Global.ts";
 import { Tag } from "../Tag.ts";
+import { Tag as TagPage } from "./Home/Tag.ts";
 import { MyFeed } from "./Home/MyFeed.ts";
 
 export interface Home {
@@ -11,23 +12,6 @@ export interface Home {
 }
 export class Home extends Component {
   #tags = reactive<string[]>([]);
-
-  #tag = this.pathParams.tag;
-
-  #pages = [
-    {
-      path: "/",
-      content: Global,
-    },
-    {
-      path: "/my-feed",
-      content: MyFeed,
-    },
-    {
-      path: "/tag/:tag",
-      content: Tag,
-    },
-  ];
 
   async connectedCallback() {
     this.#tags.value = await fetchTags();
@@ -90,7 +74,19 @@ export class Home extends Component {
   }
                             </ul>
                         </div>
-                        <${HashRouter} prop:routes=${this.#pages} />
+                        ${
+    computed(() => {
+      if (window.location.pathname === "/my-feed") {
+        return html`<${MyFeed} />`;
+      }
+      if (window.location.pathname === `/tag/${this.pathParams.tag}`) {
+        return html`<${TagPage} prop:pathParams=${{
+          tag: this.pathParams.tag,
+        }} />`;
+      }
+      return html`<${Global} />`;
+    })
+  }
                     </div>
                     <div class="col-md-3">
                         <div class="sidebar">

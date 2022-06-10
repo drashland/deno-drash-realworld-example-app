@@ -5,7 +5,6 @@ import { Home } from "./pages/Home.ts";
 import { Component, html, Router } from "./deps.ts";
 import { Login } from "./pages/Login.ts";
 import { Register } from "./pages/Register.ts";
-import { Tag } from "./pages/Tag.ts";
 import { Settings } from "./pages/Settings.ts";
 import { Profile } from "./pages/Profile.ts";
 import { Favorited } from "./pages/Profile/Favorited.ts";
@@ -48,7 +47,7 @@ export class App extends Component {
     },
     {
       path: "/profile/:username/favorites",
-      content: Profile,
+      content: Favorited,
       protected: true,
     },
     {
@@ -65,7 +64,18 @@ export class App extends Component {
   constructor() {
     super();
     // Initialise data needed for each page
-    checkIfUserIsAuthenticated();
+    const page = this.#pages.find((page) => {
+      const pattern = new URLPattern({ pathname: page.path + "{/}?" });
+      if (pattern.exec(window.location.href)) {
+        return true;
+      }
+      return false;
+    });
+    checkIfUserIsAuthenticated().then((is) => {
+      if (!is && page && page.protected) {
+        window.location.href = "/login";
+      }
+    });
   }
 
   override template = this.html(html`

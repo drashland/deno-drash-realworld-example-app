@@ -1,8 +1,11 @@
 import { Component, html, reactive, swal } from "../deps.ts";
-import { logOut, updateUser, user } from "../../state.ts";
+import { authUser, logOut, updateUser } from "../../state.ts";
 
 export class Settings extends Component {
-  #user = reactive(user);
+  #authUser = reactive(authUser);
+
+  connectedCallback() {
+  }
 
   async #logout() {
     await logOut();
@@ -15,8 +18,8 @@ export class Settings extends Component {
       timer: 500,
       buttons: false,
     });
-    const response = await updateUser(this.#user);
-    if (response === true) {
+    const response = await updateUser(this.#authUser);
+    if (response.user) {
       return swal({
         title: "Update successful!",
         icon: "success",
@@ -45,7 +48,7 @@ export class Settings extends Component {
                 <input
                   class="form-control form-control-lg"
                   type="text"
-                  prop:value=${this.#user.image}
+                  prop:value=${this.#authUser.image}
                   placeholder="URL of profile picture"
                 />
               </fieldset>
@@ -53,7 +56,7 @@ export class Settings extends Component {
                 <input
                   class="form-control form-control-lg"
                   type="text"
-                  prop:value=${this.#user.username}
+                  prop:value=${this.#authUser.username}
                   placeholder="Your username"
                 />
               </fieldset>
@@ -61,7 +64,7 @@ export class Settings extends Component {
                 <textarea
                   class="form-control form-control-lg"
                   rows="8"
-                  prop:value=${this.#user.bio}
+                  prop:value=${this.#authUser.bio}
                   placeholder="Short bio about you"
                 ></textarea>
               </fieldset>
@@ -69,7 +72,7 @@ export class Settings extends Component {
                 <input
                   class="form-control form-control-lg"
                   type="text"
-                  prop:value=${this.#user.email}
+                  prop:value=${this.#authUser.email}
                   placeholder="Email"
                 />
               </fieldset>
@@ -78,7 +81,7 @@ export class Settings extends Component {
                   class="form-control form-control-lg"
                   type="password"
                   placeholder="*****"
-                  prop:value=${this.#user.password}
+                  prop:value=${this.#authUser.password}
                 />
               </fieldset>
               <button type="button" on:click=${() =>

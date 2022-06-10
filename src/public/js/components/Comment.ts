@@ -1,23 +1,33 @@
-import { Component, computed, html } from "./deps.ts";
-import { deleteComment, user } from "../state.ts";
+import { Component, computed, html, TReactiveProperties } from "./deps.ts";
+import {
+  authUser,
+  Comment as TComment,
+  deleteComment,
+  Eventbus,
+} from "../state.ts";
 
 export interface Comment {
   id: string;
-  comment: any;
+  comment: TReactiveProperties<TComment>;
+  index: number;
 }
 export class Comment extends Component {
   #isCurrentUser = computed(() => {
-    if (user.username.value && this.comment.author_username) {
-      return this.comment.author_username === user.username.value;
+    if (authUser.username.value && this.comment.author_username) {
+      return this.comment.author_username.value === authUser.username.value;
     }
     return false;
   });
 
-  #destroy(id: number | string, commentId: number) {
-    deleteComment({
-      id,
+  async #onDelete(articleId: number, commentId: number) {
+    const status = await deleteComment({
+      id: articleId,
       commentId,
     });
+    console.log(status);
+    if (status) {
+      Eventbus.emit("comment:deleted", commentId);
+    }
   }
 
   override template = this.html(html`
@@ -35,12 +45,14 @@ export class Comment extends Component {
       >
         ${this.comment.author_username}
       </a>
-      <span class="date-posted">${this.date(this.comment.created_at)}</span>
+      <span class="date-posted">${
+    this.date(this.comment.created_at.value)
+  }</span>
       ${
     this.#isCurrentUser.truthy(html`
       <span class="mod-options">
         <i class="ion-trash-a" on:click=${() =>
-      this.#destroy(this.id, this.comment.id)}></i>
+      this.#onDelete(Number(this.id), this.comment.id.value)}></i>
       </span>
       `)
   }

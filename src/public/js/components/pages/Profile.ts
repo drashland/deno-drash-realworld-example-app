@@ -1,12 +1,25 @@
-import { classNames, Component, HashRouter, html } from "../deps.ts";
-import { fetchProfile, isAuthenticated, profile, user } from "../../state.ts";
+import { classNames, Component, HashRouter, html, reactive } from "../deps.ts";
+import {
+  authUser,
+  fetchProfile,
+  isAuthenticated,
+  updateReactiveObject,
+  User,
+  userDefault,
+} from "../../state.ts";
 import { Articles } from "./Profile/Articles.ts";
 import { Favorited } from "./Profile/Favorited.ts";
 
 export interface Profile {
-  username: string;
+  pathParams: {
+    username: string;
+  };
 }
 export class Profile extends Component {
+  #profile = reactive<User>(userDefault);
+
+  #loading = reactive(true);
+
   #pages = [
     {
       path: "/profile/:username",
@@ -18,38 +31,48 @@ export class Profile extends Component {
     },
   ];
 
-  connectedCallback() {
-    fetchProfile({ username: this.username });
+  async connectedCallback() {
+    const profile = await fetchProfile({
+      username: this.pathParams.username,
+    }) as User;
+    if (profile) {
+      updateReactiveObject(this.#profile, profile);
+    }
+    this.#loading.value = false;
   }
 
   #isCurrentUser() {
-    if (user.username.value && profile.username.value) {
-      return user.username.value === profile.username.value;
+    if (authUser.username.value && this.#profile.username.value) {
+      return authUser.username.value === this.#profile.username.value;
     }
     return false;
   }
   #follow() {
     if (!isAuthenticated.value) return;
-    // TODO :: Add method to state
-    //setFollowProfile({ username: this.username})
+    //setFollowProfile({ username: this.pathParams.username})
   }
   #unfollow() {
-    // TODO :: Add method to state
-    //setFollowProfile({ username: this.username })
+    //setFollowProfile({ username: this.pathParams.username })
   }
 
   override template = this.html(html`
+    ${
+    this.#loading.truthy(
+      html`
+      <p>Loading...</p>
+    `,
+      html`
     <div class="profile-page">
     <div class="user-info">
       <div class="container">
         <div class="row">
           <div class="col-xs-12 col-md-10 offset-md-1">
-            <img src=${profile.image.value} class="user-img" />
-            <h4>${profile.username.value}</h4>
-            <p>${profile.bio.value}</p>
+            <img src=${this.#profile.image} class="user-img" />
+            <h4>${this.#profile.username}hh</h4>
+            <p>${this.#profile.bio}</p>
             ${
-    this.#isCurrentUser()
-      ? html`
+        this.#isCurrentUser()
+          ? html`
             <div>
               <a
                 class="btn btn-sm btn-outline-secondary action-btn"
@@ -59,32 +82,32 @@ export class Profile extends Component {
               </a>
             </div>
             `
-      : html`
+          : html`
             <div>
               ${
-        profile.following.truthy(
-          html`
+            this.#profile.following.truthy(
+              html`
               <button
                 class="btn btn-sm btn-secondary action-btn"
                 on:click=${() => this.#unfollow()}
               >
                 <i class="ion-plus-round"></i> Unfollow
-                ${profile.username.value}
+                ${this.#profile.username}
               </button>
               `,
-          html`
+              html`
               <button
                 class="btn btn-sm btn-outline-secondary action-btn"
                 on:click=${() => this.#follow()}
               >
                 <i class="ion-plus-round"></i> Follow
-                ${profile.username.value}
+                ${this.#profile.username}
               </button>
               `,
-        )
-      }
+            )
+          }
             </div>`
-  }
+      }
           </div>
         </div>
       </div>
@@ -98,12 +121,13 @@ export class Profile extends Component {
               <li class="nav-item">
                 <a
                   class=${
-    classNames({
-      "nav-link": true,
-      active: window.location.href === `/profile/${profile.username.value}`,
-    })
-  }
-                  href=${`/${profile.username.value}`}
+        classNames({
+          "nav-link": true,
+          active:
+            window.location.href === `/profile/${this.#profile.username.value}`,
+        })
+      }
+                  href=${`/${this.#profile.username.value}`}
                 >
                   My Articles
                 </a>
@@ -111,14 +135,14 @@ export class Profile extends Component {
               <li class="nav-item">
                 <a
                   class=${
-    classNames({
-      "nav-link": true,
-      active:
-        window.location.href === `/profile/${profile.username.value}/favorites`,
-    })
-  }
+        classNames({
+          "nav-link": true,
+          active: window.location.href ===
+            `/profile/${this.pathParams.username}/favorites`,
+        })
+      }
                   active-class="active"
-                  href=${`/profile/${profile.username.value}/favorites`}
+                  href=${`/profile/${this.pathParams.username}/favorites`}
                 >
                   Favorited Articles
                 </a>
@@ -130,5 +154,7 @@ export class Profile extends Component {
       </div>
     </div>
   </div>
-    `);
+    `,
+    )
+  }`);
 }

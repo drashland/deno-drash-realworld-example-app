@@ -30,8 +30,8 @@ export class Login extends Component {
 
     if (response === true) {
       swal.close();
-      this.#email.value = "";
-      this.#password.value = "";
+      // this.#email.value = "";
+      // this.#password.value = "";
       return window.location.href = "/";
     }
 

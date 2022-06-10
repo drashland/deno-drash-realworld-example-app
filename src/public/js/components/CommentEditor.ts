@@ -1,5 +1,5 @@
 import { Component, html, reactive } from "./deps.ts";
-import { createArticleComment } from "../state.ts";
+import { createArticleComment, Eventbus } from "../state.ts";
 import { ListErrors } from "./ListErrors.ts";
 
 export interface CommentEditor {
@@ -10,7 +10,9 @@ export interface CommentEditor {
 export class CommentEditor extends Component {
   #comment = reactive(this.content || null);
 
-  #errors = reactive<any>([]);
+  #errors = reactive<{
+    [key: string]: string[];
+  }>({});
 
   async #onSubmit() {
     const comment = this.#comment.value ?? "";
@@ -20,16 +22,17 @@ export class CommentEditor extends Component {
       comment,
     });
     if (res.errors) {
-      this.#errors.value = res.errors;
+      this.#errors = reactive(res.errors);
       return;
     }
     this.#comment.value = "";
-    this.#errors.value = [];
+    this.#errors = reactive({});
+    Eventbus.emit("comment:created", res.comment);
   }
 
   override template = this.html(html`
     <div>
-    <${ListErrors} prop:errors=${this.#errors.value} />
+    <${ListErrors} prop:errors=${this.#errors} />
     <form class="card comment-form">
       <div class="card-block">
         <textarea

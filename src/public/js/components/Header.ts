@@ -1,14 +1,8 @@
-import { classNames, Component, computed, html } from "./deps.ts";
-import { isAuthenticated, user } from "../state.ts";
+import { classNames, Component, html } from "./deps.ts";
+import { authUser, isAuthenticated } from "../state.ts";
 
 export class Header extends Component {
   #uri = window.location.pathname;
-
-  connectedCallback() {
-    window.addEventListener("hashchange", () => {
-      this.#uri = window.location.pathname;
-    });
-  }
 
   #getClassName(uri: string) {
     return classNames({
@@ -51,14 +45,14 @@ export class Header extends Component {
             </a>
           </li>
           ${
-        user.username.value
+        authUser.username.value
           ? html`
             <li class="nav-item">
               <a
                 class=${this.#getClassName("/profile")}
-                href=${"/profile?username=" + user.username.value}
+                href=${"/profile?username=" + authUser.username.value}
               >
-                ${user.username.value}
+                ${authUser.username.value}
               </a>
             </li>`
           : ""

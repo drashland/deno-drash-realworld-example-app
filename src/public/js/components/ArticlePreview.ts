@@ -1,9 +1,10 @@
-import { Component, html } from "./deps.ts";
+import { Component, html, TReactiveProperties } from "./deps.ts";
 import { ArticleMeta } from "./ArticleMeta.ts";
 import { TagList } from "./TagList.ts";
+import { Article } from "../state.ts";
 
 export interface ArticlePreview {
-  article: any;
+  article: TReactiveProperties<Article>;
 }
 export class ArticlePreview extends Component {
   override template = this.html(html`

@@ -137,9 +137,9 @@ export class TagInput extends Component {
 
   clear() {
     for (const elem of this.shadowRoot!.querySelectorAll(".tag") ?? []) {
-        this.shadowRoot!.querySelector(".rebel-tag-input")!.removeChild(
-          elem,
-        );
+      this.shadowRoot!.querySelector(".rebel-tag-input")!.removeChild(
+        elem,
+      );
     }
   }
 

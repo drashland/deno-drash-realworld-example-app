@@ -6,7 +6,7 @@ import {
   ReactiveValue,
   ReadonlyReactiveValue,
 } from "./deps.ts";
-import { articles, fetchArticles } from "../state.ts";
+import { Article, fetchArticles } from "../state.ts";
 import { ArticlePreview } from "./ArticlePreview.ts";
 import { Pagination } from "./Pagination.ts";
 
@@ -24,12 +24,14 @@ export class ArticleList extends Component {
 
   #author: ReactiveValue<string> | ReactiveValue<undefined> = reactive(
     this.author,
-  ).bind((value) => {
+  ).bind(() => {
     this.#resetPagination();
     this.#fetchArticles();
   }, {
     noFirstRun: true,
   });
+
+  #articles = reactive<Article[]>([]);
 
   itemsPerPage = this.itemsPerPage ?? 10;
 
@@ -38,15 +40,19 @@ export class ArticleList extends Component {
   #favorited = reactive<boolean>(false);
 
   #pages = computed(() => {
-    if (articles.value.length <= this.itemsPerPage) {
+    if (this.#articles.value.length <= this.itemsPerPage) {
       return [];
     }
     return [
-      ...Array(Math.ceil(articles.value.length / this.itemsPerPage)).keys(),
+      ...Array(Math.ceil(this.#articles.value.length / this.itemsPerPage))
+        .keys(),
     ].map((e) => e + 1);
   });
 
-  #params: ReadonlyReactiveValue<any>;
+  #params: ReadonlyReactiveValue<{
+    type: string | undefined;
+    filters: Record<string, string | number | boolean>;
+  }>;
 
   constructor() {
     super();
@@ -76,7 +82,7 @@ export class ArticleList extends Component {
     // Depends on other data
     this.#params = computed(() => {
       const { type } = this;
-      const filters: any = {
+      const filters: Record<string, string | number | boolean> = {
         offset: (this.#currentPage.value - 1) * this.itemsPerPage,
         limit: this.itemsPerPage,
       };
@@ -103,7 +109,11 @@ export class ArticleList extends Component {
 
   async #fetchArticles() {
     this.#isLoading.value = true;
-    await fetchArticles(this.#params.value.filters);
+    const { articles } = await fetchArticles(this.#params.value.filters);
+    console.log("art", articles);
+    if (Array.isArray(articles)) {
+      this.#articles.value = articles;
+    }
     this.#isLoading.value = false;
   }
 
@@ -111,7 +121,6 @@ export class ArticleList extends Component {
     this.#currentPage.value = 1;
   }
 
-  // TODO :: We're passing pages here, but i dont think its being reactive, its still being sent as [1]
   override template = this.html(html`
         <div>
         ${
@@ -122,7 +131,7 @@ export class ArticleList extends Component {
       html`
             ${
         computed(() => {
-          if (!articles.value.length) {
+          if (!this.#articles.value.length) {
             return html`
                 <p class="article-preview">
                     No articles are here... yet.
@@ -130,7 +139,7 @@ export class ArticleList extends Component {
           }
           return html`
                 ${
-            articles.value.map(article =>
+            this.#articles.value.map((article) =>
               html`
                 <${ArticlePreview}
                     prop:article=${article}

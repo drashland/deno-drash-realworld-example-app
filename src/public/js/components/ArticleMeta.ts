@@ -1,9 +1,14 @@
-import { Component, computed, html } from "./deps.ts";
-import { isAuthenticated, toggleArticleFavorite, user } from "../state.ts";
+import { Component, computed, html, TReactiveProperties } from "./deps.ts";
+import {
+  Article,
+  authUser,
+  isAuthenticated,
+  toggleArticleFavorite,
+} from "../state.ts";
 import { ArticleActions } from "./ArticleActions.ts";
 
 export interface ArticleMeta {
-  article: any;
+  article: TReactiveProperties<Article>;
   actions: boolean;
 }
 export class ArticleMeta extends Component {
@@ -31,11 +36,11 @@ export class ArticleMeta extends Component {
   }
   isCurrentUser() {
     if (
-      (user && this.article && this.article.author) &&
-      user.username.value &&
+      (authUser && this.article && this.article.author) &&
+      authUser.username.value &&
       this.article.author.username.value
     ) {
-      return user.username.value === this.article.author.username.value;
+      return authUser.username.value === this.article.author.username.value;
     }
     return false;
   }
@@ -48,6 +53,7 @@ export class ArticleMeta extends Component {
       id: this.article.id.value,
       action: action,
     });
+    this.article.favorited.value = action === "set";
   }
 
   override template = this.html(html`
@@ -68,7 +74,7 @@ export class ArticleMeta extends Component {
             </div>
             ${
     computed(() => {
-      if (this.article) {
+      if (this.actions) {
         return html`
                     <${ArticleActions}
                         prop:article=${this.article}

@@ -4,15 +4,14 @@ import {
   computed,
   html,
   reactive,
-  TReactiveProperties,
   swal,
+  TReactiveProperties,
 } from "./deps.ts";
 import {
+  Article,
   deleteArticle,
   isAuthenticated,
-  profile,
   toggleArticleFavorite,
-  Article
 } from "../state.ts";
 export interface ArticleActions {
   article: TReactiveProperties<Article>;
@@ -33,8 +32,8 @@ export class ArticleActions extends Component {
     return `(${this.article.favoritesCount.value ?? 0})`;
   });
   #followUserLabel = computed(() => {
-    if (this.article && this.article.author.value) {
-      return `${profile.following.value ? "Unfollow" : "Follow"} ${
+    if (this.article && this.article.author.username.value) {
+      return `${this.article.author.following.value ? "Unfollow" : "Follow"} ${
         this.article.author!.username!.value
       }`;
     }

@@ -1,11 +1,13 @@
 import { Component, computed, html, marked, reactive } from "../deps.ts";
 import {
-  article,
-  comments,
+  authUser,
+  Comment as TComment,
+  defaultArticle,
+  Eventbus,
   fetchArticle,
   fetchArticleComments,
   isAuthenticated,
-  user,
+  updateReactiveObject,
 } from "../../state.ts";
 import { ArticleMeta } from "../ArticleMeta.ts";
 import { Tag } from "../Tag.ts";
@@ -22,14 +24,32 @@ export class Article extends Component {
 
   #loading = reactive(true);
 
+  #article = reactive(defaultArticle);
+
+  #comments = reactive<TComment[]>([]);
+
+  constructor() {
+    super();
+    Eventbus.on("comment:created", (comment) => {
+      this.#comments.push(comment);
+    });
+    Eventbus.on("comment:deleted", (commentId: number) => {
+      this.#comments.value = this.#comments.value.filter((c) =>
+        c.id.value !== commentId
+      );
+    });
+  }
+
   connectedCallback() {
     Promise.all([
       fetchArticle(this.#id),
       fetchArticleComments(this.#id),
-    ]).then(() => {
+    ]).then(([article, comments]) => {
+      updateReactiveObject(this.#article, article);
+      this.#comments.value = comments;
       this.#loading.value = false;
       this.shadowRoot!.querySelector("#markdown")!.innerHTML = marked.parse(
-        article.body.value,
+        this.#article.body.value,
       );
     });
   }
@@ -44,8 +64,8 @@ export class Article extends Component {
       <div class="article-page">
       <div class="banner">
         <div class="container">
-          <h1>${article.title.value}</h1>
-          <${ArticleMeta} prop:article=${article} prop:actions=${true} />
+          <h1>${this.#article.title.value}</h1>
+          <${ArticleMeta} prop:article=${this.#article} prop:actions=${true} />
         </div>
       </div>
       <div class="container page">
@@ -54,7 +74,7 @@ export class Article extends Component {
             <div id="markdown"></div>
             <ul class="tag-list">
             ${
-      article.tags.map((tag: string) =>
+      this.#article.tags.map((tag: string) =>
         html`
             <li>
                 <${Tag}
@@ -70,7 +90,7 @@ export class Article extends Component {
         </div>
         <hr />
         <div class="article-actions">
-          <${ArticleMeta} prop:article=${article} prop:actions=${true} />
+          <${ArticleMeta} prop:article=${this.#article} prop:actions=${true} />
         </div>
         <div class="row">
           <div class="col-xs-12 col-md-8 offset-md-2">
@@ -79,7 +99,7 @@ export class Article extends Component {
         html`  
               <${CommentEditor}
               prop:id=${this.#id}
-              prop:userImage=${user.image.value}
+              prop:userImage=${authUser.image.value}
             />
           `,
         html`
@@ -92,10 +112,11 @@ export class Article extends Component {
       )
     }
             ${
-      comments.map((comment) =>
+      this.#comments.map((comment, i) =>
         html`
             <${Comment}
               prop:id=${this.#id}
+              prop:index=${i.value}
               prop:comment=${comment}
             />
             

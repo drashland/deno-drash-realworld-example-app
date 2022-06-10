@@ -4,7 +4,7 @@ import { Drash } from "../deps.ts";
 
 class ProfilesResource extends BaseResource {
   paths = [
-    "/profiles/:username",
+    "/api/profiles/:username",
   ];
 
   public async GET(request: Drash.Request, response: Drash.Response) {

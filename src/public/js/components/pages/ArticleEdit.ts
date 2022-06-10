@@ -1,15 +1,21 @@
-import { Component, computed, html, reactive, ReactiveValue, swal, TReactiveProperties } from "../deps.ts";
+import {
+  Component,
+  computed,
+  html,
+  reactive,
+  ReactiveValue,
+  swal,
+  TReactiveProperties,
+} from "../deps.ts";
 import { ListErrors } from "../ListErrors.ts";
 import { TagInput } from "../TagInput.ts";
 import {
-  article,
+  Article,
   createArticle,
+  defaultArticle,
   fetchArticle,
-  setArticle,
-  setTags,
-  unsetArticle,
   updateArticle,
-  Article
+  updateReactiveObject,
 } from "../../state.ts";
 
 export interface ArticleEdit {
@@ -18,7 +24,7 @@ export interface ArticleEdit {
   };
 }
 export class ArticleEdit extends Component {
-  #article: TReactiveProperties<Article> = Object.create(article);
+  #article: TReactiveProperties<Article> = Object.create(defaultArticle);
 
   #new = window.location.search.includes("new=true");
 
@@ -31,13 +37,9 @@ export class ArticleEdit extends Component {
   }>({});
 
   connectedCallback() {
-    if (this.#new) {
-      unsetArticle();
-      setTags([]);
-    }
     if (this.pathParams.id) {
-      fetchArticle(Number(this.pathParams.id)).then(() => {
-        this.#article = reactive(article);
+      fetchArticle(Number(this.pathParams.id)).then((article) => {
+        updateReactiveObject(this.#article, article);
         this.#loading.value = false;
       });
     }
@@ -56,9 +58,7 @@ export class ArticleEdit extends Component {
       : await createArticle(this.#article);
     swal.close();
     this.#publishing_article.value = false;
-    unsetArticle();
     if (response.article) {
-      setArticle(response.article);
       return window.location.href = `/articles/${response.article.id}`;
     }
     let error = "";
