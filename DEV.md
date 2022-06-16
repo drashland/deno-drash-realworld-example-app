@@ -8,7 +8,9 @@ $ psql -U user
 ```
 
 Or:
-1. Ubuntu setup: 
+
+1. Ubuntu setup:
+
    ```shell script
    $ curl -o ~/.psqlrc https://raw.githubusercontent.com/mate-academy/fed/master/mate-scripts/config-files/.psqlrc
    $ sudo apt update
@@ -18,7 +20,9 @@ Or:
    password: userpassword
    # select * from users;
    ```
+
 1. macOS setup:
+
    ```shell script
    $ curl -o ~/.psqlrc https://raw.githubusercontent.com/mate-academy/fed/master/mate-scripts/config-files/.psqlrc
    $ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -29,9 +33,9 @@ Or:
    # select * from users;
    ```
 
-# Problems in Vue
+## Problems in Vue
 
-## `article.tags` returns as `["""]`
+### `article.tags` returns as `["""]`
 
 When sent down from the server, the `article.tags` property is `""`. But when
 vue gets it from the `axios` response, the property is `[""]`. This seems to be

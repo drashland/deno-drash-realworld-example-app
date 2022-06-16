@@ -1,21 +1,23 @@
 # ![Drash Example App](logo.png)
 
-### Drash codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) spec and API.
-
 This real world example application uses Deno, Drash, Vue, Webpack, PostgreSQL,
 and docker-compose.
 
-# How to Run
+Drash codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) spec and API
 
-```bash
-$ sudo docker-compose build && sudo docker-compose up
-```
+## How to Run
 
-# How to Run on MacBook with M1 chip
+1. x86 chips
 
-```bash
-$ docker-compose -f docker-compose.m1.yml build && docker-compose -f docker-compose.m1.yml up
-```
+    ```bash
+    $ sudo docker-compose build && sudo docker-compose up
+    ```
+
+1. Apple silicon chips (M1, M2)
+
+    ```bash
+    $ docker-compose -f docker-compose.m1.yml build && docker-compose -f docker-compose.m1.yml up
+    ```
 
 Navigate to [http://localhost:1667](http://localhost:1667)
 
@@ -28,24 +30,7 @@ Also, you can run the project with `Makefile` ([Unbuntu](https://www.unixmen.com
   $ make up-m1
 ```
 
-# Features
-
-- [x] Docker compose environment
-- [x] Logging
-- [x] Authentication (/users/login)
-- [x] User accounts
-  - [x] Postgres DB to hold user accounts with a seeder
-  - [x] Registration
-  - [x] Login
-  - [x] Password hashing
-- [ ] Redis?
-- [ ] API container?
-- [ ] Web socket?
-- [x] Database model representations
-- [x] Vue (built with webpack using Vue Single File Components)
-- [x] Cypress
-
-# Frontend login
+## Frontend login
 
 There are a total of 100 users, with each user having the same password. Say we
 want to login as user 32:
@@ -56,7 +41,7 @@ Password: Userpass1
 Email: user32@hotmail.com
 ```
 
-# Built With
+## Built With
 
 - [Docker](https://www.docker.com/) - Containerisation
 - [Apache](https://httpd.apache.org/) - Acts as how Apache can be used as a
