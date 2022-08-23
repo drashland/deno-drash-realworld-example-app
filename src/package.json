@@ -10,7 +10,7 @@
     "date-fns": "^2.28.0",
     "marked": "^4.0.5",
     "node-sass": "^7.0.1",
-    "prismjs": "^1.25.0",
+    "prismjs": "^1.29.0",
     "pug": "^3.0.2",
     "sass-loader": "^12.4.0",
     "style-loader": "^3.3.1",
