@@ -3,7 +3,7 @@
   "author": "Drash",
   "version": "0.0.1",
   "devDependencies": {
-    "@babel/core": "^7.16.0",
+    "@babel/core": "^7.19.1",
     "axios": "^0.24.0",
     "babel-loader": "^8.2.3",
     "css-loader": "^6.7.1",
